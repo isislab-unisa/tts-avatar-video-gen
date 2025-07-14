@@ -1,0 +1,14 @@
+{
+  "Hero": {
+    "title": "Bring your 3D avatar to life with just a few clicks",
+    "description": "Choose a character, write your text, and download a realistic lip-synced video. Turn your ideas into talking avatars in just a few seconds.",
+    "login": "Login",
+    "register": "Register"
+  },
+
+  "Theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}
