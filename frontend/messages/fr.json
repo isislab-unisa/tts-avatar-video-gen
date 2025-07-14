@@ -1,0 +1,14 @@
+{
+  "Hero": {
+    "title": "Donnez vie et voix à votre avatar 3D en quelques clics",
+    "description": "Choisissez un personnage, écrivez le texte et téléchargez une vidéo réaliste avec synchronisation labiale. Transformez vos idées en avatars parlants en quelques secondes.",
+    "login": "Connexion",
+    "register": "S’inscrire"
+  },
+
+  "Theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  }
+}
