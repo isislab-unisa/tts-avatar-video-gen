@@ -2,13 +2,16 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { sendEmail } from "@/lib/email";
 import { nextCookies } from "better-auth/next-js";
+import { cookies } from "next/headers";
 import { client } from "./db";
+import { getTranslations } from "next-intl/server";
 
 const getEmailHTML = (
   title: string,
   description: string,
   buttonText: string,
-  buttonUrl: string
+  buttonUrl: string,
+  footerNote: string
 ): string => {
   return `
     <!DOCTYPE html>
@@ -41,7 +44,7 @@ const getEmailHTML = (
         
         <div style="text-align: center; margin-top: 32px;">
           <p style="font-size: 14px; color: #888888; margin: 0; line-height: 1.4;">
-            If you didn't request this action, you can safely ignore this email.
+            ${footerNote}          
           </p>
         </div>
         
@@ -64,15 +67,21 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
+      const cookieStore = await cookies();
+      const cookieLocale = cookieStore.get("NEXT_LOCALE")?.value;
+      const locale = cookieLocale ?? "en";
+
+      const t = await getTranslations({ locale, namespace: "Email" });
       await sendEmail({
         to: user.email,
-        subject: "Reset your DUBME password",
+        subject: t("reset.subject"),
         text: `Click the link to reset your password: ${url}`,
         html: getEmailHTML(
-          "Reset your <span style='color: #C5C8D4;'>DUBME</span> password",
-          "Click the button below to reset your password and regain access to your account:",
-          "Reset Password",
-          url
+          t.raw("reset.title"),
+          t("reset.description"),
+          t("reset.button"),
+          url,
+          t("reset.footerNote")
         ),
       });
     },
@@ -99,16 +108,24 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, token }) => {
+      const cookieStore = await cookies();
+      const cookieLocale = cookieStore.get("NEXT_LOCALE")?.value;
+      const locale = cookieLocale ?? "en";
+
+      const t = await getTranslations({ locale, namespace: "Email" });
+
       const verificationUrl = `${process.env.BETTER_AUTH_URL}/api/auth/verify-email?token=${token}&callbackURL=${process.env.EMAIL_VERIFICATION_CALLBACK_URL}`;
+
       await sendEmail({
         to: user.email,
-        subject: "Welcome to DUBME - Verify your email",
+        subject: t("verify.subject"),
         text: `Click the link to verify your email address: ${verificationUrl}`,
         html: getEmailHTML(
-          "Welcome to <span style='color: #C5C8D4;'>DUBME</span>!",
-          "Click the button below to verify your email and activate your account:",
-          "Verify Email",
-          verificationUrl
+          t.raw("verify.title"),
+          t("verify.description"),
+          t("verify.button"),
+          verificationUrl,
+          t("verify.footerNote")
         ),
       });
     },

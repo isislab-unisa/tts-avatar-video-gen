@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,17 +19,25 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import {
   ResetPasswordFormValues,
-  resetPasswordSchema,
+  getResetPasswordSchema,
 } from "@/lib/schema/resetPasswordSchema";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
 
 const ResetPassword = () => {
+  const t = useTranslations("ResetPassword");
+  const tv = useTranslations("Validation");
+  const locale = useLocale();
+
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
+  const schema = getResetPasswordSchema(tv);
+
   const form = useForm<ResetPasswordFormValues>({
-    resolver: zodResolver(resetPasswordSchema),
+    resolver: zodResolver(schema),
+    mode: "onSubmit",
     defaultValues: {
       password: "",
       confirmPassword: "",
@@ -42,23 +50,31 @@ const ResetPassword = () => {
 
   const router = useRouter();
 
+  useEffect(() => {
+    form.clearErrors();
+  }, [locale, form]);
+
   const onSubmit = async (data: ResetPasswordFormValues) => {
     if (!token) return;
 
-    setPending(true);
-    const { error } = await authClient.resetPassword({
-      newPassword: data.password,
-      token,
-    });
+    try {
+      setPending(true);
+      const { error } = await authClient.resetPassword({
+        newPassword: data.password,
+        token,
+      });
 
-    if (error) {
-      toast.error("Error: " + error.message);
-    } else {
-      toast.success("Password updated. You can now log in.");
-      router.push("/login");
+      if (error) {
+        toast.error(t("toastError") + error.message);
+      } else {
+        toast.success(t("toastSuccess"));
+        router.push("/login");
+      }
+    } catch {
+      toast.error(t("toastUnexpected"));
+    } finally {
+      setPending(false);
     }
-
-    setPending(false);
   };
 
   if (!token) {
@@ -67,13 +83,11 @@ const ResetPassword = () => {
         <Card className="w-full max-w-md text-center border border-border shadow-md">
           <CardHeader>
             <CardTitle className="text-destructive text-2xl">
-              Invalid Token
+              {t("invalidToken")}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">
-              The reset link is invalid or has expired.
-            </p>
+            <p className="text-muted-foreground">{t("invalidTokenMessage")}</p>
           </CardContent>
         </Card>
       </main>
@@ -95,15 +109,17 @@ const ResetPassword = () => {
 
       <div className="relative z-10 w-full max-w-md p-6 sm:p-8 bg-card border border-border rounded-xl shadow-md space-y-6">
         <div className="text-center space-y-2">
-          <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
-          <CardDescription>Enter your new password</CardDescription>
+          <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+          <CardDescription>{t("subtitle")}</CardDescription>
         </div>
 
         <CardContent className="p-0">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="text-sm font-medium">New Password</label>
+                <label className="text-sm font-medium">
+                  {t("passwordLabel")}
+                </label>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
@@ -119,10 +135,17 @@ const ResetPassword = () => {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                {form.formState.errors.password && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.password.message}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="text-sm font-medium">Confirm Password</label>
+                <label className="text-sm font-medium">
+                  {t("confirmPasswordLabel")}
+                </label>
                 <div className="relative">
                   <Input
                     type={showConfirmPassword ? "text" : "password"}
@@ -142,17 +165,22 @@ const ResetPassword = () => {
                     )}
                   </button>
                 </div>
+                {form.formState.errors.confirmPassword && (
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.confirmPassword.message}
+                  </p>
+                )}
               </div>
 
               <Button type="submit" className="w-full" disabled={pending}>
                 {pending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Updating password...
+                    {t("updatingButton")}
                   </>
                 ) : (
                   <>
-                    Reset Password <ArrowRight className="w-4 h-4 ml-2" />
+                    {t("resetButton")} <ArrowRight className="w-4 h-4 ml-2" />
                   </>
                 )}
               </Button>
@@ -161,12 +189,12 @@ const ResetPassword = () => {
         </CardContent>
 
         <div className="text-sm text-center">
-          Remember your password?{" "}
+          {t("rememberPassword")}{" "}
           <Link
             href="/login"
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
-            Log in
+            {t("loginLink")}
           </Link>
         </div>
       </div>

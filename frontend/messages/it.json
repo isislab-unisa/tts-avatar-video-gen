@@ -10,5 +10,101 @@
     "light": "Chiaro",
     "dark": "Scuro",
     "system": "Sistema"
+  },
+
+  "Email": {
+    "reset": {
+      "subject": "Reimposta la password di DUBME",
+      "title": "Reimposta la tua password di <span style='color: #C5C8D4;'>DUBME</span>",
+      "description": "Clicca il pulsante qui sotto per reimpostare la password e riottenere l'accesso.",
+      "button": "Reimposta Password",
+      "footerNote": "Se non hai richiesto questa azione, puoi ignorare tranquillamente questa email."
+    },
+    "verify": {
+      "subject": "Benvenuto in DUBME - Verifica la tua email",
+      "title": "Benvenuto in <span style='color: #C5C8D4;'>DUBME</span>!",
+      "description": "Clicca il pulsante qui sotto per verificare la tua email e attivare il tuo account.",
+      "button": "Verifica Email",
+      "footerNote": "Se non hai richiesto questa azione, puoi ignorare tranquillamente questa email."
+    }
+  },
+
+  "Login": {
+    "title": "Accedi al tuo account",
+    "subtitle": "Inserisci le credenziali per continuare",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "rememberMe": "Ricordami",
+    "forgotPassword": "Password dimenticata?",
+    "loginButton": "Accedi",
+    "loginWithGoogle": "Accedi con Google",
+    "loginWithGitHub": "Accedi con GitHub",
+    "noAccount": "Non hai un account?",
+    "signUp": "Registrati",
+    "orContinue": "Oppure continua con",
+    "loading": "Attendere...",
+    "toastSuccess": "Accesso effettuato con successo!",
+    "toastError": "Accesso fallito",
+    "toastUnexpected": "Si è verificato un errore imprevisto"
+  },
+
+  "Signup": {
+    "title": "Crea un account",
+    "subtitle": "Inserisci le tue informazioni per registrarti",
+    "usernameLabel": "Nome utente",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Conferma password",
+    "signupButton": "Registrati",
+    "signupWithGoogle": "Registrati con Google",
+    "signupWithGitHub": "Registrati con GitHub",
+    "haveAccount": "Hai già un account?",
+    "login": "Accedi",
+    "orContinue": "Oppure continua con",
+    "loading": "Attendere...",
+    "toastSuccess": "Account creato! Controlla la tua email per verificare.",
+    "toastError": "Registrazione fallita.",
+    "toastUnexpected": "Si è verificato un errore imprevisto."
+  },
+
+  "ForgotPassword": {
+    "title": "Password dimenticata",
+    "subtitle": "Inserisci la tua email per ricevere un link di reimpostazione password.",
+    "emailLabel": "Email",
+    "sendButton": "Invia link di reimpostazione",
+    "sendingButton": "Invio email in corso...",
+    "rememberPassword": "Ti ricordi la password?",
+    "loginLink": "Accedi",
+    "toastSuccess": "Se esiste un account con questa email, riceverai un link di reimpostazione password.",
+    "toastError": "Errore: "
+  },
+
+  "ResetPassword": {
+    "title": "Reimposta password",
+    "subtitle": "Inserisci la tua nuova password",
+    "passwordLabel": "Nuova password",
+    "confirmPasswordLabel": "Conferma password",
+    "resetButton": "Reimposta password",
+    "updatingButton": "Aggiornamento password...",
+    "rememberPassword": "Ti ricordi la password?",
+    "loginLink": "Accedi",
+    "invalidToken": "Token non valido",
+    "invalidTokenMessage": "Il link di reimpostazione non è valido o è scaduto.",
+    "toastSuccess": "Password aggiornata. Ora puoi accedere.",
+    "toastError": "Errore: ",
+    "toastUnexpected": "Si è verificato un errore imprevisto"
+  },
+
+  "EmailVerified": {
+    "title": "Email verificata!",
+    "description": "La tua email è stata verificata con successo. Ora hai accesso completo al tuo account.",
+    "dashboardButton": "Vai alla dashboard"
+  },
+
+  "Validation": {
+    "email": "Inserisci un indirizzo email valido",
+    "password": "La password deve contenere almeno 8 caratteri",
+    "username": "Il nome utente deve contenere almeno 2 caratteri",
+    "confirmPassword": "Le password non corrispondono"
   }
 }

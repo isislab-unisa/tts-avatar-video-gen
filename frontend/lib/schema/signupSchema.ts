@@ -1,19 +1,16 @@
 import { z } from "zod";
 
-export const signUpSchema = z
-  .object({
-    username: z
-      .string()
-      .min(2, { message: "username must be at least 2 characters" }),
-    email: z.email({ message: "Please enter a valid email address" }),
-    password: z
-      .string()
-      .min(8, { message: "Password must be at least 8 characters" }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+export const getSignUpSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      username: z.string().min(2, { message: t("username") }),
+      email: z.string().email({ message: t("email") }),
+      password: z.string().min(8, { message: t("password") }),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("confirmPassword"),
+      path: ["confirmPassword"],
+    });
 
-export type SignUpFormValues = z.infer<typeof signUpSchema>;
+export type SignUpFormValues = z.infer<ReturnType<typeof getSignUpSchema>>;

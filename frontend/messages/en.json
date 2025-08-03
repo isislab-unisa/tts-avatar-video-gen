@@ -10,5 +10,101 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+
+  "Email": {
+    "reset": {
+      "subject": "Reset your DUBME password",
+      "title": "Reset your <span style='color: #C5C8D4;'>DUBME</span> password",
+      "description": "Click the button below to reset your password and regain access to your account.",
+      "button": "Reset Password",
+      "footerNote": "If you didn't request this action, you can safely ignore this email."
+    },
+    "verify": {
+      "subject": "Welcome to DUBME - Verify your email",
+      "title": "Welcome to <span style='color: #C5C8D4;'>DUBME</span>!",
+      "description": "Click the button below to verify your email and activate your account.",
+      "button": "Verify Email",
+      "footerNote": "If you didn't request this action, you can safely ignore this email."
+    }
+  },
+
+  "Login": {
+    "title": "Login to your account",
+    "subtitle": "Enter your credentials to continue",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginButton": "Login",
+    "loginWithGoogle": "Login with Google",
+    "loginWithGitHub": "Login with GitHub",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "orContinue": "Or continue with",
+    "loading": "Please wait...",
+    "toastSuccess": "Logged in successfully!",
+    "toastError": "Login failed",
+    "toastUnexpected": "An unexpected error occurred"
+  },
+
+  "Signup": {
+    "title": "Create an account",
+    "subtitle": "Enter your information to sign up",
+    "usernameLabel": "Username",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "signupButton": "Sign up",
+    "signupWithGoogle": "Sign up with Google",
+    "signupWithGitHub": "Sign up with GitHub",
+    "haveAccount": "Already have an account?",
+    "login": "Log in",
+    "orContinue": "Or continue with",
+    "loading": "Please wait...",
+    "toastSuccess": "Account created! Check your email to verify.",
+    "toastError": "Signup failed.",
+    "toastUnexpected": "Unexpected error occurred."
+  },
+
+  "ForgotPassword": {
+    "title": "Forgot Password",
+    "subtitle": "Enter your email to receive a password reset link.",
+    "emailLabel": "Email",
+    "sendButton": "Send Reset Link",
+    "sendingButton": "Sending email...",
+    "rememberPassword": "Remember your password?",
+    "loginLink": "Log in",
+    "toastSuccess": "If an account exists with this email, you will receive a password reset link.",
+    "toastError": "Error: "
+  },
+
+  "ResetPassword": {
+    "title": "Reset Password",
+    "subtitle": "Enter your new password",
+    "passwordLabel": "New Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "resetButton": "Reset Password",
+    "updatingButton": "Updating password...",
+    "rememberPassword": "Remember your password?",
+    "loginLink": "Log in",
+    "invalidToken": "Invalid Token",
+    "invalidTokenMessage": "The reset link is invalid or has expired.",
+    "toastSuccess": "Password updated. You can now log in.",
+    "toastError": "Error: ",
+    "toastUnexpected": "An unexpected error occurred"
+  },
+
+  "EmailVerified": {
+    "title": "Email Verified!",
+    "description": "Your email has been successfully verified. You now have full access to your account.",
+    "dashboardButton": "Go to Dashboard"
+  },
+
+  "Validation": {
+    "email": "Please enter a valid email address",
+    "password": "Password must be at least 8 characters",
+    "username": "Username must be at least 2 characters",
+    "confirmPassword": "Passwords don't match"
   }
 }

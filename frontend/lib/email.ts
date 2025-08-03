@@ -34,7 +34,7 @@ export async function sendEmail({
       messageId: info.messageId,
     };
   } catch (error) {
-    console.error("❌ Errore invio email:", error);
+    console.error("Errore invio email:", error);
     return {
       success: false,
       message: "Errore invio email",

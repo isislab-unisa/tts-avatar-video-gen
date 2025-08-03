@@ -10,5 +10,101 @@
     "light": "Clair",
     "dark": "Sombre",
     "system": "Système"
+  },
+
+  "Email": {
+    "reset": {
+      "subject": "Réinitialisez votre mot de passe DUBME",
+      "title": "Réinitialisez votre mot de passe <span style='color: #C5C8D4;'>DUBME</span>",
+      "description": "Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe et retrouver l'accès à votre compte.",
+      "button": "Réinitialiser le mot de passe",
+      "footerNote": "Si vous n'avez pas demandé cette action, vous pouvez ignorer cet e-mail."
+    },
+    "verify": {
+      "subject": "Bienvenue sur DUBME - Vérifiez votre adresse email",
+      "title": "Bienvenue sur <span style='color: #C5C8D4;'>DUBME</span> !",
+      "description": "Cliquez sur le bouton ci-dessous pour vérifier votre email et activer votre compte.",
+      "button": "Vérifier l'email",
+      "footerNote": "Si vous n'avez pas demandé cette action, vous pouvez ignorer cet e-mail."
+    }
+  },
+
+  "Login": {
+    "title": "Connectez-vous à votre compte",
+    "subtitle": "Entrez vos identifiants pour continuer",
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPassword": "Mot de passe oublié ?",
+    "loginButton": "Connexion",
+    "loginWithGoogle": "Connexion avec Google",
+    "loginWithGitHub": "Connexion avec GitHub",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "signUp": "S'inscrire",
+    "orContinue": "Ou continuer avec",
+    "loading": "Veuillez patienter...",
+    "toastSuccess": "Connexion réussie !",
+    "toastError": "Échec de la connexion",
+    "toastUnexpected": "Une erreur inattendue s'est produite"
+  },
+
+  "Signup": {
+    "title": "Créer un compte",
+    "subtitle": "Entrez vos informations pour vous inscrire",
+    "usernameLabel": "Nom d'utilisateur",
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "signupButton": "S'inscrire",
+    "signupWithGoogle": "S'inscrire avec Google",
+    "signupWithGitHub": "S'inscrire avec GitHub",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "login": "Se connecter",
+    "orContinue": "Ou continuer avec",
+    "loading": "Veuillez patienter...",
+    "toastSuccess": "Compte créé ! Vérifiez votre e-mail pour confirmer.",
+    "toastError": "Échec de l'inscription.",
+    "toastUnexpected": "Une erreur inattendue s'est produite."
+  },
+
+  "ForgotPassword": {
+    "title": "Mot de passe oublié",
+    "subtitle": "Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.",
+    "emailLabel": "Adresse e-mail",
+    "sendButton": "Envoyer le lien de réinitialisation",
+    "sendingButton": "Envoi de l'e-mail...",
+    "rememberPassword": "Vous vous souvenez de votre mot de passe ?",
+    "loginLink": "Se connecter",
+    "toastSuccess": "Si un compte existe avec cette adresse e-mail, vous recevrez un lien de réinitialisation.",
+    "toastError": "Erreur : "
+  },
+
+  "ResetPassword": {
+    "title": "Réinitialiser le mot de passe",
+    "subtitle": "Entrez votre nouveau mot de passe",
+    "passwordLabel": "Nouveau mot de passe",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "resetButton": "Réinitialiser le mot de passe",
+    "updatingButton": "Mise à jour du mot de passe...",
+    "rememberPassword": "Vous vous souvenez de votre mot de passe ?",
+    "loginLink": "Se connecter",
+    "invalidToken": "Token invalide",
+    "invalidTokenMessage": "Le lien de réinitialisation est invalide ou a expiré.",
+    "toastSuccess": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
+    "toastError": "Erreur : ",
+    "toastUnexpected": "Une erreur inattendue s'est produite"
+  },
+
+  "EmailVerified": {
+    "title": "E-mail vérifié !",
+    "description": "Votre adresse e-mail a été vérifiée avec succès. Vous avez maintenant un accès complet à votre compte.",
+    "dashboardButton": "Aller au tableau de bord"
+  },
+
+  "Validation": {
+    "email": "Veuillez saisir une adresse e-mail valide",
+    "password": "Le mot de passe doit contenir au moins 8 caractères",
+    "username": "Le nom d'utilisateur doit contenir au moins 2 caractères",
+    "confirmPassword": "Les mots de passe ne correspondent pas"
   }
 }

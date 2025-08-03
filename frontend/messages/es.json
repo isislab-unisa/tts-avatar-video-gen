@@ -10,5 +10,101 @@
     "light": "Claro",
     "dark": "Oscuro",
     "system": "Sistema"
+  },
+
+  "Email": {
+    "reset": {
+      "subject": "Restablece tu contraseña de DUBME",
+      "title": "Restablece tu contraseña de <span style='color: #C5C8D4;'>DUBME</span>",
+      "description": "Haz clic en el botón de abajo para restablecer tu contraseña y volver a acceder a tu cuenta.",
+      "button": "Restablecer contraseña",
+      "footerNote": "Si no has solicitado esta acción, puedes ignorar este correo."
+    },
+    "verify": {
+      "subject": "Bienvenido a DUBME - Verifica tu correo electrónico",
+      "title": "¡Bienvenido a <span style='color: #C5C8D4;'>DUBME</span>!",
+      "description": "Haz clic en el botón de abajo para verificar tu correo y activar tu cuenta.",
+      "button": "Verificar correo",
+      "footerNote": "Si no has solicitado esta acción, puedes ignorar este correo."
+    }
+  },
+
+  "Login": {
+    "title": "Inicia sesión en tu cuenta",
+    "subtitle": "Introduce tus credenciales para continuar",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contraseña",
+    "rememberMe": "Recuérdame",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginButton": "Iniciar sesión",
+    "loginWithGoogle": "Inicia sesión con Google",
+    "loginWithGitHub": "Inicia sesión con GitHub",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Regístrate",
+    "orContinue": "O continúa con",
+    "loading": "Por favor espera...",
+    "toastSuccess": "¡Sesión iniciada correctamente!",
+    "toastError": "Inicio de sesión fallido",
+    "toastUnexpected": "Ocurrió un error inesperado"
+  },
+
+  "Signup": {
+    "title": "Crear una cuenta",
+    "subtitle": "Introduce tu información para registrarte",
+    "usernameLabel": "Nombre de usuario",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contraseña",
+    "confirmPasswordLabel": "Confirmar contraseña",
+    "signupButton": "Registrarse",
+    "signupWithGoogle": "Registrarse con Google",
+    "signupWithGitHub": "Registrarse con GitHub",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "login": "Inicia sesión",
+    "orContinue": "O continúa con",
+    "loading": "Por favor espera...",
+    "toastSuccess": "¡Cuenta creada! Revisa tu correo para verificar.",
+    "toastError": "Registro fallido.",
+    "toastUnexpected": "Ocurrió un error inesperado."
+  },
+
+  "ForgotPassword": {
+    "title": "¿Olvidaste tu contraseña?",
+    "subtitle": "Introduce tu correo electrónico para recibir un enlace de restablecimiento.",
+    "emailLabel": "Correo electrónico",
+    "sendButton": "Enviar enlace de restablecimiento",
+    "sendingButton": "Enviando correo...",
+    "rememberPassword": "¿Recuerdas tu contraseña?",
+    "loginLink": "Inicia sesión",
+    "toastSuccess": "Si existe una cuenta con este correo, recibirás un enlace de restablecimiento.",
+    "toastError": "Error: "
+  },
+
+  "ResetPassword": {
+    "title": "Restablecer contraseña",
+    "subtitle": "Introduce tu nueva contraseña",
+    "passwordLabel": "Nueva contraseña",
+    "confirmPasswordLabel": "Confirmar contraseña",
+    "resetButton": "Restablecer contraseña",
+    "updatingButton": "Actualizando contraseña...",
+    "rememberPassword": "¿Recuerdas tu contraseña?",
+    "loginLink": "Inicia sesión",
+    "invalidToken": "Token inválido",
+    "invalidTokenMessage": "El enlace de restablecimiento es inválido o ha expirado.",
+    "toastSuccess": "Contraseña actualizada. Ya puedes iniciar sesión.",
+    "toastError": "Error: ",
+    "toastUnexpected": "Ocurrió un error inesperado"
+  },
+
+  "EmailVerified": {
+    "title": "¡Correo verificado!",
+    "description": "Tu correo electrónico ha sido verificado exitosamente. Ahora tienes acceso completo a tu cuenta.",
+    "dashboardButton": "Ir al panel"
+  },
+
+  "Validation": {
+    "email": "Introduce una dirección de correo válida",
+    "password": "La contraseña debe tener al menos 8 caracteres",
+    "username": "El nombre de usuario debe tener al menos 2 caracteres",
+    "confirmPassword": "Las contraseñas no coinciden"
   }
 }
