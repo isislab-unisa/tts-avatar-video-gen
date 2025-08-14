@@ -114,7 +114,11 @@ export function LoginForm() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={pending}>
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={pending}
+          >
             {pending ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />

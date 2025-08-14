@@ -56,7 +56,7 @@ export const InputField = <T extends FieldValues>({
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-2.5 text-muted-foreground cursor-pointer hover:text-foreground"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -78,6 +78,7 @@ type CheckboxFieldProps<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
   label: string;
+  className?: string;
 };
 
 export const CheckboxField = <T extends FieldValues>({
@@ -96,6 +97,7 @@ export const CheckboxField = <T extends FieldValues>({
               <Checkbox
                 checked={field.value}
                 onCheckedChange={field.onChange}
+                className="cursor-pointer"
               />
             </FormControl>
             <FormLabel className="!mt-0 cursor-pointer">{label}</FormLabel>

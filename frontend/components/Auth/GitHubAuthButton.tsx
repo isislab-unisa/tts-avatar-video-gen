@@ -42,7 +42,7 @@ export const GitHubAuthButton = ({
   return (
     <Button
       variant="outline"
-      className="flex items-center justify-center w-full gap-2"
+      className="flex items-center justify-center w-full cursor-pointer gap-2"
       onClick={handleGitHubAuth}
       disabled={isLoading}
       aria-busy={isLoading}
