@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { FolderPlus, CirclePlus, Folder } from "lucide-react";
+import Link from "next/link";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { Button } from "@/components/ui/button";
@@ -82,18 +83,21 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     <TooltipProvider delayDuration={150}>
       <Sidebar collapsible="icon" {...props}>
         <SidebarHeader>
-          {/* Logo */}
           <div className="flex items-center justify-center gap-2 p-2">
             {isCollapsed ? (
-              <div className="w-10 h-10 rounded-full bg-black dark:bg-white flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity p-1">
-                <span className="text-[9px] tracking-widest font-bold text-white dark:text-black">
+              <Link href="/dashboard">
+                <div className="w-10 h-10 rounded-full bg-black dark:bg-white flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity p-1">
+                  <span className="text-[9px] tracking-widest font-bold text-white dark:text-black">
+                    DUBME
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <Link href="/dashboard">
+                <span className="cursor-pointer text-lg font-bold md:text-2xl hover:opacity-80 transition-opacity">
                   DUBME
                 </span>
-              </div>
-            ) : (
-              <span className="cursor-pointer text-lg font-bold md:text-2xl hover:opacity-80 transition-opacity">
-                DUBME
-              </span>
+              </Link>
             )}
           </div>
 
@@ -124,24 +128,28 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-9 h-9 p-0 cursor-pointer"
-                    aria-label="Create Project"
-                  >
-                    <CirclePlus className="h-4 w-4" />
-                  </Button>
+                  <Link href="/dashboard/project/create">
+                    <Button
+                      variant="outline"
+                      className="w-9 h-9 p-0 cursor-pointer"
+                      aria-label="Create Project"
+                    >
+                      <CirclePlus className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right">Create Project</TooltipContent>
               </Tooltip>
             ) : (
-              <Button
-                variant="outline"
-                className="w-full justify-start gap-2 cursor-pointer"
-              >
-                <CirclePlus className="h-4 w-4" />
-                Create Project
-              </Button>
+              <Link href="/dashboard/project/create" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-2 cursor-pointer"
+                >
+                  <CirclePlus className="h-4 w-4" />
+                  Create Project
+                </Button>
+              </Link>
             )}
           </div>
 
