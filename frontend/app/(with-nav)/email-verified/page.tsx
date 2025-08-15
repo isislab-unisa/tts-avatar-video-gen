@@ -40,7 +40,7 @@ export default function EmailVerifiedPage() {
         <p className="text-sm text-muted-foreground">{t("description")}</p>
 
         <Link href="/dashboard" className="block w-full">
-          <Button className="w-full" size="lg">
+          <Button className="w-full cursor-pointer" size="lg">
             {t("dashboardButton")}
           </Button>
         </Link>

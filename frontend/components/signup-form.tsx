@@ -117,7 +117,11 @@ export function SignupForm() {
           />
 
           <div className="min-h-[44px] flex items-center">
-            <Button type="submit" className="w-full" disabled={pending}>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={pending}
+            >
               {pending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
