@@ -91,7 +91,11 @@ export default function ForgotPasswordPage() {
               type="email"
               icon={<Mail className="w-5 h-5 text-muted-foreground" />}
             />
-            <Button type="submit" className="w-full" disabled={pending}>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={pending}
+            >
               {pending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />

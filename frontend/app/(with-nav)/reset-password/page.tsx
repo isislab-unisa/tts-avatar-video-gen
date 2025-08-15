@@ -98,7 +98,11 @@ const ResetPassword = () => {
     <main className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center bg-background px-4 overflow-hidden">
       <div className="absolute inset-0 flex items-start justify-center pt-12 pointer-events-none z-0">
         <Image
-          src={showPassword ? "/cody-open.png" : "/cody-closed.png"}
+          src={
+            showPassword || showConfirmPassword
+              ? "/cody-open.png"
+              : "/cody-closed.png"
+          }
           alt="Robot"
           width={260}
           height={260}
@@ -130,7 +134,7 @@ const ResetPassword = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-2 flex items-center text-muted-foreground"
+                    className="absolute inset-y-0 right-2 flex items-center cursor-pointer text-muted-foreground"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -156,7 +160,7 @@ const ResetPassword = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-2 flex items-center text-muted-foreground"
+                    className="absolute inset-y-0 right-2 flex items-center cursor-pointer text-muted-foreground"
                   >
                     {showConfirmPassword ? (
                       <EyeOff size={18} />
@@ -172,7 +176,11 @@ const ResetPassword = () => {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={pending}>
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={pending}
+              >
                 {pending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
