@@ -7,6 +7,8 @@ import {
   Edit,
   Trash2,
   FolderEdit,
+  FolderSymlink,
+  Folder,
 } from "lucide-react";
 import {
   Collapsible,
@@ -19,6 +21,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import {
   SidebarGroup,
@@ -127,7 +132,34 @@ export function NavMain({
                                 <Edit className="text-muted-foreground" />
                                 <span>Modifica Progetto</span>
                               </DropdownMenuItem>
+
+                              <DropdownMenuSub>
+                                <DropdownMenuSubTrigger className="cursor-pointer">
+                                  <FolderSymlink className="mr-2 h-4 w-4 text-muted-foreground" />
+                                  <span>Sposta in…</span>
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent className="w-56 rounded-lg">
+                                  {items
+                                    .filter((grp) => grp.title !== item.title)
+                                    .map((grp) => (
+                                      <DropdownMenuItem
+                                        key={grp.title}
+                                        className="cursor-pointer"
+                                        onClick={() =>
+                                          console.log(
+                                            `Sposta "${subItem.title}" in "${grp.title}"`
+                                          )
+                                        }
+                                      >
+                                        <Folder className="text-muted-foreground" />
+                                        <span>{grp.title}</span>
+                                      </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                              </DropdownMenuSub>
+
                               <DropdownMenuSeparator />
+
                               <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20">
                                 <Trash2 className="text-red-600" />
                                 <span>Elimina Progetto</span>
