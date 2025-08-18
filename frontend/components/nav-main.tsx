@@ -1,5 +1,6 @@
-// nav-main.tsx
 "use client";
+import { useState } from "react";
+
 import {
   ChevronRight,
   type LucideIcon,
@@ -9,6 +10,7 @@ import {
   FolderEdit,
   FolderSymlink,
   Folder,
+  FolderPlus,
 } from "lucide-react";
 import {
   Collapsible,
@@ -36,6 +38,9 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
+
+const iconCls = "mr-2 h-4 w-4";
 
 export function NavMain({
   items,
@@ -49,133 +54,155 @@ export function NavMain({
   }[];
 }) {
   const { isMobile } = useSidebar();
+  const [createOpen, setCreateOpen] = useState(false);
 
   return (
-    <SidebarGroup>
-      <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <div className="flex items-center group/folder-item">
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    className="cursor-pointer flex-1"
-                  >
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
+    <>
+      <CreateDirectoryDialog open={createOpen} onOpenChange={setCreateOpen} />
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuAction className="opacity-0 group-hover/folder-item:opacity-100 transition-opacity cursor-pointer">
-                      <MoreHorizontal />
-                      <span className="sr-only">More</span>
-                    </SidebarMenuAction>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-48 rounded-lg"
-                    side={isMobile ? "bottom" : "right"}
-                    align={isMobile ? "end" : "start"}
-                  >
-                    <DropdownMenuItem className="cursor-pointer">
-                      <FolderEdit className="text-muted-foreground" />
-                      <span>Rinomina Cartella</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20">
-                      <Trash2 className="text-red-600" />
-                      <span>Elimina Cartella</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem
-                      key={subItem.title}
-                      className="group/project-item"
+      <SidebarGroup>
+        <SidebarMenu>
+          {items.map((item) => (
+            <Collapsible
+              key={item.title}
+              asChild
+              defaultOpen={item.isActive}
+              className="group/collapsible"
+            >
+              <SidebarMenuItem>
+                <div className="flex items-center group/folder-item">
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      className="cursor-pointer flex-1"
                     >
-                      <div className="flex items-center w-full">
-                        <SidebarMenuSubButton
-                          asChild
-                          className="cursor-pointer flex-1"
-                        >
-                          <a href={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </a>
-                        </SidebarMenuSubButton>
+                      {item.icon && <item.icon className="h-4 w-4" />}
+                      <span>{item.title}</span>
+                      <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
 
-                        {subItem.type === "project" && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <SidebarMenuAction className="opacity-0 group-hover/project-item:opacity-100 transition-opacity cursor-pointer ml-auto">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">More</span>
-                              </SidebarMenuAction>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              className="w-48 rounded-lg"
-                              side={isMobile ? "bottom" : "right"}
-                              align={isMobile ? "end" : "start"}
-                            >
-                              <DropdownMenuItem className="cursor-pointer">
-                                <Edit className="text-muted-foreground" />
-                                <span>Modifica Progetto</span>
-                              </DropdownMenuItem>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction className="opacity-0 group-hover/folder-item:opacity-100 transition-opacity cursor-pointer">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-48 rounded-lg"
+                      side={isMobile ? "bottom" : "right"}
+                      align={isMobile ? "end" : "start"}
+                    >
+                      <DropdownMenuItem className="cursor-pointer">
+                        <FolderEdit
+                          className={`${iconCls} text-muted-foreground`}
+                        />
+                        <span>Rinomina Cartella</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20">
+                        <Trash2 className={`${iconCls} text-red-600`} />
+                        <span>Elimina Cartella</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
 
-                              <DropdownMenuSub>
-                                <DropdownMenuSubTrigger className="cursor-pointer">
-                                  <FolderSymlink className="mr-2 h-4 w-4 text-muted-foreground" />
-                                  <span>Sposta in…</span>
-                                </DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent className="w-56 rounded-lg">
-                                  {items
-                                    .filter((grp) => grp.title !== item.title)
-                                    .map((grp) => (
-                                      <DropdownMenuItem
-                                        key={grp.title}
-                                        className="cursor-pointer"
-                                        onClick={() =>
-                                          console.log(
-                                            `Sposta "${subItem.title}" in "${grp.title}"`
-                                          )
-                                        }
-                                      >
-                                        <Folder className="text-muted-foreground" />
-                                        <span>{grp.title}</span>
-                                      </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuSubContent>
-                              </DropdownMenuSub>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {item.items?.map((subItem) => (
+                      <SidebarMenuSubItem
+                        key={subItem.title}
+                        className="group/project-item"
+                      >
+                        <div className="flex items-center w-full">
+                          <SidebarMenuSubButton
+                            asChild
+                            className="cursor-pointer flex-1"
+                          >
+                            <a href={subItem.url}>
+                              <span>{subItem.title}</span>
+                            </a>
+                          </SidebarMenuSubButton>
 
-                              <DropdownMenuSeparator />
+                          {subItem.type === "project" && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <SidebarMenuAction className="opacity-0 group-hover/project-item:opacity-100 transition-opacity cursor-pointer ml-auto">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">More</span>
+                                </SidebarMenuAction>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                className="w-48 rounded-lg"
+                                side={isMobile ? "bottom" : "right"}
+                                align={isMobile ? "end" : "start"}
+                              >
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Edit
+                                    className={`${iconCls} text-muted-foreground`}
+                                  />
+                                  <span>Modifica Progetto</span>
+                                </DropdownMenuItem>
 
-                              <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20">
-                                <Trash2 className="text-red-600" />
-                                <span>Elimina Progetto</span>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </div>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
+                                <DropdownMenuSub>
+                                  <DropdownMenuSubTrigger className="cursor-pointer">
+                                    <FolderSymlink
+                                      className={`${iconCls} text-muted-foreground`}
+                                    />
+                                    <span>Sposta in…</span>
+                                  </DropdownMenuSubTrigger>
+                                  <DropdownMenuSubContent className="w-56 rounded-lg">
+                                    {items
+                                      .filter((grp) => grp.title !== item.title)
+                                      .map((grp) => (
+                                        <DropdownMenuItem
+                                          key={grp.title}
+                                          className="cursor-pointer"
+                                          onClick={() =>
+                                            console.log(
+                                              `Move "${subItem.title}" -> "${grp.title}"`
+                                            )
+                                          }
+                                        >
+                                          <Folder
+                                            className={`${iconCls} text-muted-foreground`}
+                                          />
+                                          <span>{grp.title}</span>
+                                        </DropdownMenuItem>
+                                      ))}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      className="cursor-pointer"
+                                      onSelect={() => setCreateOpen(true)}
+                                    >
+                                      <FolderPlus className={iconCls} />
+                                      <span>Create Directory</span>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20">
+                                  <Trash2
+                                    className={`${iconCls} text-red-600`}
+                                  />
+                                  <span>Elimina Progetto</span>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+    </>
   );
 }

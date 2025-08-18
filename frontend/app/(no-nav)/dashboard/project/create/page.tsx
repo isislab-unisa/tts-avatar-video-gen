@@ -1,3 +1,7 @@
-export default function ProjectCreatePage() {
-  return <div className="bg-muted/50 rounded-xl p-4">Create Project</div>;
+import { getDirectoriesForPage } from "../_actions";
+import CreateProjectForm from "@/components/CreateProjectForm";
+
+export default async function Page() {
+  const directories = await getDirectoriesForPage(); // [{id,name}]
+  return <CreateProjectForm directories={directories} />;
 }

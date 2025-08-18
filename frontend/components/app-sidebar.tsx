@@ -1,9 +1,8 @@
+// components/app-sidebar.tsx
 "use client";
+
 import * as React from "react";
-import { FolderPlus, CirclePlus, Folder } from "lucide-react";
 import Link from "next/link";
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -20,15 +19,39 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { FolderPlus, CirclePlus, Folder, type LucideIcon } from "lucide-react";
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 
-// Sample data
-const data = {
-  user: {
-    name: "Cody",
-    email: "m@example.com",
-    avatar: "/cody.png",
-  },
-  navMain: [
+type DirectoryDTO = { id: string; name: string };
+
+type NavItem = {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  isActive?: boolean;
+  items?: { title: string; url: string; type?: string }[];
+};
+
+export function AppSidebar(
+  props: React.ComponentProps<typeof Sidebar> & { directories?: DirectoryDTO[] }
+) {
+  const { directories = [], ...rest } = props;
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+  const [openCreateDir, setOpenCreateDir] = React.useState(false);
+
+  // directory dal DB -> icone assegnate QUI (client)
+  const directoryGroups: NavItem[] = directories.map((d) => ({
+    title: d.name,
+    url: `/dashboard/folder/${d.id}`,
+    icon: Folder,
+    items: [],
+  }));
+
+  // gruppi statici (se li vuoi tenere)
+  const staticGroups: NavItem[] = [
     {
       title: "Playground",
       url: "#",
@@ -72,17 +95,15 @@ const data = {
         { title: "Limits", url: "#", type: "project" },
       ],
     },
-  ],
-};
+  ];
 
-export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const { state } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const navItems: NavItem[] = [...directoryGroups, ...staticGroups];
 
   return (
     <TooltipProvider delayDuration={150}>
-      <Sidebar collapsible="icon" {...props}>
+      <Sidebar collapsible="icon" {...rest}>
         <SidebarHeader>
+          {/* LOGO ripristinato: tondo se collapsed */}
           <div className="flex items-center justify-center gap-2 p-2">
             {isCollapsed ? (
               <Link href="/dashboard">
@@ -102,6 +123,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           </div>
 
           <div className="flex flex-col items-center gap-y-2 p-2">
+            {/* Create Directory -> apre il dialog */}
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -109,6 +131,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     variant="outline"
                     className="w-9 h-9 p-0 cursor-pointer"
                     aria-label="Create Directory"
+                    onClick={() => setOpenCreateDir(true)}
                   >
                     <FolderPlus className="h-4 w-4" />
                   </Button>
@@ -119,12 +142,14 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2 cursor-pointer"
+                onClick={() => setOpenCreateDir(true)}
               >
                 <FolderPlus className="h-4 w-4" />
                 Create Directory
               </Button>
             )}
 
+            {/* Create Project (link come prima) */}
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -157,15 +182,23 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         </SidebarHeader>
 
         <SidebarContent className="overflow-y-auto">
-          {!isCollapsed && <NavMain items={data.navMain} />}
+          {!isCollapsed && <NavMain items={navItems} />}
         </SidebarContent>
 
         <SidebarFooter>
-          <NavUser user={data.user} />
+          <NavUser
+            user={{ name: "Cody", email: "m@example.com", avatar: "/cody.png" }}
+          />
         </SidebarFooter>
 
         <SidebarRail />
       </Sidebar>
+
+      {/* Dialog collegato */}
+      <CreateDirectoryDialog
+        open={openCreateDir}
+        onOpenChange={setOpenCreateDir}
+      />
     </TooltipProvider>
   );
 }
