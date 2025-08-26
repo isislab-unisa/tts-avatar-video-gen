@@ -108,14 +108,36 @@
     "confirmPassword": "Las contraseñas no coinciden"
   },
 
+  "Common": {
+    "home": "Inicio"
+  },
+
   "Project": {
     "notFound": "Proyecto no encontrado.",
+    "titleLabel": "Título",
+    "textLabel": "Texto",
     "avatarLabel": "Avatar",
+    "createdOn": "Creado el",
     "download": "Descargar",
     "moveTo": "Mover a…",
-    "createNewFolderSoon": "Crear nueva carpeta… (pronto)",
+    "createNewFolder": "Crear nueva carpeta…",
     "rename": "Renombrar",
     "delete": "Eliminar"
+  },
+  "Dialog": {
+    "renameProjectTitle": "Renombrar proyecto",
+    "newTitle": "Nuevo título",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "deleteProjectTitle": "¿Eliminar el proyecto?"
+  },
+  "Toast": {
+    "renameSuccess": "Título actualizado",
+    "renameFail": "Error al renombrar",
+    "moveSuccess": "Movido",
+    "moveFail": "Error al mover",
+    "deleteSuccess": "Proyecto eliminado",
+    "deleteFail": "Error al eliminar"
   },
   "Status": {
     "loading": "Cargando…",

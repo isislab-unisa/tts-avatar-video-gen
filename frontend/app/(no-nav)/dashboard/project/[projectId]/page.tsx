@@ -1,11 +1,14 @@
-// app/(no-nav)/dashboard/project/[projectId]/page.tsx
 import Link from "next/link";
 import ProjectDetail from "@/components/ProjectDetail";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { auth } from "@/lib/auth";
 import { signApiToken } from "@/lib/jwt";
-import { listDirectoriesForUser } from "@/app/(no-nav)/dashboard/_actions/directories";
+import {
+  listDirectoriesForUser,
+  type DirectoryDTO,
+} from "@/app/(no-nav)/dashboard/_actions/directories";
 import type { ProjectDTO } from "./_actions";
+import { getLocale, getTranslations } from "next-intl/server";
 
 const API = process.env.BACKEND_API_URL!;
 
@@ -26,61 +29,84 @@ export default async function Page({
 }: {
   params: Promise<{ projectId: string }>;
 }) {
-  const { projectId } = await params; // Next 15: params è una Promise
+  const { projectId } = await params;
+
+  const [tProject, tCommon, locale] = await Promise.all([
+    getTranslations("Project"),
+    getTranslations("Common"),
+    getLocale(),
+  ]);
 
   const h = await cloneRequestHeaders();
   const session = await auth.api.getSession({ headers: h });
   if (!session) {
-    // niente sessione → mostra “non trovato” coerente
     return (
-      <div className="min-h-[60vh] grid place-items-center">
-        <p className="text-muted-foreground">Progetto non trovato.</p>
+      <div className="min-h-[60vh] grid place-items-center px-4">
+        <p className="text-muted-foreground">{tProject("notFound")}</p>
       </div>
     );
   }
 
   const token = await signApiToken(session.user.id);
-
   const [project, directories] = await Promise.all([
     fetchProject(projectId, token),
     listDirectoriesForUser(),
   ]);
 
-  const dir = project
+  const dir: DirectoryDTO | undefined = project
     ? directories.find((d) => d.id === project.directoryId)
     : undefined;
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-4 px-4">
-      {/* Breadcrumb e data in alto a destra */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <nav className="text-sm text-muted-foreground">
-          <Link href="/dashboard" className="hover:underline">
-            Home
-          </Link>
-          {dir ? (
-            <>
-              <span className="mx-2">/</span>
-              <Link
-                href={`/dashboard/folder/${dir.id}`}
-                className="hover:underline"
-              >
-                {dir.name}
-              </Link>
-            </>
-          ) : null}
-          {project ? (
-            <>
-              <span className="mx-2">/</span>
-              <span className="text-foreground">{project.title}</span>
-            </>
-          ) : null}
+      {/* Breadcrumb + data (no overflow) */}
+      <div className="flex items-center justify-between gap-3">
+        <nav
+          aria-label="Breadcrumb"
+          className="min-w-0 overflow-x-hidden text-sm text-muted-foreground"
+        >
+          <div className="inline-flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="hover:underline cursor-pointer shrink-0"
+            >
+              {tCommon("home")}
+            </Link>
+
+            {dir && (
+              <>
+                <span className="shrink-0">/</span>
+                <Link
+                  href={`/dashboard/folder/${dir.id}`}
+                  className="hover:underline cursor-pointer truncate max-w-[30vw] sm:max-w-[40vw] md:max-w-[20vw] lg:max-w-[24rem]"
+                  title={dir.name}
+                >
+                  {dir.name}
+                </Link>
+              </>
+            )}
+
+            {project && (
+              <>
+                <span className="shrink-0">/</span>
+                <span
+                  className="text-foreground truncate max-w-[40vw] sm:max-w-[50vw] md:max-w-[28vw] lg:max-w-[32rem]"
+                  title={project.title}
+                >
+                  {project.title}
+                </span>
+              </>
+            )}
+          </div>
         </nav>
 
         {project && (
-          <span className="text-xs text-muted-foreground">
-            {/* solo qui (niente duplicato nel pannello) */}
-            Creato il {new Date(project.createdAt).toLocaleString()}
+          <span className="text-xs text-muted-foreground shrink-0">
+            {tProject("createdOn")}{" "}
+            {new Intl.DateTimeFormat(locale, {
+              dateStyle: "short",
+              timeStyle: "medium",
+            }).format(new Date(project.createdAt))}
           </span>
         )}
       </div>

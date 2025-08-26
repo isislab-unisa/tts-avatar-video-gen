@@ -108,14 +108,35 @@
     "confirmPassword": "Passwords don't match"
   },
 
+  "Common": {
+    "home": "Home"
+  },
   "Project": {
     "notFound": "Project not found.",
+    "titleLabel": "Title",
+    "textLabel": "Text",
     "avatarLabel": "Avatar",
+    "createdOn": "Created on",
     "download": "Download",
     "moveTo": "Move to…",
-    "createNewFolderSoon": "Create new folder… (coming soon)",
+    "createNewFolder": "Create new folder…",
     "rename": "Rename",
     "delete": "Delete"
+  },
+  "Dialog": {
+    "renameProjectTitle": "Rename project",
+    "newTitle": "New title",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteProjectTitle": "Delete the project?"
+  },
+  "Toast": {
+    "renameSuccess": "Title updated",
+    "renameFail": "Rename failed",
+    "moveSuccess": "Moved",
+    "moveFail": "Move failed",
+    "deleteSuccess": "Project deleted",
+    "deleteFail": "Deletion failed"
   },
   "Status": {
     "loading": "Loading…",

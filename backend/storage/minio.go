@@ -1,4 +1,3 @@
-// backend/storage/minio.go
 package storage
 
 import (
@@ -17,15 +16,14 @@ import (
 )
 
 type MinioStore struct {
-	// Client per operazioni interne (Put/Get, stat, delete) verso l'endpoint “tecnico”
 	Client *minio.Client
-	// Client usato SOLO per generare i Presigned URL con host/scheme pubblici
+
 	PublicClient *minio.Client
 	Bucket       string
 }
 
 func NewMinio(ctx context.Context) (*MinioStore, error) {
-	endpoint := strings.TrimSpace(os.Getenv("MINIO_ENDPOINT")) // es: "localhost:9000" o "minio:9000"
+	endpoint := strings.TrimSpace(os.Getenv("MINIO_ENDPOINT"))
 	access := os.Getenv("MINIO_ACCESS_KEY")
 	secret := os.Getenv("MINIO_SECRET_KEY")
 	bucket := os.Getenv("MINIO_BUCKET")
@@ -34,7 +32,6 @@ func NewMinio(ctx context.Context) (*MinioStore, error) {
 	}
 	useSSL, _ := strconv.ParseBool(os.Getenv("MINIO_USE_SSL"))
 
-	// Client interno (backend -> MinIO)
 	internal, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(access, secret, ""),
 		Secure: useSSL,
@@ -43,7 +40,6 @@ func NewMinio(ctx context.Context) (*MinioStore, error) {
 		return nil, err
 	}
 
-	// Client pubblico per presign (browser -> MinIO)
 	var publicCl *minio.Client
 	if base := strings.TrimSpace(os.Getenv("MINIO_PUBLIC_URL")); base != "" {
 		if u, err := url.Parse(base); err == nil && u.Host != "" {
@@ -99,10 +95,9 @@ func (s *MinioStore) PutMP4(ctx context.Context, data []byte) (string, error) {
 }
 
 func (s *MinioStore) PresignGet(ctx context.Context, objectName string, exp time.Duration) (string, error) {
-	// IMPORTANTISSIMO: firmiamo direttamente con il client pubblico (host visibile al browser).
+
 	cl := s.PublicClient
 	if cl == nil {
-		// fallback: usa quello interno (funziona se l'endpoint è raggiungibile dal browser)
 		cl = s.Client
 	}
 	u, err := cl.PresignedGetObject(ctx, s.Bucket, objectName, exp, nil)
