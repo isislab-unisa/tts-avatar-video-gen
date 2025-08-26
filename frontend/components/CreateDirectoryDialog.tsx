@@ -1,4 +1,3 @@
-// components/CreateDirectoryDialog.tsx
 "use client";
 
 import * as React from "react";
@@ -16,14 +15,16 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { directorySchema, type DirectoryForm } from "@/lib/schema/directory";
-import { createDirectoryAction } from "@/app/(no-nav)/dashboard/_actions/directories";
+import {
+  createDirectoryAction,
+  type DirectoryDTO,
+} from "@/app/(no-nav)/dashboard/_actions/directories";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onCreated?: (dir: { id: string; name: string }) => void;
+  onCreated?: (dir: DirectoryDTO) => void;
 };
 
 export function CreateDirectoryDialog({
@@ -36,14 +37,11 @@ export function CreateDirectoryDialog({
       resolver: zodResolver(directorySchema),
       defaultValues: { name: "" },
     });
-
   const [pending, start] = React.useTransition();
-  const router = useRouter();
 
   const onSubmit = (values: DirectoryForm) => {
     const fd = new FormData();
     fd.set("name", values.name);
-
     start(async () => {
       const res = await createDirectoryAction(fd);
       if (res.ok) {
@@ -51,7 +49,6 @@ export function CreateDirectoryDialog({
         if (res.dir) onCreated?.(res.dir);
         reset();
         onOpenChange(false);
-        router.refresh();
       } else if (res.field === "name") {
         setError("name", { type: "server", message: res.message });
       } else {
@@ -63,7 +60,7 @@ export function CreateDirectoryDialog({
   return (
     <AlertDialog
       open={open}
-      onOpenChange={(v: boolean) => {
+      onOpenChange={(v) => {
         onOpenChange(v);
         if (!v) reset();
       }}
@@ -75,11 +72,17 @@ export function CreateDirectoryDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
           <div className="grid gap-2">
-            <Label htmlFor="dir-name">Name</Label>
+            <Label
+              htmlFor="dir-name"
+              className={formState.errors.name ? "text-red-600" : ""}
+            >
+              Name
+            </Label>
             <Input
               id="dir-name"
               placeholder="e.g. Playground"
               autoFocus
+              aria-invalid={!!formState.errors.name}
               {...register("name")}
             />
             {formState.errors.name && (

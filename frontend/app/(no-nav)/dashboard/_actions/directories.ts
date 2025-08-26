@@ -1,86 +1,85 @@
-// app/(no-nav)/dashboard/_actions/directories.ts
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
-import { directorySchema } from "@/lib/schema/directory";
-import { signApiToken } from "@/lib/jwt";
 import { cloneRequestHeaders } from "@/lib/headers";
+import { signApiToken } from "@/lib/jwt";
 
 const API = process.env.BACKEND_API_URL!;
-
-async function getSessionAndJwt() {
-  const h = await cloneRequestHeaders();
-  const session = await auth.api.getSession({ headers: h });
-  if (!session) throw new Error("Non autenticato");
-  const token = await signApiToken(session.user.id);
-  return { token };
-}
+if (!API) throw new Error("BACKEND_API_URL non configurato");
 
 export type DirectoryDTO = { id: string; name: string };
 
-export async function listDirectoriesForUser(): Promise<DirectoryDTO[]> {
-  try {
-    const { token } = await getSessionAndJwt();
-    const res = await fetch(`${API}/api/directories`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+async function getToken(): Promise<string> {
+  const h = await cloneRequestHeaders();
+  const session = await auth.api.getSession({ headers: h });
+  if (!session) throw new Error("Non autenticato");
+  return await signApiToken(session.user.id);
 }
 
-export async function createDirectoryAction(formData: FormData) {
-  const name = String(formData.get("name") || "").trim();
-  const parsed = directorySchema.safeParse({ name });
-  if (!parsed.success) {
-    return {
-      ok: false as const,
-      field: "name" as const,
-      message: parsed.error.issues[0]?.message || "Nome non valido",
-    };
-  }
+export async function listDirectoriesForUser(): Promise<DirectoryDTO[]> {
+  const token = await getToken();
+  const r = await fetch(`${API}/api/directories`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!r.ok) return [];
+  return (await r.json()) as DirectoryDTO[];
+}
 
-  try {
-    const { token } = await getSessionAndJwt();
-    const res = await fetch(`${API}/api/directories`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: parsed.data.name }),
-      cache: "no-store",
-    });
-
-    if (res.status === 201) {
-      // Idealmente il backend ritorna { id, name }
-      let dir: DirectoryDTO | undefined = undefined;
-      try {
-        dir = (await res.json()) as DirectoryDTO;
-      } catch {
-        // se non torna JSON, va bene lo stesso
-      }
-      revalidatePath("/dashboard");
-      return { ok: true as const, dir };
-    }
-
-    if (res.status === 409) {
+export async function createDirectoryAction(
+  formData: FormData
+): Promise<
+  | { ok: true; dir: DirectoryDTO }
+  | { ok: false; field?: "name"; message: string }
+> {
+  const token = await getToken();
+  const name = String(formData.get("name") || "");
+  const r = await fetch(`${API}/api/directories`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name }),
+  });
+  if (!r.ok) {
+    if (r.status === 409) {
       return {
-        ok: false as const,
-        field: "name" as const,
-        message: "Esiste già una directory con questo nome",
+        ok: false,
+        field: "name",
+        message: "Esiste già una cartella con questo nome",
       };
     }
-
-    return { ok: false as const, message: "Errore server" };
-  } catch (e) {
-    return {
-      ok: false as const,
-      message: (e as Error).message || "Errore di rete",
-    };
+    const msg = await r.text().catch(() => "");
+    return { ok: false, message: msg || "Errore creazione" };
   }
+  const dir = (await r.json()) as DirectoryDTO;
+  return { ok: true, dir };
+}
+
+export async function renameDirectoryAction(
+  id: string,
+  name: string
+): Promise<boolean> {
+  const token = await getToken();
+  const r = await fetch(`${API}/api/directories/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name }),
+    cache: "no-store",
+  });
+  return r.ok;
+}
+
+export async function deleteDirectoryAction(id: string): Promise<boolean> {
+  const token = await getToken();
+  const r = await fetch(`${API}/api/directories/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  return r.ok;
 }

@@ -20,157 +20,138 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import {
-  generateVideoAction,
-  saveProjectAction,
-} from "@/app/(no-nav)/dashboard/project/_actions";
+import { generateVideoAction } from "@/app/(no-nav)/dashboard/project/_actions";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import { Folder, Plus } from "lucide-react";
 
 type DirectoryDTO = { id: string; name: string };
 
-const AVATARS = [{ id: "cody", name: "Cody", image: "/cody.png" }] as const;
+// ⟵ tipo di risposta della server action token
+type TokenResp = { ok: true; token: string } | { ok: false; message?: string };
 
-// base64 -> Blob
+const API = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
+const AVATAR_ID = "cody";
+const AVATAR_IMG = "/cody.png";
+
 function base64ToBlob(base64: string, mime = "video/mp4") {
   const byteChars = atob(base64);
-  const byteNumbers = new Array(byteChars.length);
-  for (let i = 0; i < byteChars.length; i++)
-    byteNumbers[i] = byteChars.charCodeAt(i);
-  const byteArray = new Uint8Array(byteNumbers);
-  return new Blob([byteArray], { type: mime });
+  const bytes = new Uint8Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
 }
 
 export default function CreateProjectForm({
   directories,
+  getApiToken, // ⟵ server action passata dal server
 }: {
   directories: DirectoryDTO[];
+  getApiToken: () => Promise<TokenResp>;
 }) {
   const router = useRouter();
 
   const [openCreateDir, setOpenCreateDir] = React.useState(false);
-  const [avatar, setAvatar] =
-    React.useState<(typeof AVATARS)[number]["id"]>("cody");
-  const [bgColor] = React.useState("#000000"); // disabilitato
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [videoBase64, setVideoBase64] = React.useState<string | null>(null);
   const [isGenerating, setIsGenerating] = React.useState(false);
-  const [autoSaveDir, setAutoSaveDir] = React.useState<DirectoryDTO | null>(
-    null
-  );
+  const [bgColor] = React.useState("#000000");
 
-  const { register, formState, setValue, getValues } = useForm<ProjectForm>({
-    resolver: zodResolver(projectSchema),
-    defaultValues: { title: "", text: "", avatar: "cody", bgColor: undefined },
-  });
-
-  React.useEffect(() => {
-    setValue("avatar", avatar as ProjectForm["avatar"]);
-  }, [avatar, setValue]);
-
-  const selected = React.useMemo(
-    () => AVATARS.find((a) => a.id === avatar) ?? AVATARS[0],
-    [avatar]
-  );
+  const { register, formState, getValues, trigger, reset } =
+    useForm<ProjectForm>({
+      resolver: zodResolver(projectSchema),
+      defaultValues: {
+        title: "",
+        text: "",
+        avatar: AVATAR_ID,
+        bgColor: undefined,
+      },
+      mode: "onSubmit",
+    });
 
   async function onGenerate() {
-    const text = getValues("text");
-    if (!text?.trim()) return toast.error("Inserisci il testo");
-
-    setIsGenerating(true);
-    const res = await generateVideoAction({
-      text,
-      avatar: avatar as "cody",
-      bgColor,
-    });
-    setIsGenerating(false);
-
-    if (!res.ok) return toast.error(res.message);
-
-    setVideoBase64(res.base64);
-    const blob = base64ToBlob(res.base64, "video/mp4");
-    setPreviewUrl(URL.createObjectURL(blob));
-    toast.success("Video generato");
-
-    if (autoSaveDir) {
-      const vals = getValues();
-      const save = await saveProjectAction({
-        title: vals.title,
-        text: vals.text,
-        avatar: avatar as "cody",
-        avatarImage: selected.image,
-        directoryId: autoSaveDir.id,
-        base64Video: res.base64,
-      });
-      if (save.ok) {
-        toast.success(`Progetto salvato in “${autoSaveDir.name}”`);
-        setAutoSaveDir(null);
-        router.push(`/dashboard/project/${save.id}`);
-      } else {
-        toast.error(save.message);
-      }
+    const ok = await trigger(["title", "text"], { shouldFocus: true });
+    if (!ok) {
+      toast.error("Correggi i campi evidenziati");
+      return;
     }
+    const { text } = getValues();
+    setIsGenerating(true);
+    const res = await generateVideoAction({ text, avatar: AVATAR_ID, bgColor });
+    setIsGenerating(false);
+    if (!res.ok) return toast.error(res.message);
+    setVideoBase64(res.base64);
+    setPreviewUrl(URL.createObjectURL(base64ToBlob(res.base64)));
+    toast.success("Video generato");
   }
 
   function onDownload() {
     if (!videoBase64) return;
-    const blob = base64ToBlob(videoBase64, "video/mp4");
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
+    a.href = URL.createObjectURL(base64ToBlob(videoBase64));
     a.download = `${getValues("title") || "video"}.mp4`;
     a.click();
   }
 
-  async function onSaveTo(directoryId: string) {
+  async function saveTo(directoryId: string) {
     if (!videoBase64) return toast.error("Genera prima il video");
-    const vals = getValues();
-    const res = await saveProjectAction({
-      title: vals.title,
-      text: vals.text,
-      avatar: avatar as "cody",
-      avatarImage: selected.image,
-      directoryId,
-      base64Video: videoBase64,
-    });
 
-    if (res.ok) {
+    const tk = await getApiToken(); // ⟵ uso la prop
+    if (!tk.ok) return toast.error(tk.message);
+
+    const vals = getValues();
+    const form = new FormData();
+    form.set("title", vals.title);
+    form.set("text", vals.text);
+    form.set("avatar", AVATAR_ID);
+    form.set("avatarImage", AVATAR_IMG);
+    form.set("directoryId", directoryId);
+    form.set("video", base64ToBlob(videoBase64), "output.mp4");
+
+    try {
+      const res = await fetch(`${API}/api/projects`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${tk.token}` },
+        body: form,
+      });
+      if (!res.ok) {
+        const msg = await res.text().catch(() => "");
+        throw new Error(msg || `Errore salvataggio (${res.status})`);
+      }
+      const data = (await res.json()) as { id: string };
       toast.success("Progetto salvato");
-      router.push(`/dashboard/project/${res.id}`);
-    } else {
-      toast.error(res.message);
+      reset();
+      router.push(`/dashboard/project/${data.id}`);
+    } catch (err) {
+      toast.error((err as Error).message);
     }
   }
 
   return (
-    // ⬇️ Centro verticalmente tutta la sezione (no “in alto”)
-    <div className="mx-auto max-w-6xl w-full min-h-[calc(100vh-10rem)] grid place-items-center">
-      <div className="grid gap-6 lg:grid-cols-2 lg:gap-8 w-full">
-        {/* Player: NESSUN bg grigio */}
-        <div className="rounded-xl overflow-hidden bg-transparent">
+    <div className="min-h-[calc(100vh-8rem)] grid place-items-center">
+      <div className="mx-auto max-w-6xl w-full grid gap-8 lg:grid-cols-2 items-center">
+        <div className="rounded-2xl overflow-hidden">
           <div className="w-full aspect-video">
             {!previewUrl ? (
               <Image
-                src={selected.image}
-                alt={selected.name}
-                width={640}
-                height={360}
-                className="h-full w-full object-contain"
+                src={AVATAR_IMG}
+                alt="Cody"
+                width={1280}
+                height={720}
+                className="h-full w-full object-contain rounded-2xl"
                 priority
               />
             ) : (
               <video
                 src={previewUrl}
                 controls
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain rounded-2xl"
               />
             )}
           </div>
         </div>
 
-        {/* Form */}
         <div className="space-y-4">
           <div className="grid gap-2">
-            <Label className="leading-none">Titolo</Label>
+            <Label>Titolo</Label>
             <Input placeholder="Titolo progetto" {...register("title")} />
             {formState.errors.title && (
               <p className="text-sm text-red-600">
@@ -180,10 +161,10 @@ export default function CreateProjectForm({
           </div>
 
           <div className="grid gap-2">
-            <Label className="leading-none">Testo</Label>
+            <Label>Testo</Label>
             <Textarea
               placeholder="Inserisci il testo…"
-              className="min-h-[120px] md:min-h-[140px]"
+              className="min-h-[140px]"
               {...register("text")}
             />
             {formState.errors.text && (
@@ -195,51 +176,30 @@ export default function CreateProjectForm({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <div className="grid gap-2">
-              <Label className="leading-none">Avatar</Label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="justify-between h-10">
-                    <span className="flex items-center gap-2">
-                      <Image
-                        src={selected.image}
-                        alt={selected.name}
-                        width={24}
-                        height={24}
-                        className="rounded-full"
-                      />
-                      {selected.name}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  {AVATARS.map((a) => (
-                    <DropdownMenuItem
-                      key={a.id}
-                      className="cursor-pointer"
-                      onClick={() => setAvatar(a.id)}
-                    >
-                      <Image
-                        src={a.image}
-                        alt={a.name}
-                        width={20}
-                        height={20}
-                        className="rounded-full mr-2"
-                      />
-                      <span>{a.name}</span>
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem disabled>
-                    Altre voci in arrivo…
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Label>Avatar</Label>
+              <Button
+                variant="outline"
+                className="justify-start gap-2"
+                type="button"
+              >
+                <Image
+                  src={AVATAR_IMG}
+                  alt="Cody"
+                  width={20}
+                  height={20}
+                  className="rounded"
+                />
+                Cody
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                altri avatar presto
+              </p>
             </div>
 
             <div className="grid gap-2">
-              <Label className="leading-none">Colore background</Label>
-              <Input value={bgColor} disabled className="h-10" />
-              <p className="text-xs text-muted-foreground mt-1">
+              <Label>Colore background</Label>
+              <Input value={bgColor} disabled />
+              <p className="text-xs text-muted-foreground">
                 disponibile a breve
               </p>
             </div>
@@ -247,41 +207,44 @@ export default function CreateProjectForm({
 
           <Separator />
 
-          {/* Bottoni centrati */}
           <div className="flex flex-wrap justify-center gap-3">
             <Button
               onClick={onGenerate}
               disabled={isGenerating}
               className="min-w-[140px]"
+              type="button"
             >
-              {isGenerating
-                ? "Generazione..."
-                : autoSaveDir
-                ? "Genera & Salva"
-                : "Genera"}
+              {isGenerating ? "Generazione..." : "Genera"}
             </Button>
-
             <Button
               variant="outline"
               onClick={onDownload}
               disabled={!videoBase64}
               className="min-w-[140px]"
+              type="button"
             >
               Download
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button disabled={!videoBase64} className="min-w-[140px]">
+                <Button
+                  disabled={!videoBase64}
+                  className="min-w-[140px]"
+                  type="button"
+                >
                   Salva
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-72">
+              <DropdownMenuContent className="w-72 z-50">
                 {directories.map((d) => (
                   <DropdownMenuItem
                     key={d.id}
                     className="cursor-pointer"
-                    onClick={() => onSaveTo(d.id)}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      void saveTo(d.id);
+                    }}
                   >
                     <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
                     <span>{d.name}</span>
@@ -291,6 +254,7 @@ export default function CreateProjectForm({
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={() => setOpenCreateDir(true)}
+                  disabled={!videoBase64}
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   <span>Crea nuova cartella…</span>
@@ -301,16 +265,13 @@ export default function CreateProjectForm({
         </div>
       </div>
 
-      {/* Dialog crea directory → auto-save alla prossima "Genera" */}
       <CreateDirectoryDialog
         open={openCreateDir}
-        onOpenChange={(v: boolean) => setOpenCreateDir(v)}
+        onOpenChange={setOpenCreateDir}
         onCreated={(dir) => {
-          setAutoSaveDir(dir);
           setOpenCreateDir(false);
-          toast.success(
-            `Cartella “${dir.name}” creata. Alla prossima Genera salvo lì.`
-          );
+          if (videoBase64) void saveTo(dir.id);
+          else toast.error("Genera prima il video");
         }}
       />
     </div>

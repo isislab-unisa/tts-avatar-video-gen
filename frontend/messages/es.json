@@ -106,5 +106,21 @@
     "password": "La contraseña debe tener al menos 8 caracteres",
     "username": "El nombre de usuario debe tener al menos 2 caracteres",
     "confirmPassword": "Las contraseñas no coinciden"
+  },
+
+  "Project": {
+    "notFound": "Proyecto no encontrado.",
+    "avatarLabel": "Avatar",
+    "download": "Descargar",
+    "moveTo": "Mover a…",
+    "createNewFolderSoon": "Crear nueva carpeta… (pronto)",
+    "rename": "Renombrar",
+    "delete": "Eliminar"
+  },
+  "Status": {
+    "loading": "Cargando…",
+    "errorTitle": "Algo salió mal",
+    "errorMessage": "Ocurrió un error al cargar el proyecto.",
+    "retry": "Intentar de nuevo"
   }
 }

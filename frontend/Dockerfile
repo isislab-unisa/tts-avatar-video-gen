@@ -1,0 +1,50 @@
+# ============= deps =============
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# ============= builder ==========
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Aggiungi gli ARG per le variabili necessarie durante il build
+ARG NEXT_PUBLIC_BACKEND_API_URL
+ARG NEXT_PUBLIC_BETTER_AUTH_URL
+ARG MONGODB_URI
+ARG BETTER_AUTH_SECRET
+ARG BACKEND_API_URL
+ARG API_JWT_SECRET
+ARG BETTER_AUTH_URL
+
+# Converti gli ARG in ENV per il processo di build
+ENV NEXT_PUBLIC_BACKEND_API_URL=$NEXT_PUBLIC_BACKEND_API_URL
+ENV NEXT_PUBLIC_BETTER_AUTH_URL=$NEXT_PUBLIC_BETTER_AUTH_URL
+ENV MONGODB_URI=$MONGODB_URI
+ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
+ENV BACKEND_API_URL=$BACKEND_API_URL
+ENV API_JWT_SECRET=$API_JWT_SECRET
+ENV BETTER_AUTH_URL=$BETTER_AUTH_URL
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN npm run build
+
+# ============= runner ===========
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# copia solo ciò che serve a runtime
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
+
+# prendi solo dep prod
+RUN npm ci --omit=dev
+
+EXPOSE 3000
+CMD ["npm", "start"]

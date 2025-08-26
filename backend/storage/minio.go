@@ -1,11 +1,14 @@
+// backend/storage/minio.go
 package storage
 
 import (
 	"bytes"
 	"context"
 	"log"
+	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,13 +17,15 @@ import (
 )
 
 type MinioStore struct {
+	// Client per operazioni interne (Put/Get, stat, delete) verso l'endpoint “tecnico”
 	Client *minio.Client
-	Bucket string
+	// Client usato SOLO per generare i Presigned URL con host/scheme pubblici
+	PublicClient *minio.Client
+	Bucket       string
 }
 
-// NewMinio crea il client e si assicura che il bucket esista
 func NewMinio(ctx context.Context) (*MinioStore, error) {
-	endpoint := os.Getenv("MINIO_ENDPOINT") // es: "localhost:9000"
+	endpoint := strings.TrimSpace(os.Getenv("MINIO_ENDPOINT")) // es: "localhost:9000" o "minio:9000"
 	access := os.Getenv("MINIO_ACCESS_KEY")
 	secret := os.Getenv("MINIO_SECRET_KEY")
 	bucket := os.Getenv("MINIO_BUCKET")
@@ -29,7 +34,8 @@ func NewMinio(ctx context.Context) (*MinioStore, error) {
 	}
 	useSSL, _ := strconv.ParseBool(os.Getenv("MINIO_USE_SSL"))
 
-	cl, err := minio.New(endpoint, &minio.Options{
+	// Client interno (backend -> MinIO)
+	internal, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(access, secret, ""),
 		Secure: useSSL,
 	})
@@ -37,13 +43,28 @@ func NewMinio(ctx context.Context) (*MinioStore, error) {
 		return nil, err
 	}
 
-	// crea bucket se non esiste
-	exists, err := cl.BucketExists(ctx, bucket)
+	// Client pubblico per presign (browser -> MinIO)
+	var publicCl *minio.Client
+	if base := strings.TrimSpace(os.Getenv("MINIO_PUBLIC_URL")); base != "" {
+		if u, err := url.Parse(base); err == nil && u.Host != "" {
+			pubSSL := strings.EqualFold(u.Scheme, "https")
+			publicCl, err = minio.New(u.Host, &minio.Options{
+				Creds:  credentials.NewStaticV4(access, secret, ""),
+				Secure: pubSSL,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Crea bucket se mancante
+	exists, err := internal.BucketExists(ctx, bucket)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		if err := cl.MakeBucket(ctx, bucket, minio.MakeBucketOptions{}); err != nil {
+		if err := internal.MakeBucket(ctx, bucket, minio.MakeBucketOptions{}); err != nil {
 			return nil, err
 		}
 		log.Printf("[minio] created bucket %s\n", bucket)
@@ -51,10 +72,13 @@ func NewMinio(ctx context.Context) (*MinioStore, error) {
 		log.Printf("[minio] bucket %s ok\n", bucket)
 	}
 
-	return &MinioStore{Client: cl, Bucket: bucket}, nil
+	return &MinioStore{
+		Client:       internal,
+		PublicClient: publicCl,
+		Bucket:       bucket,
+	}, nil
 }
 
-// PutObject carica un blob nel bucket con content-type
 func (s *MinioStore) PutObject(ctx context.Context, objectName string, data []byte, contentType string) (string, error) {
 	reader := bytes.NewReader(data)
 	_, err := s.Client.PutObject(ctx, s.Bucket, objectName, reader, int64(len(data)), minio.PutObjectOptions{
@@ -67,11 +91,27 @@ func (s *MinioStore) PutObject(ctx context.Context, objectName string, data []by
 	return objectName, nil
 }
 
-// PutMP4 salva un video mp4 con nome univoco
 func (s *MinioStore) PutMP4(ctx context.Context, data []byte) (string, error) {
 	name := "videos/" + uuid.NewString() + ".mp4"
-	// timeout ragionevole
-	c2, cancel := context.WithTimeout(ctx, 30*time.Second)
+	c2, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 	return s.PutObject(c2, name, data, "video/mp4")
+}
+
+func (s *MinioStore) PresignGet(ctx context.Context, objectName string, exp time.Duration) (string, error) {
+	// IMPORTANTISSIMO: firmiamo direttamente con il client pubblico (host visibile al browser).
+	cl := s.PublicClient
+	if cl == nil {
+		// fallback: usa quello interno (funziona se l'endpoint è raggiungibile dal browser)
+		cl = s.Client
+	}
+	u, err := cl.PresignedGetObject(ctx, s.Bucket, objectName, exp, nil)
+	if err != nil {
+		return "", err
+	}
+	return u.String(), nil
+}
+
+func (s *MinioStore) Remove(ctx context.Context, objectName string) error {
+	return s.Client.RemoveObject(ctx, s.Bucket, objectName, minio.RemoveObjectOptions{})
 }
