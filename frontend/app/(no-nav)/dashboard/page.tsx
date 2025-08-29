@@ -1,75 +1,143 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import Link from "next/link";
+import ProjectCard from "@/components/ProjectCard";
+import { SortDropdown } from "@/components/sort-dropdown";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
+  listDirectoriesForUser,
+  type DirectoryDTO,
+} from "./_actions/directories";
 import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import React from "react";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+  listAllProjectsAction,
+  type ProjectListItem,
+} from "./_actions/projects";
 
-export default async function Page() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
-    redirect("/login");
-  }
+type SearchParams = Promise<{
+  page?: string | string[];
+  sort?: "createdAt" | "title" | string | string[];
+  order?: "asc" | "desc" | string | string[];
+  [k: string]: string | string[] | undefined;
+}>;
+
+function toIntOr(def: number, raw?: string | string[]) {
+  const s = Array.isArray(raw) ? raw[0] : raw;
+  const n = Number.parseInt(s ?? "", 10);
+  return Number.isFinite(n) && n > 0 ? n : def;
+}
+
+function asSort(raw?: string | string[]): "createdAt" | "title" {
+  const s = Array.isArray(raw) ? raw[0] : raw;
+  return s === "title" || s === "createdAt" ? s : "createdAt";
+}
+
+function asOrder(raw?: string | string[]): "asc" | "desc" {
+  const s = Array.isArray(raw) ? raw[0] : raw;
+  return s === "asc" || s === "desc" ? s : "desc";
+}
+
+export default async function DashboardHomePage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  // Await the search params promise
+  const resolvedSearchParams = await searchParams;
+
+  const sp = resolvedSearchParams ?? {};
+  const page = Math.max(1, toIntOr(1, sp.page));
+  const sort = asSort(sp.sort);
+  const order = asOrder(sp.order);
+  const limit = 8;
+
+  const [directories, data] = await Promise.all([
+    listDirectoriesForUser() as Promise<DirectoryDTO[]>,
+    listAllProjectsAction(page, limit, sort, order),
+  ]);
+
+  const items: ProjectListItem[] = data.items ?? [];
+  const total = data.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center w-full justify-between gap-2 px-4">
-            <div className="flex items-center">
-              <SidebarTrigger className="-ml-1" />
-              <Separator
-                orientation="vertical"
-                className="mr-2 data-[orientation=vertical]:h-4"
-              />
+    <div className="space-y-4">
+      <nav className="text-sm text-muted-foreground">Home</nav>
 
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      Building Your Application
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
+      <div className="flex justify-end">
+        <SortDropdown
+          basePath="/dashboard"
+          currentSort={sort}
+          currentOrder={order}
+        />
+      </div>
 
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            </div>
-            <div className="flex items-center gap-2">
-              <LanguageSwitcher />
-              <ThemeSwitcher />
-            </div>
+      <div className="min-h-[60vh]">
+        {items.length === 0 ? (
+          <div className="min-h-[40vh] grid place-items-center">
+            <p className="text-muted-foreground">Nessun progetto trovato.</p>
           </div>
-        </header>
+        ) : (
+          <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {items.map((p) => (
+              <li key={p.id}>
+                <ProjectCard item={p} directories={directories} showFolder />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+      <div className="flex justify-center">
+        <Pagination
+          current={page}
+          totalPages={totalPages}
+          sort={sort}
+          order={order}
+        />
+      </div>
+    </div>
+  );
+}
+
+function Pagination({
+  current,
+  totalPages,
+  sort,
+  order,
+}: {
+  current: number;
+  totalPages: number;
+  sort: "createdAt" | "title";
+  order: "asc" | "desc";
+}) {
+  const href = (p: number) => {
+    const qs = new URLSearchParams({ page: String(p), sort, order });
+    return `/dashboard?${qs.toString()}`;
+  };
+
+  const prevDisabled = current <= 1;
+  const nextDisabled = current >= totalPages;
+
+  return (
+    <div className="inline-flex items-center gap-2">
+      <Link
+        href={prevDisabled ? "#" : href(current - 1)}
+        className={`px-3 py-2 rounded-md border ${
+          prevDisabled ? "pointer-events-none opacity-50" : ""
+        }`}
+        aria-disabled={prevDisabled}
+      >
+        ←
+      </Link>
+      <span className="text-sm">
+        Pagina {current} di {totalPages}
+      </span>
+      <Link
+        href={nextDisabled ? "#" : href(current + 1)}
+        className={`px-3 py-2 rounded-md border ${
+          nextDisabled ? "pointer-events-none opacity-50" : ""
+        }`}
+        aria-disabled={nextDisabled}
+      >
+        →
+      </Link>
+    </div>
   );
 }
