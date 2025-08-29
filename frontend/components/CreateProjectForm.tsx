@@ -5,7 +5,10 @@ import * as React from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { projectSchema, type ProjectForm } from "@/lib/schema/project";
+import {
+  getProjectCreateSchema,
+  type ProjectCreateForm,
+} from "@/lib/schema/project";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +24,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { generateVideoAction } from "@/app/(no-nav)/dashboard/project/_actions";
+import { useTranslations, useLocale } from "next-intl";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import { Folder, Plus } from "lucide-react";
 
@@ -48,6 +52,9 @@ export default function CreateProjectForm({
   getApiToken: () => Promise<TokenResp>;
 }) {
   const router = useRouter();
+  const tv = useTranslations("Validation");
+  const locale = useLocale();
+  const schema = React.useMemo(() => getProjectCreateSchema(tv), [tv]);
 
   const [openCreateDir, setOpenCreateDir] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
@@ -55,9 +62,9 @@ export default function CreateProjectForm({
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [bgColor] = React.useState("#000000");
 
-  const { register, formState, getValues, trigger, reset } =
-    useForm<ProjectForm>({
-      resolver: zodResolver(projectSchema),
+  const { register, formState, getValues, trigger, reset, clearErrors } =
+    useForm<ProjectCreateForm>({
+      resolver: zodResolver(schema),
       defaultValues: {
         title: "",
         text: "",
@@ -66,6 +73,10 @@ export default function CreateProjectForm({
       },
       mode: "onSubmit",
     });
+
+  React.useEffect(() => {
+    clearErrors();
+  }, [locale, clearErrors]);
 
   async function onGenerate() {
     const ok = await trigger(["title", "text"], { shouldFocus: true });

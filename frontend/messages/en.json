@@ -105,7 +105,15 @@
     "email": "Please enter a valid email address",
     "password": "Password must be at least 8 characters",
     "username": "Username must be at least 2 characters",
-    "confirmPassword": "Passwords don't match"
+    "confirmPassword": "Passwords don't match",
+    "titleMin": "Title must be at least 2 characters",
+    "titleMax": "Title can be at most 120 characters",
+    "dirNameMin": "Name must be at least 2 characters",
+    "duplicateTitle": "A project with this title already exists",
+    "duplicateDir": "A folder with this name already exists",
+    "genericError": "Check the highlighted fields",
+    "textRequired": "Text is required",
+    "sameName": "The new name matches the current one"
   },
 
   "Common": {
@@ -128,7 +136,12 @@
     "newTitle": "New title",
     "cancel": "Cancel",
     "save": "Save",
-    "deleteProjectTitle": "Delete the project?"
+    "saving": "Saving...",
+    "deleteProjectTitle": "Delete the project?",
+    "delete": "Delete",
+    "createDirTitle": "Create folder",
+    "nameLabel": "Name",
+    "creating": "Creating..."
   },
   "Toast": {
     "renameSuccess": "Title updated",
@@ -136,7 +149,10 @@
     "moveSuccess": "Moved",
     "moveFail": "Move failed",
     "deleteSuccess": "Project deleted",
-    "deleteFail": "Deletion failed"
+    "deleteFail": "Deletion failed",
+    "projectMoved": "Project {title} moved to {folder}",
+    "projectDeleted": "Project {title} deleted",
+    "directoryCreated": "Folder created"
   },
   "Status": {
     "loading": "Loading…",

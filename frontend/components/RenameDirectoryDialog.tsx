@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations, useLocale } from "next-intl";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -9,65 +10,70 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   getCreateDirectorySchema,
   type CreateDirectoryForm,
 } from "@/lib/schema/project";
-import {
-  createDirectoryAction,
-  type DirectoryDTO,
-} from "@/app/(no-nav)/dashboard/_actions/directories";
-import { toast } from "sonner";
-import { useTranslations, useLocale } from "next-intl";
-import { useTranslations as useToastTranslations } from "next-intl";
+import { renameDirectoryAction } from "@/app/(no-nav)/dashboard/_actions/directories";
 
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onCreated?: (dir: DirectoryDTO) => void;
+  directoryId: string;
+  defaultName: string;
+  onRenamed?: (newName: string) => void;
 };
 
-export function CreateDirectoryDialog({
+export default function RenameDirectoryDialog({
   open,
   onOpenChange,
-  onCreated,
+  directoryId,
+  defaultName,
+  onRenamed,
 }: Props) {
   const td = useTranslations("Dialog");
-  const tm = useToastTranslations("Toast");
   const tv = useTranslations("Validation");
   const locale = useLocale();
   const schema = React.useMemo(() => getCreateDirectorySchema(tv), [tv]);
+
   const { register, handleSubmit, formState, reset, setError, clearErrors } =
     useForm<CreateDirectoryForm>({
       resolver: zodResolver(schema),
-      defaultValues: { name: "" },
       mode: "onSubmit",
+      defaultValues: { name: defaultName },
     });
-  const [pending, start] = React.useTransition();
 
   React.useEffect(() => {
     clearErrors();
   }, [locale, clearErrors]);
 
+  React.useEffect(() => {
+    if (open) {
+      reset({ name: defaultName });
+    }
+  }, [open, defaultName, reset]);
+
+  const [pending, start] = React.useTransition();
+
   const onSubmit = (values: CreateDirectoryForm) => {
-    const fd = new FormData();
-    fd.set("name", values.name);
+    const nextName = values.name.trim();
+    if (nextName === defaultName.trim()) {
+      setError("name", { type: "manual", message: tv("sameName") });
+      return;
+    }
     start(async () => {
-      const res = await createDirectoryAction(fd);
+      const res = await renameDirectoryAction(directoryId, nextName);
       if (res.ok) {
-        toast.success(tm("directoryCreated"));
-        if (res.dir) onCreated?.(res.dir);
-        reset();
+        onRenamed?.(nextName);
         onOpenChange(false);
-      } else if (res.field === "name") {
+        return;
+      }
+      if (res.field === "name") {
         setError("name", { type: "server", message: res.message });
-      } else {
-        toast.error(res.message || "Errore");
       }
     });
   };
@@ -77,34 +83,41 @@ export function CreateDirectoryDialog({
       open={open}
       onOpenChange={(v) => {
         onOpenChange(v);
-        if (!v) reset();
+        if (!v) {
+          reset({ name: defaultName });
+          clearErrors();
+        }
       }}
     >
-      <AlertDialogContent className="sm:max-w-[420px]">
+      <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{td("createDirTitle")}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {td("renameDirectoryTitle", { default: "Rinomina cartella" })}
+          </AlertDialogTitle>
         </AlertDialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
           <div className="grid gap-2">
-            <Label
-              htmlFor="dir-name"
-              className={formState.errors.name ? "text-red-600" : ""}
+            <label
+              htmlFor="dir-new-name"
+              className="text-sm text-muted-foreground"
             >
               {td("nameLabel")}
-            </Label>
+            </label>
             <Input
-              id="dir-name"
-              placeholder="e.g. Playground"
-              autoFocus
+              id="dir-new-name"
               aria-invalid={!!formState.errors.name}
+              aria-describedby={
+                formState.errors.name ? "name-error" : undefined
+              }
+              autoFocus
               {...register("name")}
             />
-            {formState.errors.name && (
-              <p className="text-sm text-red-600">
+            {formState.errors.name ? (
+              <p id="name-error" className="text-xs text-red-600">
                 {formState.errors.name.message}
               </p>
-            )}
+            ) : null}
           </div>
 
           <AlertDialogFooter>
@@ -112,7 +125,7 @@ export function CreateDirectoryDialog({
               {td("cancel")}
             </AlertDialogCancel>
             <Button type="submit" disabled={pending}>
-              {pending ? td("creating") : td("save")}
+              {pending ? td("saving") : td("save")}
             </Button>
           </AlertDialogFooter>
         </form>

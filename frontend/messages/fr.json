@@ -101,7 +101,7 @@
     "dashboardButton": "Aller au tableau de bord"
   },
 
-  "Validation": {
+  "_ValidationOld": {
     "email": "Veuillez saisir une adresse e-mail valide",
     "password": "Le mot de passe doit contenir au moins 8 caractères",
     "username": "Le nom d'utilisateur doit contenir au moins 2 caractères",
@@ -129,7 +129,12 @@
     "newTitle": "Nouveau titre",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "deleteProjectTitle": "Supprimer le projet ?"
+    "saving": "Enregistrement...",
+    "deleteProjectTitle": "Supprimer le projet ?",
+    "delete": "Supprimer",
+    "createDirTitle": "Créer un dossier",
+    "nameLabel": "Nom",
+    "creating": "Création..."
   },
   "Toast": {
     "renameSuccess": "Titre mis à jour",
@@ -137,7 +142,24 @@
     "moveSuccess": "Déplacé",
     "moveFail": "Échec du déplacement",
     "deleteSuccess": "Projet supprimé",
-    "deleteFail": "Échec de la suppression"
+    "deleteFail": "Échec de la suppression",
+    "projectMoved": "Projet {title} déplacé vers {folder}",
+    "projectDeleted": "Projet {title} supprimé",
+    "directoryCreated": "Dossier créé"
+  },
+  "Validation": {
+    "email": "Veuillez saisir une adresse e-mail valide",
+    "password": "Le mot de passe doit contenir au moins 8 caractères",
+    "username": "Le nom d'utilisateur doit contenir au moins 2 caractères",
+    "confirmPassword": "Les mots de passe ne correspondent pas",
+    "titleMin": "Le titre doit contenir au moins 2 caractères",
+    "titleMax": "Le titre peut contenir au maximum 120 caractères",
+    "dirNameMin": "Le nom doit contenir au moins 2 caractères",
+    "duplicateTitle": "Un projet avec ce titre existe déjà",
+    "duplicateDir": "Un dossier avec ce nom existe déjà",
+    "genericError": "Vérifiez les champs en surbrillance",
+    "sameName": "Le nouveau nom est identique à l'actuel",
+    "textRequired": "Le texte est obligatoire"
   },
   "Status": {
     "loading": "Chargement…",

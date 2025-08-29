@@ -60,7 +60,7 @@ export async function createDirectoryAction(
 export async function renameDirectoryAction(
   id: string,
   name: string
-): Promise<boolean> {
+): Promise<{ ok: true } | { ok: false; field?: "name"; message?: string }> {
   const token = await getToken();
   const r = await fetch(`${API}/api/directories/${id}`, {
     method: "PATCH",
@@ -71,7 +71,16 @@ export async function renameDirectoryAction(
     body: JSON.stringify({ name }),
     cache: "no-store",
   });
-  return r.ok;
+  if (r.ok) return { ok: true };
+  if (r.status === 409) {
+    return {
+      ok: false,
+      field: "name",
+      message: "Esiste già una cartella con questo nome",
+    };
+  }
+  const msg = await r.text().catch(() => "");
+  return { ok: false, message: msg || "Errore rinomina" };
 }
 
 export async function deleteDirectoryAction(id: string): Promise<boolean> {

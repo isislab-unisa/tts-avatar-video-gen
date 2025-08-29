@@ -92,7 +92,9 @@ export async function listProjectsByDirAction(
 export async function renameProjectAction(
   id: string,
   title: string
-): Promise<boolean> {
+): Promise<
+  boolean | { ok: true } | { ok: false; field?: "title"; message?: string }
+> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "PATCH",
@@ -103,8 +105,19 @@ export async function renameProjectAction(
     body: JSON.stringify({ title: title.trim() }),
     cache: "no-store",
   });
-  if (r.ok) revalidatePath("/dashboard");
-  return r.ok;
+  if (r.ok) {
+    revalidatePath("/dashboard");
+    return { ok: true };
+  }
+  if (r.status === 409) {
+    return {
+      ok: false,
+      field: "title",
+      message: "Esiste già un progetto con questo titolo",
+    };
+  }
+  const msg = await r.text().catch(() => "");
+  return { ok: false, message: msg || "Errore rinomina" };
 }
 
 export async function moveProjectAction(
@@ -125,13 +138,19 @@ export async function moveProjectAction(
   return r.ok;
 }
 
-export async function deleteProjectAction(id: string): Promise<boolean> {
+export async function deleteProjectAction(
+  id: string
+): Promise<boolean | { ok: boolean; message?: string }> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
-  if (r.ok) revalidatePath("/dashboard");
-  return r.ok;
+  if (r.ok) {
+    revalidatePath("/dashboard");
+    return { ok: true };
+  }
+  const msg = await r.text().catch(() => "");
+  return { ok: false, message: msg || "Errore eliminazione" };
 }

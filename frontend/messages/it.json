@@ -101,7 +101,7 @@
     "dashboardButton": "Vai alla dashboard"
   },
 
-  "Validation": {
+  "_ValidationOld": {
     "email": "Inserisci un indirizzo email valido",
     "password": "La password deve contenere almeno 8 caratteri",
     "username": "Il nome utente deve contenere almeno 2 caratteri",
@@ -129,7 +129,12 @@
     "newTitle": "Nuovo titolo",
     "cancel": "Annulla",
     "save": "Salva",
-    "deleteProjectTitle": "Eliminare il progetto?"
+    "saving": "Salvataggio...",
+    "deleteProjectTitle": "Eliminare il progetto?",
+    "delete": "Elimina",
+    "createDirTitle": "Crea cartella",
+    "nameLabel": "Nome",
+    "creating": "Creazione..."
   },
   "Toast": {
     "renameSuccess": "Titolo aggiornato",
@@ -137,7 +142,24 @@
     "moveSuccess": "Spostato",
     "moveFail": "Spostamento fallito",
     "deleteSuccess": "Progetto eliminato",
-    "deleteFail": "Eliminazione fallita"
+    "deleteFail": "Eliminazione fallita",
+    "projectMoved": "Progetto {title} spostato in {folder}",
+    "projectDeleted": "Progetto {title} eliminato",
+    "directoryCreated": "Cartella creata"
+  },
+  "Validation": {
+    "email": "Inserisci un indirizzo email valido",
+    "password": "La password deve contenere almeno 8 caratteri",
+    "username": "Il nome utente deve contenere almeno 2 caratteri",
+    "confirmPassword": "Le password non corrispondono",
+    "titleMin": "Il titolo deve avere almeno 2 caratteri",
+    "titleMax": "Il titolo può essere lungo al massimo 120 caratteri",
+    "dirNameMin": "Il nome deve avere almeno 2 caratteri",
+    "duplicateTitle": "Esiste già un progetto con questo titolo",
+    "duplicateDir": "Esiste già una cartella con questo nome",
+    "genericError": "Controlla i campi evidenziati",
+    "sameName": "Il nuovo nome coincide con quello attuale",
+    "textRequired": "Il testo è obbligatorio"
   },
   "Status": {
     "loading": "Caricamento…",
