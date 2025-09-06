@@ -10,7 +10,9 @@ import {
   FolderEdit,
   FolderSymlink,
   Folder,
+  FolderOpen,
   FolderPlus,
+  Download,
 } from "lucide-react";
 import {
   Collapsible,
@@ -53,6 +55,15 @@ import {
   type DirectoryDTO,
 } from "@/app/(no-nav)/dashboard/_actions/directories";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
+import RenameProjectDialog from "@/components/RenameProjectDialog";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import {
+  listProjectsByDirAction,
+  moveProjectAction,
+  deleteProjectAction,
+  type ProjectListItem,
+} from "@/app/(no-nav)/dashboard/_actions/projects";
+import { toast } from "sonner";
 
 const iconCls = "mr-2 h-4 w-4";
 
@@ -92,6 +103,19 @@ export function NavMain({
   }>({ open: false, name: "" });
   const [createOpen, setCreateOpen] = React.useState(false);
 
+  const [openDirs, setOpenDirs] = React.useState<Record<string, boolean>>({});
+  const [dirProjects, setDirProjects] = React.useState<
+    Record<string, ProjectListItem[]>
+  >({});
+  const [projectRename, setProjectRename] = React.useState<{
+    open: boolean;
+    project?: ProjectListItem;
+  }>({ open: false });
+  const [projectDelete, setProjectDelete] = React.useState<{
+    open: boolean;
+    project?: ProjectListItem;
+  }>({ open: false });
+
   async function doRename() {
     if (!rename.dirId) return;
     const name = rename.name.trim();
@@ -107,6 +131,24 @@ export function NavMain({
     const ok = await deleteDirectoryAction(dirId);
     if (ok) {
       router.push("/dashboard");
+      router.refresh();
+    }
+  }
+
+  async function onToggle(dirId: string, open: boolean) {
+    setOpenDirs((s) => ({ ...s, [dirId]: open }));
+    if (open && !dirProjects[dirId]) {
+      const res = await listProjectsByDirAction(dirId, 1, 50, "title", "asc");
+      setDirProjects((s) => ({ ...s, [dirId]: res.items }));
+    }
+  }
+
+  async function onMove(project: ProjectListItem, directoryId: string) {
+    const ok = await moveProjectAction(project.id, directoryId);
+    if (ok) {
+      const folderName =
+        directories.find((d) => d.id === directoryId)?.name || "";
+      toast.success(`Progetto ${project.title} spostato in ${folderName}`);
       router.refresh();
     }
   }
@@ -133,22 +175,25 @@ export function NavMain({
                 className="group/collapsible"
               >
                 <SidebarMenuItem>
-                  <div className="flex items-center group/folder-item">
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton
-                        tooltip={item.title}
-                        className="cursor-pointer flex-1"
-                      >
-                        {item.icon && <item.icon className="h-4 w-4" />}
+                  <div className="flex items-center gap-1 group/folder-item">
+                    <SidebarMenuButton
+                      asChild
+                      className="cursor-pointer flex-1 pr-2"
+                    >
+                      <Link href={item.url}>
+                        {dirId && openDirs[dirId] ? (
+                          <FolderOpen className="h-4 w-4" />
+                        ) : (
+                          item.icon && <item.icon className="h-4 w-4" />
+                        )}
                         <span>{item.title}</span>
-                        <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
+                      </Link>
+                    </SidebarMenuButton>
 
                     {dirId && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <SidebarMenuAction className="opacity-0 group-hover/folder-item:opacity-100 transition-opacity cursor-pointer">
+                          <SidebarMenuAction className="shrink-0 opacity-0 group-hover/folder-item:opacity-100 transition-opacity cursor-pointer right-8">
                             <MoreHorizontal className="h-4 w-4" />
                             <span className="sr-only">More</span>
                           </SidebarMenuAction>
@@ -186,11 +231,26 @@ export function NavMain({
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
+
+                    <CollapsibleTrigger asChild>
+                      <button
+                        aria-label="Toggle"
+                        className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded hover:bg-muted/50 relative z-10 data-[state=open]:rotate-90"
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          if (!dirId) return;
+                          const next = !openDirs[dirId];
+                          await onToggle(dirId, next);
+                        }}
+                      >
+                        <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                      </button>
+                    </CollapsibleTrigger>
                   </div>
 
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items?.map((sub) => (
+                      {(dirId ? dirProjects[dirId] || [] : []).map((sub) => (
                         <SidebarMenuSubItem
                           key={sub.id || sub.title}
                           className="group/project-item"
@@ -200,12 +260,12 @@ export function NavMain({
                               asChild
                               className="cursor-pointer flex-1"
                             >
-                              <Link href={sub.url}>
+                              <Link href={`/dashboard/project/${sub.id}`}>
                                 <span>{sub.title}</span>
                               </Link>
                             </SidebarMenuSubButton>
 
-                            {sub.type === "project" && dirId && (
+                            {dirId && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <SidebarMenuAction className="opacity-0 group-hover/project-item:opacity-100 transition-opacity cursor-pointer ml-auto">
@@ -214,10 +274,38 @@ export function NavMain({
                                   </SidebarMenuAction>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
-                                  className="w-48 rounded-lg"
+                                  className="w-56 rounded-lg"
                                   side="right"
                                   align="start"
                                 >
+                                  <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() =>
+                                      router.push(
+                                        `/dashboard/project/${sub.id}`
+                                      )
+                                    }
+                                  >
+                                    <Download
+                                      className={`${iconCls} text-muted-foreground`}
+                                    />
+                                    <span>Download</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() =>
+                                      setProjectRename({
+                                        open: true,
+                                        project: sub as ProjectListItem,
+                                      })
+                                    }
+                                  >
+                                    <FolderEdit
+                                      className={`${iconCls} text-muted-foreground`}
+                                    />
+                                    <span>Rinomina</span>
+                                  </DropdownMenuItem>
                                   <DropdownMenuSub>
                                     <DropdownMenuSubTrigger className="cursor-pointer">
                                       <FolderSymlink
@@ -232,11 +320,12 @@ export function NavMain({
                                           <DropdownMenuItem
                                             key={d.id}
                                             className="cursor-pointer"
-                                            onClick={() => {
-                                              // lo spostamento vero lo fai nella pagina dettaglio
-                                              // da qui portiamo l’utente alla pagina, dove c’è il dropdown “Sposta in…”
-                                              router.push(sub.url);
-                                            }}
+                                            onClick={() =>
+                                              onMove(
+                                                sub as ProjectListItem,
+                                                d.id
+                                              )
+                                            }
                                           >
                                             <Folder
                                               className={`${iconCls} text-muted-foreground`}
@@ -254,6 +343,21 @@ export function NavMain({
                                       </DropdownMenuItem>
                                     </DropdownMenuSubContent>
                                   </DropdownMenuSub>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                                    onClick={() =>
+                                      setProjectDelete({
+                                        open: true,
+                                        project: sub as ProjectListItem,
+                                      })
+                                    }
+                                  >
+                                    <Trash2
+                                      className={`${iconCls} text-red-600`}
+                                    />
+                                    <span>Elimina</span>
+                                  </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             )}
@@ -269,7 +373,7 @@ export function NavMain({
         </SidebarMenu>
       </SidebarGroup>
 
-      {/* RENAME dialog */}
+      {/* RENAME directory dialog (legacy) */}
       <AlertDialog
         open={rename.open}
         onOpenChange={(o) => setRename((s) => ({ ...s, open: o }))}
@@ -291,7 +395,7 @@ export function NavMain({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* DELETE dialog */}
+      {/* DELETE directory dialog (legacy) */}
       <AlertDialog
         open={confirm.open}
         onOpenChange={(open) => setConfirm((s) => ({ ...s, open }))}
@@ -317,6 +421,32 @@ export function NavMain({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Project rename/delete dialogs */}
+      <RenameProjectDialog
+        open={projectRename.open}
+        onOpenChange={(o) => setProjectRename((s) => ({ ...s, open: o }))}
+        projectId={projectRename.project?.id || ""}
+        defaultTitle={projectRename.project?.title || ""}
+        onRenamed={() => {
+          setProjectRename({ open: false, project: undefined });
+          router.refresh();
+        }}
+      />
+
+      <ConfirmDeleteDialog
+        open={projectDelete.open}
+        onOpenChange={(o) => setProjectDelete((s) => ({ ...s, open: o }))}
+        onConfirm={async () => {
+          const p = projectDelete.project;
+          if (!p) return;
+          const res = await deleteProjectAction(p.id);
+          if ((res as { ok?: boolean })?.ok || res === true) {
+            toast.success("Progetto eliminato");
+            setProjectDelete({ open: false, project: undefined });
+            router.refresh();
+          }
+        }}
+      />
     </>
   );
 }

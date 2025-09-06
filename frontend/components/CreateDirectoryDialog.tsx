@@ -65,9 +65,15 @@ export function CreateDirectoryDialog({
         reset();
         onOpenChange(false);
       } else if (res.field === "name") {
-        setError("name", { type: "server", message: res.message });
+        const msgKey = res.message;
+        const message =
+          typeof msgKey === "string" ? tv(msgKey) : tv("genericError");
+        setError("name", { type: "server", message });
       } else {
-        toast.error(res.message || "Errore");
+        const msgKey = res.message;
+        const message =
+          typeof msgKey === "string" ? tv(msgKey) : tv("genericError");
+        toast.error(message);
       }
     });
   };

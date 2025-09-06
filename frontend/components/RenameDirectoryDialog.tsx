@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -89,21 +90,19 @@ export default function RenameDirectoryDialog({
         }
       }}
     >
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[420px]">
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {td("renameDirectoryTitle", { default: "Rinomina cartella" })}
-          </AlertDialogTitle>
+          <AlertDialogTitle>{td("renameDirectoryTitle")}</AlertDialogTitle>
         </AlertDialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
           <div className="grid gap-2">
-            <label
+            <Label
               htmlFor="dir-new-name"
-              className="text-sm text-muted-foreground"
+              className={formState.errors.name ? "text-red-600" : ""}
             >
               {td("nameLabel")}
-            </label>
+            </Label>
             <Input
               id="dir-new-name"
               aria-invalid={!!formState.errors.name}
@@ -114,7 +113,7 @@ export default function RenameDirectoryDialog({
               {...register("name")}
             />
             {formState.errors.name ? (
-              <p id="name-error" className="text-xs text-red-600">
+              <p id="name-error" className="text-sm text-red-600">
                 {formState.errors.name.message}
               </p>
             ) : null}

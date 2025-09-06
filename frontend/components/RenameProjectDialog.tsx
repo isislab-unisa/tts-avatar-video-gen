@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -103,19 +104,19 @@ export default function RenameProjectDialog({
         }
       }}
     >
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[420px]">
         <AlertDialogHeader>
           <AlertDialogTitle>{td("renameProjectTitle")}</AlertDialogTitle>
         </AlertDialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
           <div className="grid gap-2">
-            <label
+            <Label
               htmlFor="new-title"
-              className="text-sm text-muted-foreground"
+              className={formState.errors.title ? "text-red-600" : ""}
             >
               {td("newTitle")}
-            </label>
+            </Label>
             <Input
               id="new-title"
               aria-invalid={!!formState.errors.title}
@@ -126,7 +127,7 @@ export default function RenameProjectDialog({
               {...register("title")}
             />
             {formState.errors.title ? (
-              <p id="title-error" className="text-xs text-red-600">
+              <p id="title-error" className="text-sm text-red-600">
                 {formState.errors.title.message}
               </p>
             ) : null}

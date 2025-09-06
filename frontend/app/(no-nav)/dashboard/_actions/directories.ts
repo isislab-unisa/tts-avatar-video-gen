@@ -47,11 +47,11 @@ export async function createDirectoryAction(
       return {
         ok: false,
         field: "name",
-        message: "Esiste già una cartella con questo nome",
+        message: "duplicateDir",
       };
     }
     const msg = await r.text().catch(() => "");
-    return { ok: false, message: msg || "Errore creazione" };
+    return { ok: false, message: msg || "genericError" };
   }
   const dir = (await r.json()) as DirectoryDTO;
   return { ok: true, dir };
