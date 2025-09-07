@@ -1,5 +1,6 @@
 import Link from "next/link";
-import ProjectCard from "@/components/ProjectCard";
+import { getTranslations } from "next-intl/server";
+import ProjectHomeCard from "@/components/ProjectHomeCard";
 import { SortDropdown } from "@/components/sort-dropdown";
 import {
   listDirectoriesForUser,
@@ -42,6 +43,8 @@ export default async function FolderPage({
   params: Params;
   searchParams: SearchParams;
 }) {
+  const t = await getTranslations("Common");
+
   // Await the promises
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
@@ -50,7 +53,8 @@ export default async function FolderPage({
   const page = Math.max(1, toIntOr(1, sp.page));
   const sort = asSort(sp.sort);
   const order = asOrder(sp.order);
-  const limit = 8;
+  // 10 card = 2 righe da 5 -> niente scroll verticale
+  const limit = 10;
 
   const [directories, data] = await Promise.all([
     listDirectoriesForUser() as Promise<DirectoryDTO[]>,
@@ -63,10 +67,11 @@ export default async function FolderPage({
   const currentDir = directories.find((d) => d.id === resolvedParams.folderId);
 
   return (
-    <div className="space-y-4">
+    // Niente micro–scroll: blocco l'altezza e rendo scrollabile solo il grid se serve
+    <div className="space-y-3 overflow-hidden">
       <nav className="text-sm text-muted-foreground">
         <Link href="/dashboard" className="underline hover:no-underline">
-          Home
+          {t("home")}
         </Link>{" "}
         / {currentDir?.name ?? "Cartella"}
       </nav>
@@ -79,38 +84,41 @@ export default async function FolderPage({
         />
       </div>
 
-      <div className="min-h-[60vh]">
-        {items.length === 0 ? (
-          <div className="min-h-[40vh] grid place-items-center">
-            <p className="text-muted-foreground">Nessun progetto.</p>
-          </div>
-        ) : (
-          <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            {items.map((p) => (
-              <li key={p.id}>
-                <ProjectCard
-                  item={p}
-                  directories={directories}
-                  showFolder={false}
-                  currentDirId={resolvedParams.folderId}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {/* Contenuto + paginazione ancorata in basso */}
+      <div className="flex h-[calc(100vh-10rem)] flex-col">
+        <div className="flex-1 overflow-hidden">
+          {items.length === 0 ? (
+            <div className="h-full grid place-items-center">
+              <p className="text-muted-foreground">{t("noProjectsFound")}</p>
+            </div>
+          ) : (
+            <ul className="h-full overflow-auto pr-1 grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+              {items.map((p) => (
+                <li key={p.id}>
+                  <ProjectHomeCard
+                    item={p}
+                    directories={directories}
+                    showFolder={false}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-      <div className="flex justify-center">
-        <Pagination
-          current={page}
-          totalPages={totalPages}
-          makeHref={(p) => {
-            const qs = new URLSearchParams({ page: String(p), sort, order });
-            return `/dashboard/folder/${
-              resolvedParams.folderId
-            }?${qs.toString()}`;
-          }}
-        />
+        <div className="flex justify-center pt-1">
+          <Pagination
+            current={page}
+            totalPages={totalPages}
+            t={t}
+            makeHref={(p) => {
+              const qs = new URLSearchParams({ page: String(p), sort, order });
+              return `/dashboard/folder/${
+                resolvedParams.folderId
+              }?${qs.toString()}`;
+            }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -119,10 +127,12 @@ export default async function FolderPage({
 function Pagination({
   current,
   totalPages,
+  t,
   makeHref,
 }: {
   current: number;
   totalPages: number;
+  t: (key: string) => string;
   makeHref: (p: number) => string;
 }) {
   const prevDisabled = current <= 1;
@@ -139,7 +149,7 @@ function Pagination({
         ←
       </Link>
       <span className="text-sm">
-        Pagina {current} di {totalPages}
+        {t("page")} {current} {t("of")} {totalPages}
       </span>
       <Link
         href={nextDisabled ? "#" : makeHref(current + 1)}

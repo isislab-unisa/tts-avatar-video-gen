@@ -29,7 +29,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar directories={directories} />
+      <AppSidebar directories={directories} user={session.user} />
       <SidebarInset>
         <header className="flex h-16 items-center px-4 justify-between">
           <div className="flex items-center">

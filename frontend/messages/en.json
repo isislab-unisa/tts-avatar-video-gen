@@ -117,7 +117,21 @@
   },
 
   "Common": {
-    "home": "Home"
+    "home": "Home",
+    "page": "Page",
+    "of": "of",
+    "noProjectsFound": "No projects found.",
+    "createDirectory": "Create Directory",
+    "createProject": "Create Project",
+    "toggleSidebar": "Toggle Sidebar",
+    "noProjects": "No projects",
+    "sort": "Sort",
+    "sortField": "Field",
+    "sortDirection": "Direction",
+    "sortByDate": "By date",
+    "sortByTitle": "By title",
+    "sortAscending": "Ascending",
+    "sortDescending": "Descending"
   },
   "Project": {
     "notFound": "Project not found.",
@@ -129,7 +143,21 @@
     "moveTo": "Move to…",
     "createNewFolder": "Create new folder…",
     "rename": "Rename",
-    "delete": "Delete"
+    "delete": "Delete",
+    "titlePlaceholder": "Project title",
+    "textPlaceholder": "Enter text…",
+    "avatarDescription": "other avatars coming soon",
+    "backgroundLabel": "Background Color",
+    "backgroundDescription": "available soon",
+    "generate": "Generate",
+    "generating": "Generating...",
+    "downloadVideo": "Download",
+    "saveProject": "Save",
+    "selectFolder": "Select folder",
+    "generateFirst": "Generate video first",
+    "fixFields": "Fix highlighted fields",
+    "videoGenerated": "Video generated",
+    "projectSaved": "Project saved"
   },
   "Dialog": {
     "renameProjectTitle": "Rename project",
@@ -141,7 +169,12 @@
     "delete": "Delete",
     "createDirTitle": "Create folder",
     "nameLabel": "Name",
-    "creating": "Creating..."
+    "creating": "Creating...",
+    "renameFolder": "Rename Folder",
+    "deleteFolder": "Delete Folder",
+    "deleteFolderConfirm": "Delete folder \"{name}\"?",
+    "deleteFolderWarning": "Warning: all contained projects and related videos will also be deleted.",
+    "renameDirectoryTitle": "Rename Folder"
   },
   "Toast": {
     "renameSuccess": "Title updated",
@@ -152,7 +185,12 @@
     "deleteFail": "Deletion failed",
     "projectMoved": "Project {title} moved to {folder}",
     "projectDeleted": "Project {title} deleted",
-    "directoryCreated": "Folder created"
+    "directoryCreated": "Folder created",
+    "signOutSuccess": "Signed out successfully",
+    "signOutError": "Error signing out",
+    "loggingOut": "Logging out...",
+    "logOut": "Log out",
+    "downloadFail": "Download failed"
   },
   "Status": {
     "loading": "Loading…",

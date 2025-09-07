@@ -58,48 +58,33 @@ export default async function Page({
     : undefined;
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-4 px-4">
-      {/* Breadcrumb + data (no overflow) */}
-      <div className="flex items-center justify-between gap-3">
-        <nav
-          aria-label="Breadcrumb"
-          className="min-w-0 overflow-x-hidden text-sm text-muted-foreground"
-        >
-          <div className="inline-flex items-center gap-2">
+    <div className="space-y-3 overflow-hidden">
+      <nav className="text-sm text-muted-foreground">
+        <Link href="/dashboard" className="hover:underline cursor-pointer">
+          {tCommon("home")}
+        </Link>
+        {dir && (
+          <>
+            {" / "}
             <Link
-              href="/dashboard"
-              className="hover:underline cursor-pointer shrink-0"
+              href={`/dashboard/folder/${dir.id}`}
+              className="hover:underline cursor-pointer"
+              title={dir.name}
             >
-              {tCommon("home")}
+              {dir.name}
             </Link>
+          </>
+        )}
+        {project && (
+          <>
+            {" / "}
+            <span title={project.title}>{project.title}</span>
+          </>
+        )}
+      </nav>
 
-            {dir && (
-              <>
-                <span className="shrink-0">/</span>
-                <Link
-                  href={`/dashboard/folder/${dir.id}`}
-                  className="hover:underline cursor-pointer truncate max-w-[30vw] sm:max-w-[40vw] md:max-w-[20vw] lg:max-w-[24rem]"
-                  title={dir.name}
-                >
-                  {dir.name}
-                </Link>
-              </>
-            )}
-
-            {project && (
-              <>
-                <span className="shrink-0">/</span>
-                <span
-                  className="text-foreground truncate max-w-[40vw] sm:max-w-[50vw] md:max-w-[28vw] lg:max-w-[32rem]"
-                  title={project.title}
-                >
-                  {project.title}
-                </span>
-              </>
-            )}
-          </div>
-        </nav>
-
+      <div className="flex items-center justify-between gap-3">
+        <div></div>
         {project && (
           <span className="text-xs text-muted-foreground shrink-0">
             {tProject("createdOn")}{" "}

@@ -154,3 +154,35 @@ export async function deleteProjectAction(
   const msg = await r.text().catch(() => "");
   return { ok: false, message: msg || "Errore eliminazione" };
 }
+
+export async function getProjectDownloadUrlAction(
+  id: string
+): Promise<{ ok: true; url: string } | { ok: false; message?: string }> {
+  const token = await getJwt();
+  const endpoint = `${API}/api/projects/${id}/download`;
+  const r = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+    redirect: "manual",
+  });
+
+  if (!r.ok && r.status !== 302 && r.status !== 301) {
+    const msg = await r.text().catch(() => "");
+    return { ok: false, message: msg || "download url error" };
+  }
+
+  const location = r.headers.get("Location");
+  if (location) return { ok: true, url: location };
+
+  const ctype = r.headers.get("content-type") || "";
+  try {
+    if (ctype.includes("application/json")) {
+      const data = (await r.json()) as { url?: string };
+      if (data?.url) return { ok: true, url: data.url };
+    } else {
+      const txt = await r.text();
+      if (txt && /^https?:\/\//.test(txt)) return { ok: true, url: txt.trim() };
+    }
+  } catch {}
+  return { ok: false, message: "download url not found" };
+}

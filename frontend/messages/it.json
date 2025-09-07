@@ -109,7 +109,21 @@
   },
 
   "Common": {
-    "home": "Home"
+    "home": "Home",
+    "page": "Pagina",
+    "of": "di",
+    "noProjectsFound": "Nessun progetto trovato.",
+    "createDirectory": "Crea Cartella",
+    "createProject": "Crea Progetto",
+    "toggleSidebar": "Mostra/Nascondi Sidebar",
+    "noProjects": "Nessun progetto",
+    "sort": "Ordina",
+    "sortField": "Campo",
+    "sortDirection": "Direzione",
+    "sortByDate": "Per data",
+    "sortByTitle": "Per titolo",
+    "sortAscending": "Ascendente",
+    "sortDescending": "Discendente"
   },
 
   "Project": {
@@ -122,7 +136,21 @@
     "moveTo": "Sposta in…",
     "createNewFolder": "Crea nuova cartella…",
     "rename": "Rinomina",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "titlePlaceholder": "Titolo progetto",
+    "textPlaceholder": "Inserisci il testo…",
+    "avatarDescription": "altri avatar presto",
+    "backgroundLabel": "Colore background",
+    "backgroundDescription": "disponibile a breve",
+    "generate": "Genera",
+    "generating": "Generazione...",
+    "downloadVideo": "Download",
+    "saveProject": "Salva",
+    "selectFolder": "Seleziona cartella",
+    "generateFirst": "Genera prima il video",
+    "fixFields": "Correggi i campi evidenziati",
+    "videoGenerated": "Video generato",
+    "projectSaved": "Progetto salvato"
   },
   "Dialog": {
     "renameProjectTitle": "Rinomina progetto",
@@ -134,7 +162,12 @@
     "delete": "Elimina",
     "createDirTitle": "Crea cartella",
     "nameLabel": "Nome",
-    "creating": "Creazione..."
+    "creating": "Creazione...",
+    "renameFolder": "Rinomina Cartella",
+    "deleteFolder": "Elimina Cartella",
+    "deleteFolderConfirm": "Eliminare la cartella \"{name}\"?",
+    "deleteFolderWarning": "Attenzione: verranno eliminati anche tutti i progetti contenuti e i relativi video.",
+    "renameDirectoryTitle": "Rinomina Cartella"
   },
   "Toast": {
     "renameSuccess": "Titolo aggiornato",
@@ -145,7 +178,12 @@
     "deleteFail": "Eliminazione fallita",
     "projectMoved": "Progetto {title} spostato in {folder}",
     "projectDeleted": "Progetto {title} eliminato",
-    "directoryCreated": "Cartella creata"
+    "directoryCreated": "Cartella creata",
+    "signOutSuccess": "Disconnesso con successo",
+    "signOutError": "Errore durante la disconnessione",
+    "loggingOut": "Disconnessione in corso...",
+    "logOut": "Esci",
+    "downloadFail": "Download fallito"
   },
   "Validation": {
     "email": "Inserisci un indirizzo email valido",

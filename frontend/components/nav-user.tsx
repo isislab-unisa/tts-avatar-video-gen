@@ -1,5 +1,6 @@
 "use client";
 import { ChevronsUpDown, LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -32,15 +33,16 @@ export function NavUser({
 }) {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const t = useTranslations("Toast");
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
       await authClient.signOut();
-      toast.success("Signed out successfully");
+      toast.success(t("signOutSuccess"));
       router.push("/login");
     } catch {
-      toast.error("Error signing out");
+      toast.error(t("signOutError"));
     } finally {
       setIsSigningOut(false);
     }
@@ -117,12 +119,12 @@ export function NavUser({
               {isSigningOut ? (
                 <>
                   <LogOut className="text-red-600 animate-spin mr-2" />
-                  Logging out...
+                  {t("loggingOut")}
                 </>
               ) : (
                 <>
                   <LogOut className="text-red-600 mr-2" />
-                  Log out
+                  {t("logOut")}
                 </>
               )}
             </DropdownMenuItem>

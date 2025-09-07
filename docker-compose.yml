@@ -13,6 +13,8 @@ services:
       retries: 30
     volumes:
       - mongo-data:/data/db
+    networks:
+      - dubme-network
 
   minio:
     image: minio/minio:latest
@@ -36,6 +38,8 @@ services:
     volumes:
       - minio-data:/data
       - minio-config:/root/.minio
+    networks:
+      - dubme-network
 
   createbuckets:
     image: minio/mc:latest
@@ -53,6 +57,8 @@ services:
         exit 0
       "
     restart: "no"
+    networks:
+      - dubme-network
 
   backend:
     build:
@@ -78,6 +84,8 @@ services:
     ports:
       - "4000:4000"
     restart: unless-stopped
+    networks:
+      - dubme-network
 
   frontend:
     build:
@@ -90,22 +98,31 @@ services:
         BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-build-time-secret-123}
         BACKEND_API_URL: http://backend:4000
         API_JWT_SECRET: ${API_JWT_SECRET:-supersecret123}
-        BETTER_AUTH_URL: http://frontend:3000
+        BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
     container_name: dubme-frontend
     depends_on:
       backend:
         condition: service_started
-    env_file:
-      - frontend/.env
+      mongo:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       BACKEND_API_URL: http://backend:4000
       MONGODB_URI: mongodb://mongo:27017/dubme
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-build-time-secret-123}
+      API_JWT_SECRET: ${API_JWT_SECRET:-supersecret123}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
     ports:
       - "3000:3000"
     restart: unless-stopped
+    networks:
+      - dubme-network
 
 volumes:
   mongo-data:
   minio-data:
   minio-config:
+
+networks:
+  dubme-network:
+    driver: bridge
