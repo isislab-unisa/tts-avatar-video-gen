@@ -133,6 +133,7 @@
     "avatarLabel": "Avatar",
     "createdOn": "Creato il",
     "download": "Download",
+    "folder": "Cartella",
     "moveTo": "Sposta in…",
     "createNewFolder": "Crea nuova cartella…",
     "rename": "Rinomina",
@@ -150,7 +151,8 @@
     "generateFirst": "Genera prima il video",
     "fixFields": "Correggi i campi evidenziati",
     "videoGenerated": "Video generato",
-    "projectSaved": "Progetto salvato"
+    "projectSaved": "Progetto salvato",
+    "deleteConfirmTitle": "Eliminare il progetto?"
   },
   "Dialog": {
     "renameProjectTitle": "Rinomina progetto",
@@ -183,7 +185,8 @@
     "signOutError": "Errore durante la disconnessione",
     "loggingOut": "Disconnessione in corso...",
     "logOut": "Esci",
-    "downloadFail": "Download fallito"
+    "downloadFail": "Download fallito",
+    "downloadStarted": "Download avviato"
   },
   "Validation": {
     "email": "Inserisci un indirizzo email valido",
@@ -204,5 +207,14 @@
     "errorTitle": "Qualcosa è andato storto",
     "errorMessage": "Si è verificato un errore durante il caricamento del progetto.",
     "retry": "Riprova"
+  },
+
+  "Error": {
+    "projectErrorTitle": "Errore Progetto",
+    "projectErrorDescription": "Si è verificato un errore durante il caricamento del progetto. Riprova.",
+    "folderErrorTitle": "Errore Cartella",
+    "folderErrorDescription": "Si è verificato un errore durante il caricamento della cartella. Riprova.",
+    "tryAgain": "Riprova",
+    "goToDashboard": "Vai alla Dashboard"
   }
 }

@@ -133,6 +133,7 @@
     "avatarLabel": "Avatar",
     "createdOn": "Créé le",
     "download": "Télécharger",
+    "folder": "Dossier",
     "moveTo": "Déplacer vers…",
     "createNewFolder": "Créer un nouveau dossier…",
     "rename": "Renommer",
@@ -150,7 +151,8 @@
     "generateFirst": "Génère d'abord la vidéo",
     "fixFields": "Corrige les champs surlignés",
     "videoGenerated": "Vidéo générée",
-    "projectSaved": "Projet enregistré"
+    "projectSaved": "Projet enregistré",
+    "deleteConfirmTitle": "Supprimer le projet ?"
   },
   "Dialog": {
     "renameProjectTitle": "Renommer le projet",
@@ -183,7 +185,8 @@
     "signOutError": "Erreur lors de la déconnexion",
     "loggingOut": "Déconnexion en cours...",
     "logOut": "Se déconnecter",
-    "downloadFail": "Téléchargement échoué"
+    "downloadFail": "Téléchargement échoué",
+    "downloadStarted": "Téléchargement démarré"
   },
   "Validation": {
     "email": "Veuillez saisir une adresse e-mail valide",

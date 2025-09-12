@@ -11,14 +11,12 @@ import {
   type ProjectListItem,
 } from "../../_actions/projects";
 
-type Params = Promise<{ folderId: string }>;
-
-type SearchParams = Promise<{
-  page?: string | string[];
-  sort?: "createdAt" | "title" | string | string[];
-  order?: "asc" | "desc" | string | string[];
-  [k: string]: string | string[] | undefined;
-}>;
+type Params = { folderId: string };
+type SearchParams = {
+  page?: string;
+  sort?: "createdAt" | "title";
+  order?: "asc" | "desc";
+};
 
 function toIntOr(def: number, raw?: string | string[]) {
   const s = Array.isArray(raw) ? raw[0] : raw;
@@ -45,11 +43,7 @@ export default async function FolderPage({
 }) {
   const t = await getTranslations("Common");
 
-  // Await the promises
-  const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const sp = resolvedSearchParams ?? {};
+  const sp = searchParams ?? {};
   const page = Math.max(1, toIntOr(1, sp.page));
   const sort = asSort(sp.sort);
   const order = asOrder(sp.order);
@@ -58,13 +52,13 @@ export default async function FolderPage({
 
   const [directories, data] = await Promise.all([
     listDirectoriesForUser() as Promise<DirectoryDTO[]>,
-    listProjectsByDirAction(resolvedParams.folderId, page, limit, sort, order),
+    listProjectsByDirAction(params.folderId, page, limit, sort, order),
   ]);
 
   const items: ProjectListItem[] = data.items ?? [];
   const total = data.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / limit));
-  const currentDir = directories.find((d) => d.id === resolvedParams.folderId);
+  const currentDir = directories.find((d) => d.id === params.folderId);
 
   return (
     // Niente micro–scroll: blocco l'altezza e rendo scrollabile solo il grid se serve
@@ -78,7 +72,7 @@ export default async function FolderPage({
 
       <div className="flex justify-end">
         <SortDropdown
-          basePath={`/dashboard/folder/${resolvedParams.folderId}`}
+          basePath={`/dashboard/folder/${params.folderId}`}
           currentSort={sort}
           currentOrder={order}
         />
@@ -113,9 +107,7 @@ export default async function FolderPage({
             t={t}
             makeHref={(p) => {
               const qs = new URLSearchParams({ page: String(p), sort, order });
-              return `/dashboard/folder/${
-                resolvedParams.folderId
-              }?${qs.toString()}`;
+              return `/dashboard/folder/${params.folderId}?${qs.toString()}`;
             }}
           />
         </div>

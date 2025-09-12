@@ -140,6 +140,7 @@
     "avatarLabel": "Avatar",
     "createdOn": "Created on",
     "download": "Download",
+    "folder": "Folder",
     "moveTo": "Move to…",
     "createNewFolder": "Create new folder…",
     "rename": "Rename",
@@ -157,7 +158,8 @@
     "generateFirst": "Generate video first",
     "fixFields": "Fix highlighted fields",
     "videoGenerated": "Video generated",
-    "projectSaved": "Project saved"
+    "projectSaved": "Project saved",
+    "deleteConfirmTitle": "Delete project?"
   },
   "Dialog": {
     "renameProjectTitle": "Rename project",
@@ -190,12 +192,22 @@
     "signOutError": "Error signing out",
     "loggingOut": "Logging out...",
     "logOut": "Log out",
-    "downloadFail": "Download failed"
+    "downloadFail": "Download failed",
+    "downloadStarted": "Download started"
   },
   "Status": {
     "loading": "Loading…",
     "errorTitle": "Something went wrong",
     "errorMessage": "An unexpected error occurred while loading the project.",
     "retry": "Try again"
+  },
+
+  "Error": {
+    "projectErrorTitle": "Project Error",
+    "projectErrorDescription": "There was an error loading the project. Please try again.",
+    "folderErrorTitle": "Folder Error",
+    "folderErrorDescription": "There was an error loading the folder. Please try again.",
+    "tryAgain": "Try Again",
+    "goToDashboard": "Go to Dashboard"
   }
 }

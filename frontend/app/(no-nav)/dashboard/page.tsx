@@ -11,12 +11,11 @@ import {
   type ProjectListItem,
 } from "./_actions/projects";
 
-type SearchParams = Promise<{
+type SearchParams = {
   page?: string | string[];
   sort?: "createdAt" | "title" | string | string[];
   order?: "asc" | "desc" | string | string[];
-  [k: string]: string | string[] | undefined;
-}>;
+};
 
 function toIntOr(def: number, raw?: string | string[]) {
   const s = Array.isArray(raw) ? raw[0] : raw;
@@ -41,7 +40,7 @@ export default async function DashboardHomePage({
 }) {
   const t = await getTranslations("Common");
 
-  const sp = (await searchParams) ?? {};
+  const sp = searchParams ?? {};
   const page = Math.max(1, toIntOr(1, sp.page));
   const sort = asSort(sp.sort);
   const order = asOrder(sp.order);

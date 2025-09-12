@@ -120,3 +120,65 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Animazioni per collapsible */
+@keyframes collapsible-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.animate-collapsible-down {
+  animation: collapsible-down 300ms ease-out;
+}
+
+.animate-collapsible-up {
+  animation: collapsible-up 300ms ease-out;
+}
+
+/* Animazioni per sidebar */
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 300ms ease-out;
+}
+
+.animate-slide-out {
+  animation: slide-out 300ms ease-out;
+}

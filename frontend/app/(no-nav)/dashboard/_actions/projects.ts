@@ -5,16 +5,18 @@ import { auth } from "@/lib/auth";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { signApiToken } from "@/lib/jwt";
 
-const API = process.env.BACKEND_API_URL!;
+const API = process.env.BACKEND_API_URL;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
 
+// === Helpers ===
 async function getJwt(): Promise<string> {
-  const h = await cloneRequestHeaders();
-  const session = await auth.api.getSession({ headers: h });
+  const headers = await cloneRequestHeaders();
+  const session = await auth.api.getSession({ headers });
   if (!session) throw new Error("Non autenticato");
-  return await signApiToken(session.user.id);
+  return signApiToken(session.user.id);
 }
 
+// === Tipi ===
 export type ProjectListItem = {
   id: string;
   title: string;
@@ -25,8 +27,12 @@ export type ProjectListItem = {
   directoryName?: string;
 };
 
-export type ListProjectsResp = { items: ProjectListItem[]; total: number };
+export type ListProjectsResp = {
+  items: ProjectListItem[];
+  total: number;
+};
 
+// === Reads ===
 export async function listAllProjectsAction(
   page = 1,
   limit = 8,
@@ -89,12 +95,11 @@ export async function listProjectsByDirAction(
   };
 }
 
+// === Mutations ===
 export async function renameProjectAction(
   id: string,
   title: string
-): Promise<
-  boolean | { ok: true } | { ok: false; field?: "title"; message?: string }
-> {
+): Promise<{ ok: true } | { ok: false; field?: "title"; message?: string }> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "PATCH",
@@ -105,10 +110,12 @@ export async function renameProjectAction(
     body: JSON.stringify({ title: title.trim() }),
     cache: "no-store",
   });
+
   if (r.ok) {
     revalidatePath("/dashboard");
     return { ok: true };
   }
+
   if (r.status === 409) {
     return {
       ok: false,
@@ -116,6 +123,7 @@ export async function renameProjectAction(
       message: "Esiste già un progetto con questo titolo",
     };
   }
+
   const msg = await r.text().catch(() => "");
   return { ok: false, message: msg || "Errore rinomina" };
 }
@@ -123,7 +131,7 @@ export async function renameProjectAction(
 export async function moveProjectAction(
   id: string,
   directoryId: string
-): Promise<boolean> {
+): Promise<{ ok: boolean; message?: string }> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "PATCH",
@@ -134,55 +142,53 @@ export async function moveProjectAction(
     body: JSON.stringify({ directoryId }),
     cache: "no-store",
   });
-  if (r.ok) revalidatePath("/dashboard");
-  return r.ok;
+
+  if (r.ok) {
+    revalidatePath("/dashboard");
+    return { ok: true };
+  }
+
+  const msg = await r.text().catch(() => "");
+  return { ok: false, message: msg || "Errore spostamento" };
 }
 
 export async function deleteProjectAction(
   id: string
-): Promise<boolean | { ok: boolean; message?: string }> {
+): Promise<{ ok: boolean; message?: string }> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
+
   if (r.ok) {
     revalidatePath("/dashboard");
     return { ok: true };
   }
+
   const msg = await r.text().catch(() => "");
   return { ok: false, message: msg || "Errore eliminazione" };
 }
 
+// === Download URL ===
+// Prende i dettagli del progetto dal backend e restituisce la URL finale (presigned) da usare lato client.
 export async function getProjectDownloadUrlAction(
   id: string
 ): Promise<{ ok: true; url: string } | { ok: false; message?: string }> {
   const token = await getJwt();
-  const endpoint = `${API}/api/projects/${id}/download`;
-  const r = await fetch(endpoint, {
+  const r = await fetch(`${API}/api/projects/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
-    redirect: "manual",
   });
 
-  if (!r.ok && r.status !== 302 && r.status !== 301) {
+  if (!r.ok) {
     const msg = await r.text().catch(() => "");
-    return { ok: false, message: msg || "download url error" };
+    return { ok: false, message: msg || "Progetto non trovato" };
   }
 
-  const location = r.headers.get("Location");
-  if (location) return { ok: true, url: location };
+  const data = (await r.json()) as { downloadUrl?: string };
+  if (data?.downloadUrl) return { ok: true, url: data.downloadUrl };
 
-  const ctype = r.headers.get("content-type") || "";
-  try {
-    if (ctype.includes("application/json")) {
-      const data = (await r.json()) as { url?: string };
-      if (data?.url) return { ok: true, url: data.url };
-    } else {
-      const txt = await r.text();
-      if (txt && /^https?:\/\//.test(txt)) return { ok: true, url: txt.trim() };
-    }
-  } catch {}
-  return { ok: false, message: "download url not found" };
+  return { ok: false, message: "downloadUrl non presente" };
 }

@@ -1,5 +1,5 @@
 "use server";
-
+import "server-only";
 import { auth } from "@/lib/auth";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { signApiToken } from "@/lib/jwt";

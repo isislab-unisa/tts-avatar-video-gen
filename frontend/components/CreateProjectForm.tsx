@@ -282,6 +282,7 @@ export default function CreateProjectForm({
         onOpenChange={setOpenCreateDir}
         onCreated={(dir) => {
           setOpenCreateDir(false);
+          router.refresh(); // Aggiorna la sidebar
           if (videoBase64) void saveTo(dir.id);
           else toast.error("Genera prima il video");
         }}

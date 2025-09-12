@@ -102,7 +102,7 @@ func (h *ProjectsHandler) GetProject(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "not found")
 	}
-	url, err := h.Store.PresignGet(c.Context(), doc.BucketID, 1*time.Hour)
+	url, err := h.Store.PresignGet(c.Context(), doc.BucketID, 10*time.Minute)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "presign error")
 	}
@@ -288,4 +288,33 @@ func (h *ProjectsHandler) ListAllProjects(c *fiber.Ctx) error {
 	}
 	total, _ := db.Col("projects").CountDocuments(c.Context(), filter)
 	return c.JSON(bson.M{"items": out, "total": total})
+}
+
+func (h *ProjectsHandler) DownloadProject(c *fiber.Ctx) error {
+	userID, _ := c.Locals("userId").(string)
+	if userID == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+	id := c.Params("id")
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
+	}
+
+	// owner check
+	var doc models.Project
+	if err := db.Col("projects").FindOne(c.Context(), bson.M{"_id": oid, "userId": userID}).Decode(&doc); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return fiber.NewError(fiber.StatusNotFound, "not found")
+		}
+		return fiber.NewError(fiber.StatusInternalServerError, "db error")
+	}
+
+	// presigned 10 minuti
+	url, err := h.Store.PresignGet(c.Context(), doc.BucketID, 10*time.Minute)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "presign error")
+	}
+
+	return c.Redirect(url, fiber.StatusFound) // 302
 }

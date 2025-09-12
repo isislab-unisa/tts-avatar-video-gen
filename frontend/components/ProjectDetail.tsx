@@ -4,9 +4,6 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-//
-//
-//
 import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
 import {
@@ -20,7 +17,6 @@ import RenameProjectDialog from "@/components/RenameProjectDialog";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import MoveToMenu from "@/components/MoveToMenu";
 import DownloadButton from "@/components/DownloadButton";
-//
 
 type Dir = DirectoryDTO;
 
@@ -38,14 +34,12 @@ export default function ProjectDetail({
   directories: Dir[];
 }) {
   const t = useTranslations("Project");
-  //
   const m = useTranslations("Toast");
-
   const router = useRouter();
+
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [renameOpen, setRenameOpen] = React.useState(false);
   const [createOpen, setCreateOpen] = React.useState(false);
-  // state legacy removed by reusable dialogs
 
   if (!project) {
     return (
@@ -54,41 +48,35 @@ export default function ProjectDetail({
       </div>
     );
   }
-  const p = project as NonNullable<typeof project>;
 
-  //
-
-  // gestione rinomina spostata in RenameProjectDialog
+  const p = project;
 
   async function onMove(dirId: string) {
-    const ok = await moveProjectAction(p.id, dirId);
-    if (ok) {
+    const res = await moveProjectAction(p.id, dirId);
+    if (res.ok) {
       const folderName = directories.find((d) => d.id === dirId)?.name || "";
       toast.success(m("projectMoved", { title: p.title, folder: folderName }));
       router.refresh();
-    } else toast.error(m("moveFail"));
+    } else {
+      toast.error(res.message || m("moveFail"));
+    }
   }
 
-  // gestione delete spostata in ConfirmDeleteDialog
-
-  // selectableDirs handled inside MoveToMenu filtering
-
   return (
-    // ⬇️ wrapper che centra tutto verticalmente e orizzontalmente
     <section className="min-h-[calc(100vh-10rem)] grid place-content-center px-4">
       <div className="grid w-full max-w-6xl gap-8 lg:grid-cols-2 items-center justify-items-center">
         {/* Player */}
         <div className="w-full rounded-2xl overflow-hidden bg-black">
           <div className="aspect-video grid place-items-center">
             <video
-              src={p.downloadUrl}
+              src={`/api/projects/${p.id}/download`}
               controls
               className="h-full w-full object-contain rounded-2xl"
             />
           </div>
         </div>
 
-        {/* Pannello: Titolo → Avatar → Testo (testo scrollabile in box) */}
+        {/* Info + azioni */}
         <div className="w-full max-w-2xl">
           <div className="space-y-4 text-left">
             <h2 className="text-2xl font-semibold leading-snug break-words">
@@ -109,11 +97,10 @@ export default function ProjectDetail({
               </p>
             </div>
 
-            {/* Azioni */}
             <div className="grid gap-3 max-w-sm">
               <div className="grid grid-cols-2 gap-3">
                 <DownloadButton
-                  url={p.downloadUrl}
+                  url={`/api/projects/${p.id}/download`}
                   filename={`${p.title}.mp4`}
                   label={t("download")}
                 />
@@ -161,18 +148,11 @@ export default function ProjectDetail({
         onOpenChange={setConfirmOpen}
         onConfirm={async () => {
           const res = await deleteProjectAction(p.id);
-          if (typeof res === "object") {
-            if (res.ok) {
-              toast.success(m("projectDeleted", { title: p.title }));
-              router.push("/dashboard");
-            } else {
-              toast.error(res.message || m("deleteFail"));
-            }
-          } else if (res) {
+          if (res.ok) {
             toast.success(m("projectDeleted", { title: p.title }));
             router.push("/dashboard");
           } else {
-            toast.error(m("deleteFail"));
+            toast.error(res.message || m("deleteFail"));
           }
         }}
       />

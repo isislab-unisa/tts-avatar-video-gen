@@ -9,12 +9,9 @@ import {
   MoreHorizontal,
   Trash2,
   FolderEdit,
-  FolderSymlink,
-  Folder,
   FolderOpen,
-  FolderPlus,
-  Download,
 } from "lucide-react";
+import ProjectMenu from "@/components/ProjectMenu";
 import {
   Collapsible,
   CollapsibleContent,
@@ -25,9 +22,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -56,16 +50,10 @@ import {
 } from "@/app/(no-nav)/dashboard/_actions/directories";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import RenameDirectoryDialog from "@/components/RenameDirectoryDialog";
-import RenameProjectDialog from "@/components/RenameProjectDialog";
-import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import {
   listProjectsByDirAction,
-  moveProjectAction,
-  deleteProjectAction,
-  getProjectDownloadUrlAction,
   type ProjectListItem,
 } from "@/app/(no-nav)/dashboard/_actions/projects";
-import { toast } from "sonner";
 
 const iconCls = "mr-2 h-4 w-4";
 
@@ -94,8 +82,6 @@ export function NavMain({
   const router = useRouter();
   const t = useTranslations("Dialog");
   const tCommon = useTranslations("Common");
-  const tToast = useTranslations("Toast");
-  const tProj = useTranslations("Project");
 
   const [confirm, setConfirm] = React.useState<{
     open: boolean;
@@ -113,14 +99,6 @@ export function NavMain({
   const [dirProjects, setDirProjects] = React.useState<
     Record<string, ProjectListItem[]>
   >({});
-  const [projectRename, setProjectRename] = React.useState<{
-    open: boolean;
-    project?: ProjectListItem;
-  }>({ open: false });
-  const [projectDelete, setProjectDelete] = React.useState<{
-    open: boolean;
-    project?: ProjectListItem;
-  }>({ open: false });
 
   async function remove(dirId: string) {
     const ok = await deleteDirectoryAction(dirId);
@@ -142,38 +120,6 @@ export function NavMain({
         console.error("Error loading projects:", error);
         setDirProjects((s) => ({ ...s, [dirId]: [] }));
       }
-    }
-  }
-
-  async function onMove(project: ProjectListItem, directoryId: string) {
-    const ok = await moveProjectAction(project.id, directoryId);
-    if (ok) {
-      const folderName =
-        directories.find((d) => d.id === directoryId)?.name || "";
-      toast.success(
-        tToast("projectMoved", { title: project.title, folder: folderName })
-      );
-      router.refresh();
-    }
-  }
-
-  async function onDownload(project: ProjectListItem) {
-    const res = await getProjectDownloadUrlAction(project.id);
-    if (!res.ok || !res.url) {
-      toast.error(tToast("downloadFail"));
-      return;
-    }
-    try {
-      const r = await fetch(res.url);
-      if (!r.ok) throw new Error(String(r.status));
-      const blob = await r.blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `${project.title || "video"}.mp4`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    } catch {
-      toast.error(tToast("downloadFail"));
     }
   }
 
@@ -293,102 +239,45 @@ export function NavMain({
                               </SidebarMenuSubButton>
 
                               {dirId && (
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <SidebarMenuAction className="opacity-0 group-hover/project-item:opacity-100 transition-opacity cursor-pointer ml-auto">
-                                      <MoreHorizontal className="h-4 w-4" />
-                                      <span className="sr-only">More</span>
-                                    </SidebarMenuAction>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent
-                                    className="w-56 rounded-lg"
-                                    side="right"
-                                    align="start"
-                                  >
-                                    <DropdownMenuItem
-                                      className="cursor-pointer"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        void onDownload(sub as ProjectListItem);
-                                      }}
-                                    >
-                                      <Download
-                                        className={`${iconCls} text-muted-foreground`}
-                                      />
-                                      <span>{tProj("download")}</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                      className="cursor-pointer"
-                                      onClick={() =>
-                                        setProjectRename({
-                                          open: true,
-                                          project: sub as ProjectListItem,
-                                        })
-                                      }
-                                    >
-                                      <FolderEdit
-                                        className={`${iconCls} text-muted-foreground`}
-                                      />
-                                      <span>{tProj("rename")}</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSub>
-                                      <DropdownMenuSubTrigger className="cursor-pointer">
-                                        <FolderSymlink
-                                          className={`${iconCls} text-muted-foreground`}
-                                        />
-                                        <span>{tProj("moveTo")}</span>
-                                      </DropdownMenuSubTrigger>
-                                      <DropdownMenuSubContent className="w-56 rounded-lg">
-                                        {directories
-                                          .filter((d) => d.id !== dirId)
-                                          .map((d) => (
-                                            <DropdownMenuItem
-                                              key={d.id}
-                                              className="cursor-pointer"
-                                              onClick={() =>
-                                                onMove(
-                                                  sub as ProjectListItem,
-                                                  d.id
-                                                )
-                                              }
-                                            >
-                                              <Folder
-                                                className={`${iconCls} text-muted-foreground`}
-                                              />
-                                              <span>{d.name}</span>
-                                            </DropdownMenuItem>
-                                          ))}
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                          className="cursor-pointer"
-                                          onSelect={() => setCreateOpen(true)}
-                                        >
-                                          <FolderPlus className={iconCls} />
-                                          <span>
-                                            {tCommon("createDirectory")}
-                                          </span>
-                                        </DropdownMenuItem>
-                                      </DropdownMenuSubContent>
-                                    </DropdownMenuSub>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                      className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
-                                      onClick={() =>
-                                        setProjectDelete({
-                                          open: true,
-                                          project: sub as ProjectListItem,
-                                        })
-                                      }
-                                    >
-                                      <Trash2
-                                        className={`${iconCls} text-red-600`}
-                                      />
-                                      <span>{tProj("delete")}</span>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div className="opacity-0 group-hover/project-item:opacity-100 transition-opacity ml-auto">
+                                  <ProjectMenu
+                                    project={sub as ProjectListItem}
+                                    directories={directories}
+                                    currentDirId={dirId}
+                                    onProjectUpdated={() => {
+                                      // Ricarica i progetti per questa cartella
+                                      const loadProjects = async () => {
+                                        try {
+                                          const res =
+                                            await listProjectsByDirAction(
+                                              dirId,
+                                              1,
+                                              50,
+                                              "title",
+                                              "asc"
+                                            );
+                                          setDirProjects((s) => ({
+                                            ...s,
+                                            [dirId]: res.items || [],
+                                          }));
+                                        } catch (error) {
+                                          console.error(
+                                            "Error loading projects:",
+                                            error
+                                          );
+                                          setDirProjects((s) => ({
+                                            ...s,
+                                            [dirId]: [],
+                                          }));
+                                        }
+                                      };
+                                      void loadProjects();
+                                    }}
+                                    className="h-6 w-6"
+                                    size="sm"
+                                    variant="ghost"
+                                  />
+                                </div>
                               )}
                             </div>
                           </SidebarMenuSubItem>
@@ -445,31 +334,6 @@ export function NavMain({
         </AlertDialogContent>
       </AlertDialog>
       {/* Project rename/delete dialogs */}
-      <RenameProjectDialog
-        open={projectRename.open}
-        onOpenChange={(o) => setProjectRename((s) => ({ ...s, open: o }))}
-        projectId={projectRename.project?.id || ""}
-        defaultTitle={projectRename.project?.title || ""}
-        onRenamed={() => {
-          setProjectRename({ open: false, project: undefined });
-          router.refresh();
-        }}
-      />
-
-      <ConfirmDeleteDialog
-        open={projectDelete.open}
-        onOpenChange={(o) => setProjectDelete((s) => ({ ...s, open: o }))}
-        onConfirm={async () => {
-          const p = projectDelete.project;
-          if (!p) return;
-          const res = await deleteProjectAction(p.id);
-          if ((res as { ok?: boolean })?.ok || res === true) {
-            toast.success("Progetto eliminato");
-            setProjectDelete({ open: false, project: undefined });
-            router.refresh();
-          }
-        }}
-      />
     </>
   );
 }

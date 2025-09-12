@@ -76,7 +76,7 @@ export function AppSidebar(
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-9 h-9 p-0 cursor-pointer"
+                    className="w-9 h-9 p-0 cursor-pointer hover:scale-105 transition-transform duration-200"
                     aria-label={t("createDirectory")}
                     onClick={() => setOpenCreateDir(true)}
                   >
@@ -90,7 +90,7 @@ export function AppSidebar(
             ) : (
               <Button
                 variant="outline"
-                className="w-full justify-start gap-2 cursor-pointer"
+                className="w-full justify-start gap-2 cursor-pointer hover:scale-[1.02] transition-transform duration-200"
                 onClick={() => setOpenCreateDir(true)}
               >
                 <FolderPlus className="h-4 w-4" />
@@ -104,7 +104,7 @@ export function AppSidebar(
                   <Link href="/dashboard/project/create">
                     <Button
                       variant="outline"
-                      className="w-9 h-9 p-0 cursor-pointer"
+                      className="w-9 h-9 p-0 cursor-pointer hover:scale-105 transition-transform duration-200"
                       aria-label={t("createProject")}
                     >
                       <CirclePlus className="h-4 w-4" />
@@ -119,7 +119,7 @@ export function AppSidebar(
               <Link href="/dashboard/project/create" className="w-full">
                 <Button
                   variant="outline"
-                  className="w-full justify-start gap-2 cursor-pointer"
+                  className="w-full justify-start gap-2 cursor-pointer hover:scale-[1.02] transition-transform duration-200"
                 >
                   <CirclePlus className="h-4 w-4" />
                   {t("createProject")}
@@ -133,7 +133,9 @@ export function AppSidebar(
 
         <SidebarContent className="overflow-y-auto">
           {!isCollapsed && (
-            <NavMain items={directoryGroups} directories={directories} />
+            <div className="animate-slide-in">
+              <NavMain items={directoryGroups} directories={directories} />
+            </div>
           )}
         </SidebarContent>
 

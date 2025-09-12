@@ -72,8 +72,13 @@ func main() {
 		BodyLimit: 200 * 1024 * 1024,
 	})
 
+	corsOrigins := strings.TrimSpace(os.Getenv("CORS_ORIGINS"))
+	if corsOrigins == "" {
+		corsOrigins = "http://localhost:3000"
+	}
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     strings.TrimSpace(os.Getenv("CORS_ORIGINS")),
+		AllowOrigins:     corsOrigins,
 		AllowHeaders:     "Content-Type,Authorization",
 		AllowMethods:     "GET,POST,PATCH,DELETE,OPTIONS",
 		AllowCredentials: true,
@@ -93,6 +98,7 @@ func main() {
 	api.Get("/projects", proj.ListProjects) // by dir
 	api.Get("/projects/all", proj.ListAllProjects)
 	api.Get("/projects/:id", proj.GetProject)
+	api.Get("/projects/:id/download", proj.DownloadProject)
 	api.Patch("/projects/:id", proj.UpdateProject)
 	api.Delete("/projects/:id", proj.DeleteProject)
 

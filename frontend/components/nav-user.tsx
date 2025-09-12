@@ -28,7 +28,8 @@ export function NavUser({
   user: {
     name: string;
     email: string;
-    avatar: string;
+    avatar?: string;
+    image?: string;
   };
 }) {
   const router = useRouter();
@@ -60,7 +61,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={user.avatar}
+                  src={user.avatar || user.image || undefined}
                   alt={user.name}
                   className="object-cover"
                 />

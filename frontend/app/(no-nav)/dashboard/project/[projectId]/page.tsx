@@ -7,10 +7,22 @@ import {
   listDirectoriesForUser,
   type DirectoryDTO,
 } from "@/app/(no-nav)/dashboard/_actions/directories";
-import type { ProjectDTO } from "./_actions";
 import { getLocale, getTranslations } from "next-intl/server";
 
 const API = process.env.BACKEND_API_URL!;
+if (!API) throw new Error("BACKEND_API_URL non configurato");
+
+export type ProjectDTO = {
+  id: string;
+  title: string;
+  text: string;
+  directoryId: string;
+  createdAt: string;
+  avatar: string;
+  avatarImage: string;
+  bucketId: string;
+  downloadUrl: string;
+};
 
 async function fetchProject(
   id: string,
@@ -27,9 +39,9 @@ async function fetchProject(
 export default async function Page({
   params,
 }: {
-  params: Promise<{ projectId: string }>;
+  params: { projectId: string };
 }) {
-  const { projectId } = await params;
+  const { projectId } = params;
 
   const [tProject, tCommon, locale] = await Promise.all([
     getTranslations("Project"),
@@ -84,7 +96,7 @@ export default async function Page({
       </nav>
 
       <div className="flex items-center justify-between gap-3">
-        <div></div>
+        <div />
         {project && (
           <span className="text-xs text-muted-foreground shrink-0">
             {tProject("createdOn")}{" "}
