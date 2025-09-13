@@ -112,18 +112,23 @@
     "home": "Accueil",
     "page": "Page",
     "of": "de",
-    "noProjectsFound": "Aucun projet trouvé.",
     "createDirectory": "Créer Dossier",
     "createProject": "Créer Projet",
     "toggleSidebar": "Afficher/Masquer Barre Latérale",
     "noProjects": "Aucun projet",
+    "noProjectsInFolder": "Aucun projet présent",
+    "noFolders": "Aucun dossier disponible",
+    "loadingProjects": "Chargement des projets...",
     "sort": "Trier",
     "sortField": "Champ",
     "sortDirection": "Direction",
     "sortByDate": "Par date",
     "sortByTitle": "Par titre",
     "sortAscending": "Ascendant",
-    "sortDescending": "Descendant"
+    "sortDescending": "Descendant",
+    "searchProjects": "Rechercher des projets...",
+    "searchInFolder": "Rechercher dans ce dossier...",
+    "moreFolders": "et {count} dossiers de plus"
   },
 
   "Project": {
@@ -175,7 +180,7 @@
     "renameSuccess": "Titre mis à jour",
     "renameFail": "Échec du renommage",
     "moveSuccess": "Déplacé",
-    "moveFail": "Échec du déplacement",
+    "moveFail": "Échec du déplacement du projet",
     "deleteSuccess": "Projet supprimé",
     "deleteFail": "Échec de la suppression",
     "projectMoved": "Projet {title} déplacé vers {folder}",
@@ -200,7 +205,8 @@
     "duplicateDir": "Un dossier avec ce nom existe déjà",
     "genericError": "Vérifiez les champs en surbrillance",
     "sameName": "Le nouveau nom est identique à l'actuel",
-    "textRequired": "Le texte est obligatoire"
+    "textRequired": "Le texte est obligatoire",
+    "invalid name": "Nom invalide"
   },
   "Status": {
     "loading": "Chargement…",

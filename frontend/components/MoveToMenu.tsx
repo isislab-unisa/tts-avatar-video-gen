@@ -44,19 +44,21 @@ export default function MoveToMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="z-50 w-72">
-        {filtered.map((d) => (
-          <DropdownMenuItem
-            key={d.id}
-            className="cursor-pointer"
-            onSelect={(e) => {
-              e.preventDefault();
-              void onMove(d.id);
-            }}
-          >
-            <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{d.name}</span>
-          </DropdownMenuItem>
-        ))}
+        <div className="max-h-60 overflow-y-auto">
+          {filtered.map((d) => (
+            <DropdownMenuItem
+              key={d.id}
+              className="cursor-pointer"
+              onSelect={(e) => {
+                e.preventDefault();
+                void onMove(d.id);
+              }}
+            >
+              <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span className="truncate">{d.name}</span>
+            </DropdownMenuItem>
+          ))}
+        </div>
         {onCreateNew ? (
           <>
             <DropdownMenuSeparator />

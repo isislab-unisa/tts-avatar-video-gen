@@ -24,8 +24,7 @@ import { FolderPlus, CirclePlus, Folder } from "lucide-react";
 import { NavMain, type NavItem } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
-
-export type DirectoryDTO = { id: string; name: string };
+import { DirectoryDTO } from "@/lib/schema/directory";
 
 export function AppSidebar(
   props: React.ComponentProps<typeof Sidebar> & {

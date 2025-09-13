@@ -18,10 +18,8 @@ import {
   getCreateDirectorySchema,
   type CreateDirectoryForm,
 } from "@/lib/schema/project";
-import {
-  createDirectoryAction,
-  type DirectoryDTO,
-} from "@/app/(no-nav)/dashboard/_actions/directories";
+import { createDirectoryAction } from "@/app/(no-nav)/dashboard/_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { useTranslations as useToastTranslations } from "next-intl";

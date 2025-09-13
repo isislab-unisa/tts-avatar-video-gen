@@ -3,10 +3,10 @@
 import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { type ProjectListItem } from "@/app/(no-nav)/dashboard/_actions/projects";
-import { type DirectoryDTO } from "@/app/(no-nav)/dashboard/_actions/directories";
-import ProjectMenu from "@/components/ProjectMenu";
+import { type DirectoryDTO } from "@/lib/schema/directory";
+import ProjectActionMenu from "@/components/ProjectActionMenu";
 
 type Props = {
   item: ProjectListItem;
@@ -21,6 +21,7 @@ export default function ProjectHomeCard({
 }: Props) {
   const router = useRouter();
   const tProj = useTranslations("Project");
+  const locale = useLocale();
 
   const dirName =
     directories.find((d) => d.id === item.directoryId)?.name ?? "—";
@@ -31,6 +32,22 @@ export default function ProjectHomeCard({
 
   const handleProjectUpdated = () => {
     router.refresh();
+  };
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+
+    // Format based on locale
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: locale === "en", // Use 12-hour format for English, 24-hour for others
+    };
+
+    return date.toLocaleString(locale, options);
   };
 
   return (
@@ -72,7 +89,7 @@ export default function ProjectHomeCard({
       <div className="p-3 relative">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <div className="text-[11px] text-muted-foreground uppercase">
+            <div className="text-xs text-muted-foreground uppercase">
               {item.avatar || "cody"}
             </div>
 
@@ -84,23 +101,23 @@ export default function ProjectHomeCard({
             </div>
 
             {showFolder && (
-              <div className="text-[11px] text-muted-foreground truncate">
+              <div className="text-xs text-muted-foreground truncate">
                 {tProj("folder")}: {dirName}
               </div>
             )}
 
-            <div className="text-[11px] text-muted-foreground">
-              {new Date(item.createdAt).toLocaleDateString()}
+            <div className="text-xs text-muted-foreground">
+              {formatDateTime(item.createdAt)}
             </div>
           </div>
 
-          <ProjectMenu
+          <ProjectActionMenu
             project={item}
             directories={directories}
             currentDirId={item.directoryId}
             onProjectUpdated={handleProjectUpdated}
             className="shrink-0"
-            size="md"
+            size="default"
             variant="ghost"
           />
         </div>

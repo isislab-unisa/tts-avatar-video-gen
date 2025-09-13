@@ -3,10 +3,8 @@ import ProjectDetail from "@/components/ProjectDetail";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { auth } from "@/lib/auth";
 import { signApiToken } from "@/lib/jwt";
-import {
-  listDirectoriesForUser,
-  type DirectoryDTO,
-} from "@/app/(no-nav)/dashboard/_actions/directories";
+import { listDirectoriesForUser } from "@/app/(no-nav)/dashboard/_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
 import { getLocale, getTranslations } from "next-intl/server";
 
 const API = process.env.BACKEND_API_URL!;
@@ -39,9 +37,9 @@ async function fetchProject(
 export default async function Page({
   params,
 }: {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }) {
-  const { projectId } = params;
+  const { projectId } = await params;
 
   const [tProject, tCommon, locale] = await Promise.all([
     getTranslations("Project"),

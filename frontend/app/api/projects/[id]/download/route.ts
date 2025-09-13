@@ -9,10 +9,10 @@ if (!API) throw new Error("BACKEND_API_URL non configurato");
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Verifica autenticazione
     const headers = await cloneRequestHeaders();

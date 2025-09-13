@@ -1,11 +1,9 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import ProjectHomeCard from "@/components/ProjectHomeCard";
-import { SortDropdown } from "@/components/sort-dropdown";
-import {
-  listDirectoriesForUser,
-  type DirectoryDTO,
-} from "./_actions/directories";
+import ProjectsToolbar from "@/components/ProjectsToolbar";
+import Pagination from "@/components/Pagination";
+import { listDirectoriesForUser } from "./_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
 import {
   listAllProjectsAction,
   type ProjectListItem,
@@ -15,7 +13,13 @@ type SearchParams = {
   page?: string | string[];
   sort?: "createdAt" | "title" | string | string[];
   order?: "asc" | "desc" | string | string[];
+  q?: string | string[];
 };
+
+function asQ(raw?: string | string[]): string {
+  const s = Array.isArray(raw) ? raw[0] : raw;
+  return s ? String(s) : "";
+}
 
 function toIntOr(def: number, raw?: string | string[]) {
   const s = Array.isArray(raw) ? raw[0] : raw;
@@ -36,21 +40,22 @@ function asOrder(raw?: string | string[]): "asc" | "desc" {
 export default async function DashboardHomePage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   const t = await getTranslations("Common");
 
-  const sp = searchParams ?? {};
+  const sp = await searchParams;
   const page = Math.max(1, toIntOr(1, sp.page));
   const sort = asSort(sp.sort);
   const order = asOrder(sp.order);
+  const q = asQ(sp.q);
 
   // 10 card = 2 righe da 5 -> niente scroll verticale
   const limit = 10;
 
   const [directories, data] = await Promise.all([
     listDirectoriesForUser() as Promise<DirectoryDTO[]>,
-    listAllProjectsAction(page, limit, sort, order),
+    listAllProjectsAction(page, limit, sort, order, q),
   ]);
 
   const items: ProjectListItem[] = data.items ?? [];
@@ -58,98 +63,52 @@ export default async function DashboardHomePage({
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    // Niente micro–scroll: blocco l’altezza e rendo scrollabile solo il grid se serve
-    <div className="space-y-3 overflow-hidden">
-      <nav className="text-sm text-muted-foreground">{t("home")}</nav>
-
-      <div className="flex justify-end">
-        <SortDropdown
+    <div className="min-h-[calc(100vh-8rem)] flex flex-col">
+      {/* Header fisso */}
+      <div className="space-y-2 flex-shrink-0">
+        <nav className="text-sm text-muted-foreground">{t("home")}</nav>
+        <ProjectsToolbar
           basePath="/dashboard"
           currentSort={sort}
           currentOrder={order}
+          isInFolder={false}
         />
       </div>
 
-      {/* Contenuto + paginazione ancorata in basso */}
-      <div className="flex h-[calc(100vh-10rem)] flex-col">
-        <div className="flex-1 overflow-hidden">
-          {items.length === 0 ? (
-            <div className="h-full grid place-items-center">
-              <p className="text-muted-foreground">{t("noProjectsFound")}</p>
-            </div>
-          ) : (
-            <ul className="h-full overflow-auto pr-1 grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-              {items.map((p) => (
-                <li key={p.id}>
-                  <ProjectHomeCard
-                    item={p}
-                    directories={directories}
-                    showFolder
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="flex justify-center pt-1">
-          <Pagination
-            current={page}
-            totalPages={totalPages}
-            t={t}
-            sort={sort}
-            order={order}
-          />
-        </div>
+      {/* Contenuto principale */}
+      <div className="flex-1">
+        {items.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">{t("noProjectsInFolder")}</p>
+          </div>
+        ) : (
+          <ul className="grid gap-1 gap-y-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+            {items.map((p) => (
+              <li key={p.id}>
+                <ProjectHomeCard
+                  item={p}
+                  directories={directories}
+                  showFolder
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-    </div>
-  );
-}
 
-function Pagination({
-  current,
-  totalPages,
-  t,
-  sort,
-  order,
-}: {
-  current: number;
-  totalPages: number;
-  t: (key: string) => string;
-  sort: "createdAt" | "title";
-  order: "asc" | "desc";
-}) {
-  const href = (p: number) => {
-    const qs = new URLSearchParams({ page: String(p), sort, order });
-    return `/dashboard?${qs.toString()}`;
-  };
-
-  const prevDisabled = current <= 1;
-  const nextDisabled = current >= totalPages;
-
-  return (
-    <div className="inline-flex items-center gap-2">
-      <Link
-        href={prevDisabled ? "#" : href(current - 1)}
-        className={`px-3 py-2 rounded-md border ${
-          prevDisabled ? "pointer-events-none opacity-50" : ""
-        }`}
-        aria-disabled={prevDisabled}
-      >
-        ←
-      </Link>
-      <span className="text-sm">
-        {t("page")} {current} {t("of")} {totalPages}
-      </span>
-      <Link
-        href={nextDisabled ? "#" : href(current + 1)}
-        className={`px-3 py-2 rounded-md border ${
-          nextDisabled ? "pointer-events-none opacity-50" : ""
-        }`}
-        aria-disabled={nextDisabled}
-      >
-        →
-      </Link>
+      {/* Paginazione sempre in basso */}
+      <div className="flex justify-center py-4 mt-auto">
+        <Pagination
+          current={page}
+          totalPages={totalPages}
+          t={t}
+          makeHref={(p) => {
+            const qs = new URLSearchParams({ page: String(p), sort, order });
+            if (q) qs.set("q", q);
+            return `/dashboard?${qs.toString()}`;
+          }}
+        />
+      </div>
     </div>
   );
 }

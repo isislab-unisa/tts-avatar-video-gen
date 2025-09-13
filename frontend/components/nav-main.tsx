@@ -11,7 +11,7 @@ import {
   FolderEdit,
   FolderOpen,
 } from "lucide-react";
-import ProjectMenu from "@/components/ProjectMenu";
+import ProjectActionMenu from "@/components/ProjectActionMenu";
 import {
   Collapsible,
   CollapsibleContent,
@@ -44,12 +44,11 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  deleteDirectoryAction,
-  type DirectoryDTO,
-} from "@/app/(no-nav)/dashboard/_actions/directories";
+import { deleteDirectoryAction } from "@/app/(no-nav)/dashboard/_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import RenameDirectoryDialog from "@/components/RenameDirectoryDialog";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   listProjectsByDirAction,
   type ProjectListItem,
@@ -99,6 +98,9 @@ export function NavMain({
   const [dirProjects, setDirProjects] = React.useState<
     Record<string, ProjectListItem[]>
   >({});
+  const [loadingDirs, setLoadingDirs] = React.useState<Record<string, boolean>>(
+    {}
+  );
 
   async function remove(dirId: string) {
     const ok = await deleteDirectoryAction(dirId);
@@ -113,12 +115,17 @@ export function NavMain({
   async function onToggle(dirId: string, open: boolean) {
     setOpenDirs((s) => ({ ...s, [dirId]: open }));
     if (open && !dirProjects[dirId]) {
+      setLoadingDirs((s) => ({ ...s, [dirId]: true }));
       try {
         const res = await listProjectsByDirAction(dirId, 1, 50, "title", "asc");
+        // Aggiungi un piccolo delay per mostrare l'animazione di caricamento
+        await new Promise((resolve) => setTimeout(resolve, 500));
         setDirProjects((s) => ({ ...s, [dirId]: res.items || [] }));
       } catch (error) {
         console.error("Error loading projects:", error);
         setDirProjects((s) => ({ ...s, [dirId]: [] }));
+      } finally {
+        setLoadingDirs((s) => ({ ...s, [dirId]: false }));
       }
     }
   }
@@ -222,70 +229,81 @@ export function NavMain({
 
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {dirId && dirProjects[dirId] ? (
-                        dirProjects[dirId].map((sub) => (
-                          <SidebarMenuSubItem
-                            key={sub.id || sub.title}
-                            className="group/project-item"
-                          >
-                            <div className="flex items-center w-full">
-                              <SidebarMenuSubButton
-                                asChild
-                                className="cursor-pointer flex-1"
-                              >
-                                <Link href={`/dashboard/project/${sub.id}`}>
-                                  <span>{sub.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
+                      {dirId && loadingDirs[dirId] ? (
+                        <SidebarMenuSubItem>
+                          <div className="flex items-center gap-2 px-2 py-1 text-sm text-muted-foreground">
+                            <LoadingSpinner size="sm" />
+                            <span>{tCommon("loadingProjects")}</span>
+                          </div>
+                        </SidebarMenuSubItem>
+                      ) : dirId &&
+                        dirProjects[dirId] &&
+                        dirProjects[dirId].length > 0 ? (
+                        <div className="animate-slide-in">
+                          {dirProjects[dirId].map((sub) => (
+                            <SidebarMenuSubItem
+                              key={sub.id || sub.title}
+                              className="group/project-item"
+                            >
+                              <div className="flex items-center w-full">
+                                <SidebarMenuSubButton
+                                  asChild
+                                  className="cursor-pointer flex-1"
+                                >
+                                  <Link href={`/dashboard/project/${sub.id}`}>
+                                    <span>{sub.title}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
 
-                              {dirId && (
-                                <div className="opacity-0 group-hover/project-item:opacity-100 transition-opacity ml-auto">
-                                  <ProjectMenu
-                                    project={sub as ProjectListItem}
-                                    directories={directories}
-                                    currentDirId={dirId}
-                                    onProjectUpdated={() => {
-                                      // Ricarica i progetti per questa cartella
-                                      const loadProjects = async () => {
-                                        try {
-                                          const res =
-                                            await listProjectsByDirAction(
-                                              dirId,
-                                              1,
-                                              50,
-                                              "title",
-                                              "asc"
+                                {dirId && (
+                                  <div className="opacity-0 group-hover/project-item:opacity-100 transition-opacity ml-auto">
+                                    <ProjectActionMenu
+                                      project={sub as ProjectListItem}
+                                      directories={directories}
+                                      currentDirId={dirId}
+                                      onProjectUpdated={() => {
+                                        // Ricarica i progetti per questa cartella
+                                        const loadProjects = async () => {
+                                          try {
+                                            const res =
+                                              await listProjectsByDirAction(
+                                                dirId,
+                                                1,
+                                                50,
+                                                "title",
+                                                "asc"
+                                              );
+                                            setDirProjects((s) => ({
+                                              ...s,
+                                              [dirId]: res.items || [],
+                                            }));
+                                          } catch (error) {
+                                            console.error(
+                                              "Error loading projects:",
+                                              error
                                             );
-                                          setDirProjects((s) => ({
-                                            ...s,
-                                            [dirId]: res.items || [],
-                                          }));
-                                        } catch (error) {
-                                          console.error(
-                                            "Error loading projects:",
-                                            error
-                                          );
-                                          setDirProjects((s) => ({
-                                            ...s,
-                                            [dirId]: [],
-                                          }));
-                                        }
-                                      };
-                                      void loadProjects();
-                                    }}
-                                    className="h-6 w-6"
-                                    size="sm"
-                                    variant="ghost"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          </SidebarMenuSubItem>
-                        ))
+                                            setDirProjects((s) => ({
+                                              ...s,
+                                              [dirId]: [],
+                                            }));
+                                          }
+                                        };
+                                        void loadProjects();
+                                      }}
+                                      className="h-6 w-6"
+                                      size="sm"
+                                      variant="ghost"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </div>
                       ) : (
                         <SidebarMenuSubItem>
                           <div className="px-2 py-1 text-sm text-muted-foreground">
-                            {tCommon("noProjects")}
+                            {tCommon("noProjectsInFolder")}
                           </div>
                         </SidebarMenuSubItem>
                       )}

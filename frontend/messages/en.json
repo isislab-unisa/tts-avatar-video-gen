@@ -113,25 +113,31 @@
     "duplicateDir": "A folder with this name already exists",
     "genericError": "Check the highlighted fields",
     "textRequired": "Text is required",
-    "sameName": "The new name matches the current one"
+    "sameName": "The new name matches the current one",
+    "invalid name": "Invalid name"
   },
 
   "Common": {
     "home": "Home",
     "page": "Page",
     "of": "of",
-    "noProjectsFound": "No projects found.",
     "createDirectory": "Create Directory",
     "createProject": "Create Project",
     "toggleSidebar": "Toggle Sidebar",
     "noProjects": "No projects",
+    "noProjectsInFolder": "No projects present",
+    "noFolders": "No folders available",
+    "loadingProjects": "Loading projects...",
     "sort": "Sort",
     "sortField": "Field",
     "sortDirection": "Direction",
     "sortByDate": "By date",
     "sortByTitle": "By title",
     "sortAscending": "Ascending",
-    "sortDescending": "Descending"
+    "sortDescending": "Descending",
+    "searchProjects": "Search projects...",
+    "searchInFolder": "Search in this folder...",
+    "moreFolders": "and {count} more folders"
   },
   "Project": {
     "notFound": "Project not found.",
@@ -182,7 +188,7 @@
     "renameSuccess": "Title updated",
     "renameFail": "Rename failed",
     "moveSuccess": "Moved",
-    "moveFail": "Move failed",
+    "moveFail": "Failed to move project",
     "deleteSuccess": "Project deleted",
     "deleteFail": "Deletion failed",
     "projectMoved": "Project {title} moved to {folder}",

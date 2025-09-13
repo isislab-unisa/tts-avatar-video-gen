@@ -3,11 +3,10 @@ import "server-only";
 import { auth } from "@/lib/auth";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { signApiToken } from "@/lib/jwt";
+import { DirectoryDTO } from "@/lib/schema/directory";
 
 const API = process.env.BACKEND_API_URL!;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
-
-export type DirectoryDTO = { id: string; name: string };
 
 async function getToken(): Promise<string> {
   const h = await cloneRequestHeaders();

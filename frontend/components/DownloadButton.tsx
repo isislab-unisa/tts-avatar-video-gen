@@ -28,22 +28,26 @@ export default function DownloadButton(props: Props) {
   const { filename, label, className } = props;
 
   const handleClick = React.useCallback(async () => {
-    const finalUrl = "url" in props ? props.url : await props.resolveUrl();
-    if (!finalUrl) return;
+    try {
+      const finalUrl = "url" in props ? props.url : await props.resolveUrl();
+      if (!finalUrl) return;
 
-    const res = await fetch(finalUrl);
-    if (!res.ok) throw new Error("Download failed");
+      const res = await fetch(finalUrl);
+      if (!res.ok) throw new Error("Download failed");
 
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = filename || "download";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(objectUrl);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename || "download";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
   }, [props, filename]);
 
   const disabled = "url" in props ? !props.url : false;

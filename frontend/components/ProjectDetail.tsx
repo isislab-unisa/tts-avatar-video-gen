@@ -11,12 +11,14 @@ import {
   deleteProjectAction,
   type ProjectListItem,
 } from "@/app/(no-nav)/dashboard/_actions/projects";
-import type { DirectoryDTO } from "@/app/(no-nav)/dashboard/_actions/directories";
+import type { DirectoryDTO } from "@/lib/schema/directory";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import RenameProjectDialog from "@/components/RenameProjectDialog";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import MoveToMenu from "@/components/MoveToMenu";
-import DownloadButton from "@/components/DownloadButton";
+import { useDownloadProject } from "@/hooks/useDownloadProject";
+import { Download as DownloadIcon } from "lucide-react";
+import ResponsiveVideo from "@/components/ResponsiveVideo";
 
 type Dir = DirectoryDTO;
 
@@ -36,10 +38,24 @@ export default function ProjectDetail({
   const t = useTranslations("Project");
   const m = useTranslations("Toast");
   const router = useRouter();
+  const downloadProject = useDownloadProject();
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [renameOpen, setRenameOpen] = React.useState(false);
   const [createOpen, setCreateOpen] = React.useState(false);
+
+  const handleDownload = async () => {
+    if (!project) return;
+    setIsDownloading(true);
+    try {
+      await downloadProject(project.id, project.title);
+    } catch (error) {
+      console.error("Download failed:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   if (!project) {
     return (
@@ -67,12 +83,8 @@ export default function ProjectDetail({
       <div className="grid w-full max-w-6xl gap-8 lg:grid-cols-2 items-center justify-items-center">
         {/* Player */}
         <div className="w-full rounded-2xl overflow-hidden bg-black">
-          <div className="aspect-video grid place-items-center">
-            <video
-              src={`/api/projects/${p.id}/download`}
-              controls
-              className="h-full w-full object-contain rounded-2xl"
-            />
+          <div className="w-full rounded-2xl overflow-hidden">
+            <ResponsiveVideo src={`/api/projects/${p.id}/download`} />
           </div>
         </div>
 
@@ -99,11 +111,14 @@ export default function ProjectDetail({
 
             <div className="grid gap-3 max-w-sm">
               <div className="grid grid-cols-2 gap-3">
-                <DownloadButton
-                  url={`/api/projects/${p.id}/download`}
-                  filename={`${p.title}.mp4`}
-                  label={t("download")}
-                />
+                <Button
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="cursor-pointer"
+                >
+                  <DownloadIcon className="mr-2 h-4 w-4" />
+                  {isDownloading ? t("generating") : t("download")}
+                </Button>
                 <MoveToMenu
                   currentDirectoryId={p.directoryId}
                   targets={directories.map((d) => ({ id: d.id, name: d.name }))}

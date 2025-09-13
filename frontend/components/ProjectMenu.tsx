@@ -29,9 +29,10 @@ import {
   moveProjectAction,
   type ProjectListItem,
 } from "@/app/(no-nav)/dashboard/_actions/projects";
-import type { DirectoryDTO } from "@/app/(no-nav)/dashboard/_actions/directories";
+import type { DirectoryDTO } from "@/lib/schema/directory";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import { toast } from "sonner";
+import { useDownloadProject } from "@/hooks/useDownloadProject";
 
 type Props = {
   project: ProjectListItem;
@@ -119,10 +120,15 @@ export default function ProjectMenu({
   //   }
   // };
 
-  const handleDownload = React.useCallback(() => {
-    // passa sempre dal proxy Next (niente CORS, niente segreti)
-    window.location.href = `/api/projects/${project.id}/download`;
-  }, [project.id]);
+  const download = useDownloadProject();
+
+  const handleDownload = React.useCallback(async () => {
+    try {
+      await download(project.id, `${project.title}.mp4`);
+    } catch (err) {
+      console.error("Download error:", err);
+    }
+  }, [download, project.id, project.title]);
 
   const sizeClasses = { sm: "h-6 w-6", md: "h-8 w-8", lg: "h-10 w-10" };
   const iconSizes = { sm: "h-3 w-3", md: "h-4 w-4", lg: "h-5 w-5" };
@@ -216,7 +222,7 @@ export default function ProjectMenu({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleDownload();
+              void handleDownload();
             }}
           >
             <DownloadIcon

@@ -56,12 +56,14 @@ export default function RenameProjectDialog({
   React.useEffect(() => {
     if (open) {
       reset({ title: defaultTitle });
+      clearErrors();
     }
-  }, [open, defaultTitle, reset]);
+  }, [open, defaultTitle, reset, clearErrors]);
 
   const [pending, start] = React.useTransition();
 
   const onSubmit = (values: ProjectRenameForm) => {
+    console.log("Form submitted with values:", values);
     const nextTitle = values.title.trim();
     if (nextTitle === defaultTitle.trim()) {
       setError("title", { type: "manual", message: tv("sameName") });
@@ -109,7 +111,11 @@ export default function RenameProjectDialog({
           <AlertDialogTitle>{td("renameProjectTitle")}</AlertDialogTitle>
         </AlertDialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid gap-3"
+          noValidate
+        >
           <div className="grid gap-2">
             <Label
               htmlFor="new-title"
@@ -137,7 +143,14 @@ export default function RenameProjectDialog({
             <AlertDialogCancel type="button" disabled={pending}>
               {td("cancel")}
             </AlertDialogCancel>
-            <Button type="submit" disabled={pending}>
+            <Button
+              type="submit"
+              disabled={pending}
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(onSubmit)();
+              }}
+            >
               {pending ? td("saving") : td("save")}
             </Button>
           </AlertDialogFooter>

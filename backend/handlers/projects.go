@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"io"
+	"regexp"
 	"strings"
 	"time"
 
@@ -176,7 +177,7 @@ func (h *ProjectsHandler) DeleteProject(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// GET /api/projects?dir=<id>&sort=createdAt|title&order=asc|desc&limit=12&skip=0
+// GET /api/projects?dir=<id>&sort=createdAt|title&order=asc|desc&limit=12&skip=0&q=<query>
 func (h *ProjectsHandler) ListProjects(c *fiber.Ctx) error {
 	userID, _ := c.Locals("userId").(string)
 	dir := strings.TrimSpace(c.Query("dir"))
@@ -184,6 +185,7 @@ func (h *ProjectsHandler) ListProjects(c *fiber.Ctx) error {
 	order := c.Query("order", "desc")
 	limit := int64(c.QueryInt("limit", 12))
 	skip := int64(c.QueryInt("skip", 0))
+	q := strings.TrimSpace(c.Query("q"))
 
 	if dir == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "dir obbligatoria")
@@ -199,6 +201,10 @@ func (h *ProjectsHandler) ListProjects(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{"userId": userID, "directoryId": dir}
+	// Add search filter for title prefix if query is provided
+	if q != "" {
+		filter["title"] = bson.M{"$regex": "^" + strings.ReplaceAll(regexp.QuoteMeta(q), "\\", "\\\\"), "$options": "i"}
+	}
 	opts := options.Find().
 		SetSort(bson.D{{Key: sortKey, Value: sortDir}}).
 		SetLimit(limit).
@@ -233,7 +239,7 @@ func (h *ProjectsHandler) ListProjects(c *fiber.Ctx) error {
 	return c.JSON(bson.M{"items": out, "total": total})
 }
 
-// GET /api/projects/all  (paginato, ordinabile)
+// GET /api/projects/all  (paginato, ordinabile, ricercabile)
 func (h *ProjectsHandler) ListAllProjects(c *fiber.Ctx) error {
 	userID, _ := c.Locals("userId").(string)
 
@@ -241,6 +247,7 @@ func (h *ProjectsHandler) ListAllProjects(c *fiber.Ctx) error {
 	order := c.Query("order", "desc")
 	limit := int64(c.QueryInt("limit", 12))
 	skip := int64(c.QueryInt("skip", 0))
+	q := strings.TrimSpace(c.Query("q"))
 
 	sortKey := "createdAt"
 	if sort == "title" {
@@ -252,6 +259,10 @@ func (h *ProjectsHandler) ListAllProjects(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{"userId": userID}
+	// Add search filter for title prefix if query is provided
+	if q != "" {
+		filter["title"] = bson.M{"$regex": "^" + strings.ReplaceAll(regexp.QuoteMeta(q), "\\", "\\\\"), "$options": "i"}
+	}
 	opts := options.Find().
 		SetSort(bson.D{{Key: sortKey, Value: sortDir}}).
 		SetLimit(limit).

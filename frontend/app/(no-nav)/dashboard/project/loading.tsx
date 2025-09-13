@@ -1,4 +1,3 @@
-import { useTranslations } from "next-intl";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProjectLoading() {

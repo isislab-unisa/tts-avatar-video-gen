@@ -37,7 +37,8 @@ export async function listAllProjectsAction(
   page = 1,
   limit = 8,
   sort: "createdAt" | "title" = "createdAt",
-  order: "asc" | "desc" = "desc"
+  order: "asc" | "desc" = "desc",
+  q?: string
 ): Promise<ListProjectsResp> {
   const p = Math.max(1, Number(page) || 1);
   const l = Math.max(1, Number(limit) || 8);
@@ -49,12 +50,16 @@ export async function listAllProjectsAction(
   url.searchParams.set("skip", String(skip));
   url.searchParams.set("sort", sort);
   url.searchParams.set("order", order);
+  if (q && q.trim()) url.searchParams.set("q", q.trim());
 
   const r = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
-  if (!r.ok) return { items: [], total: 0 };
+
+  if (!r.ok) {
+    return { items: [], total: 0 };
+  }
 
   const data = (await r.json()) as ListProjectsResp;
   return {
@@ -68,7 +73,8 @@ export async function listProjectsByDirAction(
   page = 1,
   limit = 8,
   sort: "createdAt" | "title" = "createdAt",
-  order: "asc" | "desc" = "desc"
+  order: "asc" | "desc" = "desc",
+  q?: string
 ): Promise<ListProjectsResp> {
   const p = Math.max(1, Number(page) || 1);
   const l = Math.max(1, Number(limit) || 8);
@@ -81,12 +87,16 @@ export async function listProjectsByDirAction(
   url.searchParams.set("skip", String(skip));
   url.searchParams.set("sort", sort);
   url.searchParams.set("order", order);
+  if (q && q.trim()) url.searchParams.set("q", q.trim());
 
   const r = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
-  if (!r.ok) return { items: [], total: 0 };
+
+  if (!r.ok) {
+    return { items: [], total: 0 };
+  }
 
   const data = (await r.json()) as ListProjectsResp;
   return {
