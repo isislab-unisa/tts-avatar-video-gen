@@ -26,6 +26,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   projectId: string;
+  directoryId?: string | null;
   defaultTitle: string;
   onRenamed?: (newTitle: string) => void;
 };
@@ -34,6 +35,7 @@ export default function RenameProjectDialog({
   open,
   onOpenChange,
   projectId,
+  directoryId,
   defaultTitle,
   onRenamed,
 }: Props) {
@@ -79,6 +81,17 @@ export default function RenameProjectDialog({
         if (res.ok) {
           toast.success(tm("renameSuccess"));
           onRenamed?.(values.title);
+
+          // Emetti evento per aggiornare la sidebar
+          const event = new CustomEvent("projectRenamed", {
+            detail: {
+              projectId: projectId,
+              directoryId: directoryId,
+              newTitle: values.title,
+            },
+          });
+          window.dispatchEvent(event);
+
           onOpenChange(false);
           return;
         }
@@ -88,6 +101,17 @@ export default function RenameProjectDialog({
       if (res) {
         toast.success(tm("renameSuccess"));
         onRenamed?.(values.title);
+
+        // Emetti evento per aggiornare la sidebar
+        const event = new CustomEvent("projectRenamed", {
+          detail: {
+            projectId: projectId,
+            directoryId: directoryId,
+            newTitle: values.title,
+          },
+        });
+        window.dispatchEvent(event);
+
         onOpenChange(false);
       } else {
         toast.error(tm("renameFail"));

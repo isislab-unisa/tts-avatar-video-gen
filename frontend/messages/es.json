@@ -128,7 +128,8 @@
     "sortDescending": "Descendente",
     "searchProjects": "Buscar proyectos...",
     "searchInFolder": "Buscar en esta carpeta...",
-    "moreFolders": "y {count} carpetas más"
+    "moreFolders": "y {count} carpetas más",
+    "folderFallback": "Carpeta"
   },
 
   "Project": {
@@ -196,7 +197,18 @@
     "loggingOut": "Desconectando...",
     "logOut": "Cerrar sesión",
     "downloadFail": "Descarga fallida",
-    "downloadStarted": "Descarga iniciada"
+    "downloadStarted": "Descarga iniciada",
+    "noFoldersAvailable": "No hay carpetas disponibles",
+    "saveError": "Error de guardado"
+  },
+  "Api": {
+    "notAuthenticated": "No autenticado",
+    "renameError": "Error al renombrar",
+    "moveError": "Error al mover",
+    "deleteError": "Error al eliminar",
+    "projectNotFound": "Proyecto no encontrado",
+    "downloadFailed": "Descarga fallida",
+    "folderFallback": "Carpeta"
   },
   "Validation": {
     "email": "Introduce una dirección de correo válida",
@@ -218,5 +230,27 @@
     "errorTitle": "Algo salió mal",
     "errorMessage": "Ocurrió un error al cargar el proyecto.",
     "retry": "Intentar de nuevo"
+  },
+
+  "Error": {
+    "projectErrorTitle": "Error de Proyecto",
+    "projectErrorDescription": "Hubo un error al cargar el proyecto. Inténtalo de nuevo.",
+    "folderErrorTitle": "Error de Carpeta",
+    "folderErrorDescription": "Hubo un error al cargar la carpeta. Inténtalo de nuevo.",
+    "tryAgain": "Intentar de nuevo",
+    "goToDashboard": "Ir al Panel"
+  },
+
+  "Errors": {
+    "notAuthenticated": "No autenticado",
+    "renameError": "Error al renombrar",
+    "moveError": "Error al mover",
+    "deleteError": "Error al eliminar",
+    "projectNotFound": "Proyecto no encontrado",
+    "downloadFailed": "Descarga fallida",
+    "folderFallback": "Carpeta",
+    "duplicateTitle": "Ya existe un proyecto con este título",
+    "downloadUrlMissing": "URL de descarga no disponible",
+    "videoUrlMissing": "URL de video no disponible"
   }
 }

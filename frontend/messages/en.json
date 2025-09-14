@@ -137,7 +137,8 @@
     "sortDescending": "Descending",
     "searchProjects": "Search projects...",
     "searchInFolder": "Search in this folder...",
-    "moreFolders": "and {count} more folders"
+    "moreFolders": "and {count} more folders",
+    "folderFallback": "Folder"
   },
   "Project": {
     "notFound": "Project not found.",
@@ -204,7 +205,18 @@
     "loggingOut": "Logging out...",
     "logOut": "Log out",
     "downloadFail": "Download failed",
-    "downloadStarted": "Download started"
+    "downloadStarted": "Download started",
+    "noFoldersAvailable": "No folders available",
+    "saveError": "Save error"
+  },
+  "Api": {
+    "notAuthenticated": "Not authenticated",
+    "renameError": "Rename error",
+    "moveError": "Move error",
+    "deleteError": "Delete error",
+    "projectNotFound": "Project not found",
+    "downloadFailed": "Download failed",
+    "folderFallback": "Folder"
   },
   "Status": {
     "loading": "Loading…",
@@ -220,5 +232,18 @@
     "folderErrorDescription": "There was an error loading the folder. Please try again.",
     "tryAgain": "Try Again",
     "goToDashboard": "Go to Dashboard"
+  },
+
+  "Errors": {
+    "notAuthenticated": "Not authenticated",
+    "renameError": "Rename error",
+    "moveError": "Move error",
+    "deleteError": "Delete error",
+    "projectNotFound": "Project not found",
+    "downloadFailed": "Download failed",
+    "folderFallback": "Folder",
+    "duplicateTitle": "A project with this title already exists",
+    "downloadUrlMissing": "Download URL not available",
+    "videoUrlMissing": "Video URL not available"
   }
 }

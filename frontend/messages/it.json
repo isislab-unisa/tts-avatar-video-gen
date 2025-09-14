@@ -1,6 +1,6 @@
 {
   "Hero": {
-    "title": "Dai vita e voce al tuo avatar 3D con pochi clic",
+    "title": "Dai vita e voce al tuo avatar 3D con pochi click",
     "description": "Scegli un personaggio, scrivi il testo e scarica un video realistico con sincronizzazione labiale. Trasforma le tue idee in avatar parlanti in pochi secondi.",
     "login": "Accedi",
     "register": "Registrati"
@@ -101,13 +101,6 @@
     "dashboardButton": "Vai alla dashboard"
   },
 
-  "_ValidationOld": {
-    "email": "Inserisci un indirizzo email valido",
-    "password": "La password deve contenere almeno 8 caratteri",
-    "username": "Il nome utente deve contenere almeno 2 caratteri",
-    "confirmPassword": "Le password non corrispondono"
-  },
-
   "Common": {
     "home": "Home",
     "page": "Pagina",
@@ -128,7 +121,8 @@
     "sortDescending": "Discendente",
     "searchProjects": "Cerca progetti...",
     "searchInFolder": "Cerca in questa cartella...",
-    "moreFolders": "e altre {count} cartelle"
+    "moreFolders": "e altre {count} cartelle",
+    "folderFallback": "Cartella"
   },
 
   "Project": {
@@ -196,7 +190,18 @@
     "loggingOut": "Disconnessione in corso...",
     "logOut": "Esci",
     "downloadFail": "Download fallito",
-    "downloadStarted": "Download avviato"
+    "downloadStarted": "Download avviato",
+    "noFoldersAvailable": "Nessuna cartella disponibile",
+    "saveError": "Errore salvataggio"
+  },
+  "Api": {
+    "notAuthenticated": "Non autenticato",
+    "renameError": "Errore rinomina",
+    "moveError": "Errore spostamento",
+    "deleteError": "Errore eliminazione",
+    "projectNotFound": "Progetto non trovato",
+    "downloadFailed": "Download fallito",
+    "folderFallback": "Cartella"
   },
   "Validation": {
     "email": "Inserisci un indirizzo email valido",
@@ -227,5 +232,18 @@
     "folderErrorDescription": "Si è verificato un errore durante il caricamento della cartella. Riprova.",
     "tryAgain": "Riprova",
     "goToDashboard": "Vai alla Dashboard"
+  },
+
+  "Errors": {
+    "notAuthenticated": "Non autenticato",
+    "renameError": "Errore rinomina",
+    "moveError": "Errore spostamento",
+    "deleteError": "Errore eliminazione",
+    "projectNotFound": "Progetto non trovato",
+    "downloadFailed": "Download fallito",
+    "folderFallback": "Cartella",
+    "duplicateTitle": "Esiste già un progetto con questo titolo",
+    "downloadUrlMissing": "URL di download non presente",
+    "videoUrlMissing": "URL video non presente"
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Download as DownloadIcon } from "lucide-react";
 
@@ -26,6 +27,7 @@ type Props = WithUrl | WithResolver;
 
 export default function DownloadButton(props: Props) {
   const { filename, label, className } = props;
+  const t = useTranslations("Api");
 
   const handleClick = React.useCallback(async () => {
     try {
@@ -33,7 +35,7 @@ export default function DownloadButton(props: Props) {
       if (!finalUrl) return;
 
       const res = await fetch(finalUrl);
-      if (!res.ok) throw new Error("Download failed");
+      if (!res.ok) throw new Error(t("downloadFailed"));
 
       const blob = await res.blob();
       const objectUrl = URL.createObjectURL(blob);
@@ -48,7 +50,7 @@ export default function DownloadButton(props: Props) {
     } catch (error) {
       console.error("Download failed:", error);
     }
-  }, [props, filename]);
+  }, [props, filename, t]);
 
   const disabled = "url" in props ? !props.url : false;
 

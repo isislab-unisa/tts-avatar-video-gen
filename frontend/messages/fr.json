@@ -128,7 +128,8 @@
     "sortDescending": "Descendant",
     "searchProjects": "Rechercher des projets...",
     "searchInFolder": "Rechercher dans ce dossier...",
-    "moreFolders": "et {count} dossiers de plus"
+    "moreFolders": "et {count} dossiers de plus",
+    "folderFallback": "Dossier"
   },
 
   "Project": {
@@ -196,7 +197,18 @@
     "loggingOut": "Déconnexion en cours...",
     "logOut": "Se déconnecter",
     "downloadFail": "Téléchargement échoué",
-    "downloadStarted": "Téléchargement démarré"
+    "downloadStarted": "Téléchargement démarré",
+    "noFoldersAvailable": "Aucun dossier disponible",
+    "saveError": "Erreur de sauvegarde"
+  },
+  "Api": {
+    "notAuthenticated": "Non authentifié",
+    "renameError": "Erreur de renommage",
+    "moveError": "Erreur de déplacement",
+    "deleteError": "Erreur de suppression",
+    "projectNotFound": "Projet introuvable",
+    "downloadFailed": "Téléchargement échoué",
+    "folderFallback": "Dossier"
   },
   "Validation": {
     "email": "Veuillez saisir une adresse e-mail valide",
@@ -218,5 +230,27 @@
     "errorTitle": "Un problème est survenu",
     "errorMessage": "Une erreur s'est produite lors du chargement du projet.",
     "retry": "Réessayer"
+  },
+
+  "Error": {
+    "projectErrorTitle": "Erreur de Projet",
+    "projectErrorDescription": "Une erreur s'est produite lors du chargement du projet. Réessayez.",
+    "folderErrorTitle": "Erreur de Dossier",
+    "folderErrorDescription": "Une erreur s'est produite lors du chargement du dossier. Réessayez.",
+    "tryAgain": "Réessayer",
+    "goToDashboard": "Aller au Tableau de Bord"
+  },
+
+  "Errors": {
+    "notAuthenticated": "Non authentifié",
+    "renameError": "Erreur de renommage",
+    "moveError": "Erreur de déplacement",
+    "deleteError": "Erreur de suppression",
+    "projectNotFound": "Projet introuvable",
+    "downloadFailed": "Téléchargement échoué",
+    "folderFallback": "Dossier",
+    "duplicateTitle": "Un projet avec ce titre existe déjà",
+    "downloadUrlMissing": "URL de téléchargement non disponible",
+    "videoUrlMissing": "URL vidéo non disponible"
   }
 }

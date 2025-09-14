@@ -12,12 +12,14 @@ type Props = {
   item: ProjectListItem;
   directories: DirectoryDTO[];
   showFolder?: boolean;
+  currentDirId?: string;
 };
 
 export default function ProjectHomeCard({
   item,
   directories,
   showFolder,
+  currentDirId,
 }: Props) {
   const router = useRouter();
   const tProj = useTranslations("Project");
@@ -31,6 +33,7 @@ export default function ProjectHomeCard({
   }, [router, item.id]);
 
   const handleProjectUpdated = () => {
+    // Aggiorna solo i dati del server senza ricaricare completamente la pagina
     router.refresh();
   };
 
@@ -114,7 +117,7 @@ export default function ProjectHomeCard({
           <ProjectActionMenu
             project={item}
             directories={directories}
-            currentDirId={item.directoryId}
+            currentDirId={currentDirId || item.directoryId}
             onProjectUpdated={handleProjectUpdated}
             className="shrink-0"
             size="default"

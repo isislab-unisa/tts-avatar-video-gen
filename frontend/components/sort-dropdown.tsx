@@ -35,7 +35,7 @@ export function SortDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2 cursor-pointer">
           <ArrowUpDown className="h-4 w-4" />
           {t("sort")}
         </Button>
@@ -48,7 +48,7 @@ export function SortDropdown({
         <DropdownMenuItem asChild>
           <Link
             href={href("createdAt", currentOrder)}
-            className="flex items-center justify-between"
+            className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -62,7 +62,7 @@ export function SortDropdown({
         <DropdownMenuItem asChild>
           <Link
             href={href("title", currentOrder)}
-            className="flex items-center justify-between"
+            className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <Type className="h-4 w-4 text-muted-foreground" />
@@ -83,7 +83,7 @@ export function SortDropdown({
         <DropdownMenuItem asChild>
           <Link
             href={href(currentSort, "asc")}
-            className="flex items-center justify-between"
+            className="flex items-center justify-between cursor-pointer"
           >
             <span>{t("sortAscending")}</span>
             {currentOrder === "asc" && (
@@ -94,7 +94,7 @@ export function SortDropdown({
         <DropdownMenuItem asChild>
           <Link
             href={href(currentSort, "desc")}
-            className="flex items-center justify-between"
+            className="flex items-center justify-between cursor-pointer"
           >
             <span>{t("sortDescending")}</span>
             {currentOrder === "desc" && (

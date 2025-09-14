@@ -54,6 +54,7 @@ export default function CreateProjectForm({
   const router = useRouter();
   const t = useTranslations("Project");
   const tv = useTranslations("Validation");
+  const tm = useTranslations("Toast");
   const locale = useLocale();
   const schema = React.useMemo(() => getProjectCreateSchema(tv), [tv]);
 
@@ -126,11 +127,23 @@ export default function CreateProjectForm({
       });
       if (!res.ok) {
         const msg = await res.text().catch(() => "");
-        throw new Error(msg || `Errore salvataggio (${res.status})`);
+        throw new Error(msg || `${tm("saveError")} (${res.status})`);
       }
       const data = (await res.json()) as { id: string };
+      const projectTitle = getValues("title"); // Salva il titolo prima del reset
       toast.success(t("projectSaved"));
       reset();
+
+      // Emetti evento per aggiornare la sidebar senza refresh completo
+      const event = new CustomEvent("projectCreated", {
+        detail: {
+          projectId: data.id,
+          directoryId: directoryId,
+          projectTitle: projectTitle,
+        },
+      });
+      window.dispatchEvent(event);
+
       router.push(`/dashboard/project/${data.id}`);
     } catch (err) {
       toast.error((err as Error).message);
@@ -155,7 +168,7 @@ export default function CreateProjectForm({
               <video
                 src={previewUrl}
                 controls
-                className="h-full w-full object-contain rounded-2xl"
+                className="h-full w-full object-contain rounded-2xl cursor-pointer"
               />
             )}
           </div>
@@ -223,7 +236,7 @@ export default function CreateProjectForm({
             <Button
               onClick={onGenerate}
               disabled={isGenerating}
-              className="min-w-[140px]"
+              className="min-w-[140px] cursor-pointer"
               type="button"
             >
               {isGenerating ? t("generating") : t("generate")}
@@ -232,7 +245,7 @@ export default function CreateProjectForm({
               variant="outline"
               onClick={onDownload}
               disabled={!videoBase64}
-              className="min-w-[140px]"
+              className="min-w-[140px] cursor-pointer"
               type="button"
             >
               {t("downloadVideo")}
@@ -242,26 +255,33 @@ export default function CreateProjectForm({
               <DropdownMenuTrigger asChild>
                 <Button
                   disabled={!videoBase64}
-                  className="min-w-[140px]"
+                  className="min-w-[140px] cursor-pointer"
                   type="button"
                 >
                   {t("saveProject")}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-72 z-50">
-                {directories.map((d) => (
-                  <DropdownMenuItem
-                    key={d.id}
-                    className="cursor-pointer"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      void saveTo(d.id);
-                    }}
-                  >
+                {directories.length > 0 ? (
+                  directories.map((d) => (
+                    <DropdownMenuItem
+                      key={d.id}
+                      className="cursor-pointer"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        void saveTo(d.id);
+                      }}
+                    >
+                      <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <span>{d.name}</span>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled>
                     <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <span>{d.name}</span>
+                    <span>{tm("noFoldersAvailable")}</span>
                   </DropdownMenuItem>
-                ))}
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer"
@@ -282,9 +302,18 @@ export default function CreateProjectForm({
         onOpenChange={setOpenCreateDir}
         onCreated={(dir) => {
           setOpenCreateDir(false);
-          router.refresh(); // Aggiorna la sidebar
+
+          // Emetti evento per aggiornare la sidebar senza refresh completo
+          const event = new CustomEvent("directoryCreated", {
+            detail: {
+              directoryId: dir.id,
+              directoryName: dir.name,
+            },
+          });
+          window.dispatchEvent(event);
+
           if (videoBase64) void saveTo(dir.id);
-          else toast.error("Genera prima il video");
+          else toast.error(t("generateFirst"));
         }}
       />
     </div>

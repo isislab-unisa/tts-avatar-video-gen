@@ -98,6 +98,18 @@ export default function ProjectDetail({
     if (res.ok) {
       const folderName = directories.find((d) => d.id === dirId)?.name || "";
       toast.success(m("projectMoved", { title: p.title, folder: folderName }));
+
+      // Emetti evento per aggiornare la sidebar
+      const event = new CustomEvent("projectMoved", {
+        detail: {
+          projectId: p.id,
+          oldDirectoryId: p.directoryId,
+          newDirectoryId: dirId,
+          projectTitle: p.title,
+        },
+      });
+      window.dispatchEvent(event);
+
       router.refresh();
     } else {
       toast.error(res.message || m("moveFail"));
@@ -171,7 +183,6 @@ export default function ProjectDetail({
                   {isDownloading ? t("generating") : t("download")}
                 </Button>
                 <MoveToMenu
-                  currentDirectoryId={p.directoryId}
                   targets={directories.map((d) => ({ id: d.id, name: d.name }))}
                   onMove={(id) => void onMove(id)}
                   onCreateNew={() => setCreateOpen(true)}
@@ -205,6 +216,7 @@ export default function ProjectDetail({
         open={renameOpen}
         onOpenChange={setRenameOpen}
         projectId={p.id}
+        directoryId={p.directoryId}
         defaultTitle={p.title}
         onRenamed={() => router.refresh()}
       />
@@ -215,8 +227,17 @@ export default function ProjectDetail({
         onConfirm={async () => {
           const res = await deleteProjectAction(p.id);
           if (res.ok) {
+            // Emetti evento per aggiornare la cache della sidebar in tempo reale
+            const event = new CustomEvent("projectDeleted", {
+              detail: {
+                projectId: p.id,
+                directoryId: p.directoryId,
+              },
+            });
+            window.dispatchEvent(event);
+
             toast.success(m("projectDeleted", { title: p.title }));
-            router.push("/dashboard");
+            router.back();
           } else {
             toast.error(res.message || m("deleteFail"));
           }

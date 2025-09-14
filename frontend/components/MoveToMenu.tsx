@@ -23,20 +23,30 @@ type Props = {
 };
 
 export default function MoveToMenu({
-  currentDirectoryId,
   targets,
   onMove,
   onCreateNew,
   className,
-}: Props) {
+}: Omit<Props, "currentDirectoryId">) {
   const t = useTranslations("Project");
-  const filtered = React.useMemo(
-    () => targets.filter((d) => d.id !== currentDirectoryId),
-    [targets, currentDirectoryId]
-  );
+  const [open, setOpen] = React.useState(false);
+  // I targets sono già filtrati dal componente padre
+  const filtered = targets;
+
+  const handleMove = async (directoryId: string) => {
+    await onMove(directoryId);
+    setOpen(false); // Chiudi il dropdown dopo lo spostamento
+  };
+
+  const handleCreateNew = () => {
+    if (onCreateNew) {
+      onCreateNew();
+      setOpen(false); // Chiudi il dropdown dopo aver aperto il dialog di creazione
+    }
+  };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className={className || "cursor-pointer"}>
           <FolderSymlink className="mr-2 h-4 w-4" />
@@ -52,7 +62,7 @@ export default function MoveToMenu({
                 className="cursor-pointer"
                 onSelect={(e) => {
                   e.preventDefault();
-                  void onMove(d.id);
+                  void handleMove(d.id);
                 }}
               >
                 <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -69,7 +79,10 @@ export default function MoveToMenu({
         {onCreateNew ? (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onSelect={onCreateNew}>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={handleCreateNew}
+            >
               <FolderPlus className="mr-2 h-4 w-4" />
               <span>{t("createNewFolder")}</span>
             </DropdownMenuItem>

@@ -239,7 +239,6 @@ func (h *ProjectsHandler) ListProjects(c *fiber.Ctx) error {
 	return c.JSON(bson.M{"items": out, "total": total})
 }
 
-// GET /api/projects/all  (paginato, ordinabile, ricercabile)
 func (h *ProjectsHandler) ListAllProjects(c *fiber.Ctx) error {
 	userID, _ := c.Locals("userId").(string)
 
@@ -259,7 +258,7 @@ func (h *ProjectsHandler) ListAllProjects(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{"userId": userID}
-	// Add search filter for title prefix if query is provided
+
 	if q != "" {
 		filter["title"] = bson.M{"$regex": "^" + strings.ReplaceAll(regexp.QuoteMeta(q), "\\", "\\\\"), "$options": "i"}
 	}
@@ -312,7 +311,6 @@ func (h *ProjectsHandler) DownloadProject(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
 	}
 
-	// owner check
 	var doc models.Project
 	if err := db.Col("projects").FindOne(c.Context(), bson.M{"_id": oid, "userId": userID}).Decode(&doc); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -341,7 +339,6 @@ func (h *ProjectsHandler) GetProjectVideo(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
 	}
 
-	// owner check
 	var doc models.Project
 	if err := db.Col("projects").FindOne(c.Context(), bson.M{"_id": oid, "userId": userID}).Decode(&doc); err != nil {
 		if err == mongo.ErrNoDocuments {

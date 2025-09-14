@@ -69,7 +69,7 @@ export function AppSidebar(
             )}
           </div>
 
-          <div className="flex flex-col items-center gap-y-1 p-2">
+          <div className="flex flex-col items-center gap-y-2 p-2">
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>

@@ -129,7 +129,6 @@ func UpdateDirectory(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-/* ====== NUOVO: handler con store per cancellazione a cascata ====== */
 type DirectoriesHandler struct {
 	Store *storage.MinioStore
 }

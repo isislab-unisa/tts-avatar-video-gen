@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { signApiToken } from "@/lib/jwt";
+import { getErrorMessage } from "@/lib/error-translations";
 
 const API = process.env.BACKEND_API_URL;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
@@ -12,7 +13,7 @@ if (!API) throw new Error("BACKEND_API_URL non configurato");
 async function getJwt(): Promise<string> {
   const headers = await cloneRequestHeaders();
   const session = await auth.api.getSession({ headers });
-  if (!session) throw new Error("Non autenticato");
+  if (!session) throw new Error(getErrorMessage("notAuthenticated"));
   return signApiToken(session.user.id);
 }
 
@@ -130,12 +131,12 @@ export async function renameProjectAction(
     return {
       ok: false,
       field: "title",
-      message: "Esiste già un progetto con questo titolo",
+      message: getErrorMessage("duplicateTitle"),
     };
   }
 
   const msg = await r.text().catch(() => "");
-  return { ok: false, message: msg || "Errore rinomina" };
+  return { ok: false, message: msg || getErrorMessage("renameError") };
 }
 
 export async function moveProjectAction(
@@ -159,7 +160,7 @@ export async function moveProjectAction(
   }
 
   const msg = await r.text().catch(() => "");
-  return { ok: false, message: msg || "Errore spostamento" };
+  return { ok: false, message: msg || getErrorMessage("moveError") };
 }
 
 export async function deleteProjectAction(
@@ -178,7 +179,7 @@ export async function deleteProjectAction(
   }
 
   const msg = await r.text().catch(() => "");
-  return { ok: false, message: msg || "Errore eliminazione" };
+  return { ok: false, message: msg || getErrorMessage("deleteError") };
 }
 
 // === Download URL ===
@@ -194,13 +195,16 @@ export async function getProjectDownloadUrlAction(
 
   if (!r.ok) {
     const msg = await r.text().catch(() => "");
-    return { ok: false, message: msg || "Progetto non trovato" };
+    return {
+      ok: false,
+      message: msg || getErrorMessage("projectNotFound"),
+    };
   }
 
   const data = (await r.json()) as { downloadUrl?: string };
   if (data?.downloadUrl) return { ok: true, url: data.downloadUrl };
 
-  return { ok: false, message: "downloadUrl non presente" };
+  return { ok: false, message: getErrorMessage("downloadUrlMissing") };
 }
 
 // === Video URL ===
@@ -216,11 +220,14 @@ export async function getProjectVideoUrlAction(
 
   if (!r.ok) {
     const msg = await r.text().catch(() => "");
-    return { ok: false, message: msg || "Progetto non trovato" };
+    return {
+      ok: false,
+      message: msg || getErrorMessage("projectNotFound"),
+    };
   }
 
   const data = (await r.json()) as { videoUrl?: string };
   if (data?.videoUrl) return { ok: true, url: data.videoUrl };
 
-  return { ok: false, message: "videoUrl non presente" };
+  return { ok: false, message: getErrorMessage("videoUrlMissing") };
 }

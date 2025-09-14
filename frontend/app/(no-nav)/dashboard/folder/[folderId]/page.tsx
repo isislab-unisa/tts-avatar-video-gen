@@ -85,7 +85,7 @@ export default async function FolderPage({
           <Link href="/dashboard" className="underline hover:no-underline">
             {t("home")}
           </Link>{" "}
-          / {currentDir?.name ?? "Cartella"}
+          / {currentDir?.name ?? t("folderFallback")}
         </nav>
         <ProjectsToolbar
           basePath={`/dashboard/folder/${resolvedParams.folderId}`}
@@ -109,6 +109,7 @@ export default async function FolderPage({
                   item={p}
                   directories={directories}
                   showFolder={false}
+                  currentDirId={resolvedParams.folderId}
                 />
               </li>
             ))}

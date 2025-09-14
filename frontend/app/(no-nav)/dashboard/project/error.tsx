@@ -6,7 +6,6 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function ProjectError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -27,11 +26,6 @@ export default function ProjectError({
           <p className="text-muted-foreground">
             {t("projectErrorDescription")}
           </p>
-          {error.digest && (
-            <p className="text-xs text-muted-foreground font-mono">
-              Error ID: {error.digest}
-            </p>
-          )}
         </div>
 
         <div className="flex gap-4">

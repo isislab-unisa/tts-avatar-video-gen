@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   MoreHorizontal,
@@ -55,6 +56,7 @@ export default function ProjectMenu({
 }: Props) {
   const tProj = useTranslations("Project");
   const tToast = useTranslations("Toast");
+  const router = useRouter();
 
   const [renameOpen, setRenameOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
@@ -69,11 +71,24 @@ export default function ProjectMenu({
   const handleMove = async (dirId: string, dirLabel?: string) => {
     const res = await moveProjectAction(project.id, dirId);
     if (res.ok) {
-      setDropdownOpen(false);
+      setDropdownOpen(false); // Chiudi il dropdown
+
+      // Emetti evento per aggiornare la sidebar in tempo reale
+      const event = new CustomEvent("projectMoved", {
+        detail: {
+          projectId: project.id,
+          oldDirectoryId: project.directoryId,
+          newDirectoryId: dirId,
+          projectTitle: project.title,
+        },
+      });
+      window.dispatchEvent(event);
+
       toast.success(
         tToast("projectMoved", { title: project.title, folder: dirLabel ?? "" })
       );
       onProjectUpdated?.();
+      router.refresh(); // Aggiorna la sidebar
     } else {
       toast.error(res.message || tToast("moveFail"));
     }
@@ -83,8 +98,19 @@ export default function ProjectMenu({
     const res = await deleteProjectAction(project.id);
     if (res.ok) {
       setDropdownOpen(false);
+
+      // Emetti evento per aggiornare la cache della sidebar in tempo reale
+      const event = new CustomEvent("projectDeleted", {
+        detail: {
+          projectId: project.id,
+          directoryId: project.directoryId,
+        },
+      });
+      window.dispatchEvent(event);
+
       toast.success(tToast("projectDeleted", { title: project.title }));
       onProjectUpdated?.();
+      router.refresh(); // Aggiorna la sidebar
     } else {
       toast.error(res.message || tToast("deleteFail"));
     }
@@ -157,23 +183,21 @@ export default function ProjectMenu({
           onClick={(e) => e.stopPropagation()}
         >
           <DropdownMenuItem
-            className="cursor-pointer"
+            className="cursor-pointer gap-2"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setRenameOpen(true);
             }}
           >
-            <Pencil
-              className={`mr-2 ${iconSizes[size]} text-muted-foreground`}
-            />
+            <Pencil className={`${iconSizes[size]} text-muted-foreground`} />
             {tProj("rename")}
           </DropdownMenuItem>
 
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="cursor-pointer gap-2">
               <FolderSymlink
-                className={`mr-2 ${iconSizes[size]} text-muted-foreground`}
+                className={`${iconSizes[size]} text-muted-foreground`}
               />
               {tProj("moveTo")}
             </DropdownMenuSubTrigger>
@@ -182,12 +206,17 @@ export default function ProjectMenu({
               onClick={(e) => e.stopPropagation()}
             >
               {moveTargets.length === 0 ? (
-                <div className="px-2 py-2 text-sm text-muted-foreground">—</div>
+                <DropdownMenuItem disabled className="gap-2">
+                  <Folder
+                    className={`${iconSizes[size]} text-muted-foreground`}
+                  />
+                  <span>{tToast("noFoldersAvailable")}</span>
+                </DropdownMenuItem>
               ) : (
                 moveTargets.map((d) => (
                   <DropdownMenuItem
                     key={d.id}
-                    className="cursor-pointer"
+                    className="cursor-pointer gap-2"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -195,7 +224,7 @@ export default function ProjectMenu({
                     }}
                   >
                     <Folder
-                      className={`mr-2 ${iconSizes[size]} text-muted-foreground`}
+                      className={`${iconSizes[size]} text-muted-foreground`}
                     />
                     <span className="truncate">{d.name}</span>
                   </DropdownMenuItem>
@@ -204,21 +233,21 @@ export default function ProjectMenu({
 
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="cursor-pointer"
+                className="cursor-pointer gap-2"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   setCreateOpen(true);
                 }}
               >
-                <FolderPlus className={`mr-2 ${iconSizes[size]}`} />
+                <FolderPlus className={`${iconSizes[size]}`} />
                 {tProj("createNewFolder")}
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
 
           <DropdownMenuItem
-            className="cursor-pointer"
+            className="cursor-pointer gap-2"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -226,7 +255,7 @@ export default function ProjectMenu({
             }}
           >
             <DownloadIcon
-              className={`mr-2 ${iconSizes[size]} text-muted-foreground`}
+              className={`${iconSizes[size]} text-muted-foreground`}
             />
             {tProj("download")}
           </DropdownMenuItem>
@@ -234,14 +263,14 @@ export default function ProjectMenu({
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+            className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setDeleteOpen(true);
             }}
           >
-            <Trash2 className={`mr-2 ${iconSizes[size]} text-red-600`} />
+            <Trash2 className={`${iconSizes[size]} text-red-600`} />
             {tProj("delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -251,8 +280,12 @@ export default function ProjectMenu({
         open={renameOpen}
         onOpenChange={setRenameOpen}
         projectId={project.id}
+        directoryId={project.directoryId}
         defaultTitle={project.title}
-        onRenamed={() => onProjectUpdated?.()}
+        onRenamed={() => {
+          onProjectUpdated?.();
+          router.refresh(); // Aggiorna la sidebar
+        }}
       />
 
       <ConfirmDeleteDialog
