@@ -202,3 +202,25 @@ export async function getProjectDownloadUrlAction(
 
   return { ok: false, message: "downloadUrl non presente" };
 }
+
+// === Video URL ===
+// Ottiene l'URL presigned per la visualizzazione del video (non per il download).
+export async function getProjectVideoUrlAction(
+  id: string
+): Promise<{ ok: true; url: string } | { ok: false; message?: string }> {
+  const token = await getJwt();
+  const r = await fetch(`${API}/api/projects/${id}/video`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    return { ok: false, message: msg || "Progetto non trovato" };
+  }
+
+  const data = (await r.json()) as { videoUrl?: string };
+  if (data?.videoUrl) return { ok: true, url: data.videoUrl };
+
+  return { ok: false, message: "videoUrl non presente" };
+}

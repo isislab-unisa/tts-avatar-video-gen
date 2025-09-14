@@ -98,6 +98,7 @@ func main() {
 	api.Get("/projects", proj.ListProjects) // by dir
 	api.Get("/projects/all", proj.ListAllProjects)
 	api.Get("/projects/:id", proj.GetProject)
+	api.Get("/projects/:id/video", proj.GetProjectVideo)
 	api.Get("/projects/:id/download", proj.DownloadProject)
 	api.Patch("/projects/:id", proj.UpdateProject)
 	api.Delete("/projects/:id", proj.DeleteProject)

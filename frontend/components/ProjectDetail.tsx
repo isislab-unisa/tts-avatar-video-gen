@@ -9,6 +9,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import {
   moveProjectAction,
   deleteProjectAction,
+  getProjectVideoUrlAction,
   type ProjectListItem,
 } from "@/app/(no-nav)/dashboard/_actions/projects";
 import type { DirectoryDTO } from "@/lib/schema/directory";
@@ -18,7 +19,6 @@ import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import MoveToMenu from "@/components/MoveToMenu";
 import { useDownloadProject } from "@/hooks/useDownloadProject";
 import { Download as DownloadIcon } from "lucide-react";
-import ResponsiveVideo from "@/components/ResponsiveVideo";
 
 type Dir = DirectoryDTO;
 
@@ -40,10 +40,29 @@ export default function ProjectDetail({
   const router = useRouter();
   const downloadProject = useDownloadProject();
   const [isDownloading, setIsDownloading] = React.useState(false);
+  const [videoUrl, setVideoUrl] = React.useState<string | null>(null);
+  const [isLoadingVideo, setIsLoadingVideo] = React.useState(false);
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [renameOpen, setRenameOpen] = React.useState(false);
   const [createOpen, setCreateOpen] = React.useState(false);
+
+  const loadVideoUrl = React.useCallback(async () => {
+    if (!project) return;
+    setIsLoadingVideo(true);
+    try {
+      const result = await getProjectVideoUrlAction(project.id);
+      if (result.ok) {
+        setVideoUrl(result.url);
+      } else {
+        console.error("Failed to load video URL:", result.message);
+      }
+    } catch (error) {
+      console.error("Error loading video URL:", error);
+    } finally {
+      setIsLoadingVideo(false);
+    }
+  }, [project]);
 
   const handleDownload = async () => {
     if (!project) return;
@@ -56,6 +75,13 @@ export default function ProjectDetail({
       setIsDownloading(false);
     }
   };
+
+  // Carica l'URL del video quando il componente si monta
+  React.useEffect(() => {
+    if (project) {
+      loadVideoUrl();
+    }
+  }, [project, loadVideoUrl]);
 
   if (!project) {
     return (
@@ -82,9 +108,34 @@ export default function ProjectDetail({
     <section className="min-h-[calc(100vh-10rem)] grid place-content-center px-4">
       <div className="grid w-full max-w-6xl gap-8 lg:grid-cols-2 items-center justify-items-center">
         {/* Player */}
-        <div className="w-full rounded-2xl overflow-hidden bg-black">
-          <div className="w-full rounded-2xl overflow-hidden">
-            <ResponsiveVideo src={`/api/projects/${p.id}/download`} />
+        <div className="w-full rounded-2xl overflow-hidden bg-sidebar dark:bg-sidebar">
+          <div className="w-full rounded-2xl overflow-hidden ">
+            {isLoadingVideo ? (
+              <div className="w-full aspect-video bg-sidebar dark:bg-sidebar relative flex items-center justify-center">
+                <div className="text-sidebar-foreground text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sidebar-foreground mx-auto mb-2"></div>
+                  <div className="text-sm">{t("loadingVideo")}</div>
+                </div>
+              </div>
+            ) : videoUrl ? (
+              <video
+                className="w-full aspect-video object-cover cursor-pointer"
+                controls
+                preload="auto"
+                src={videoUrl}
+                onError={(e) => {
+                  console.error("Video load error:", e);
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <div className="w-full aspect-video bg-sidebar dark:bg-sidebar relative flex items-center justify-center">
+                <div className="text-sidebar-foreground text-center">
+                  <div className="text-sm">{t("videoNotAvailable")}</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

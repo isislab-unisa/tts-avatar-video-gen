@@ -112,10 +112,14 @@ export function CreateDirectoryDialog({
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel type="button" disabled={pending}>
+            <AlertDialogCancel
+              type="button"
+              disabled={pending}
+              className="cursor-pointer"
+            >
               {td("cancel")}
             </AlertDialogCancel>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending} className="cursor-pointer">
               {pending ? td("creating") : td("save")}
             </Button>
           </AlertDialogFooter>

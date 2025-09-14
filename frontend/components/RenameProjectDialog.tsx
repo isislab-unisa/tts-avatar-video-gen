@@ -39,6 +39,7 @@ export default function RenameProjectDialog({
 }: Props) {
   const td = useTranslations("Dialog");
   const tv = useTranslations("Validation");
+  const tm = useTranslations("Toast");
   const locale = useLocale();
   const schema = React.useMemo(() => getProjectRenameSchema(tv), [tv]);
 
@@ -63,7 +64,6 @@ export default function RenameProjectDialog({
   const [pending, start] = React.useTransition();
 
   const onSubmit = (values: ProjectRenameForm) => {
-    console.log("Form submitted with values:", values);
     const nextTitle = values.title.trim();
     if (nextTitle === defaultTitle.trim()) {
       setError("title", { type: "manual", message: tv("sameName") });
@@ -77,20 +77,20 @@ export default function RenameProjectDialog({
           return;
         }
         if (res.ok) {
-          toast.success(td("save"));
+          toast.success(tm("renameSuccess"));
           onRenamed?.(values.title);
           onOpenChange(false);
           return;
         }
-        toast.error(res.message || "Error");
+        toast.error(res.message || tm("renameFail"));
         return;
       }
       if (res) {
-        toast.success(td("save"));
+        toast.success(tm("renameSuccess"));
         onRenamed?.(values.title);
         onOpenChange(false);
       } else {
-        toast.error("Error");
+        toast.error(tm("renameFail"));
       }
     });
   };
@@ -140,12 +140,17 @@ export default function RenameProjectDialog({
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel type="button" disabled={pending}>
+            <AlertDialogCancel
+              type="button"
+              disabled={pending}
+              className="cursor-pointer"
+            >
               {td("cancel")}
             </AlertDialogCancel>
             <Button
               type="submit"
               disabled={pending}
+              className="cursor-pointer"
               onClick={(e) => {
                 e.preventDefault();
                 handleSubmit(onSubmit)();

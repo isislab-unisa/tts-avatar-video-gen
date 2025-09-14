@@ -329,3 +329,32 @@ func (h *ProjectsHandler) DownloadProject(c *fiber.Ctx) error {
 
 	return c.Redirect(url, fiber.StatusFound) // 302
 }
+
+func (h *ProjectsHandler) GetProjectVideo(c *fiber.Ctx) error {
+	userID, _ := c.Locals("userId").(string)
+	if userID == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+	id := c.Params("id")
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
+	}
+
+	// owner check
+	var doc models.Project
+	if err := db.Col("projects").FindOne(c.Context(), bson.M{"_id": oid, "userId": userID}).Decode(&doc); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return fiber.NewError(fiber.StatusNotFound, "not found")
+		}
+		return fiber.NewError(fiber.StatusInternalServerError, "db error")
+	}
+
+	// presigned per visualizzazione video (1 ora)
+	url, err := h.Store.PresignGet(c.Context(), doc.BucketID, 1*time.Hour)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "presign error")
+	}
+
+	return c.JSON(bson.M{"videoUrl": url})
+}
