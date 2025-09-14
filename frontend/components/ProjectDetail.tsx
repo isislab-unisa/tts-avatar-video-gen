@@ -151,7 +151,6 @@ export default function ProjectDetail({
           </div>
         </div>
 
-        {/* Info + azioni */}
         <div className="w-full max-w-2xl">
           <div className="space-y-4 text-left">
             <h2 className="text-2xl font-semibold leading-snug break-words">

@@ -29,11 +29,15 @@ export default function ProjectError({
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={reset} variant="default">
+          <Button onClick={reset} variant="default" className="cursor-pointer">
             <RefreshCw className="mr-2 h-4 w-4" />
             {t("tryAgain")}
           </Button>
-          <Button onClick={() => router.push("/dashboard")} variant="outline">
+          <Button
+            onClick={() => router.push("/dashboard")}
+            variant="outline"
+            className="cursor-pointer"
+          >
             {t("goToDashboard")}
           </Button>
         </div>

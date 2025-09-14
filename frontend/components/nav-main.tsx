@@ -49,14 +49,14 @@ import { type DirectoryDTO } from "@/lib/schema/directory";
 import { listProjectsByDirAction } from "@/app/(no-nav)/dashboard/_actions/projects";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import RenameDirectoryDialog from "@/components/RenameDirectoryDialog";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import { type ProjectListItem } from "@/app/(no-nav)/dashboard/_actions/projects";
 
 const iconCls = "mr-2 h-4 w-4";
 
 export type NavItem = {
   title: string;
-  url: string; // NON naviga sul trigger; il link vive nei sotto-elementi
+  url: string;
   icon?: React.ComponentType<{ className?: string }>;
   isActive?: boolean;
   meta?: { id?: string };
@@ -103,9 +103,6 @@ export function NavMain({
     {}
   );
 
-  // Rimuoviamo questo useEffect perché svuotava la cache inutilmente
-  // La cache dirProjects deve rimanere persistente per mantenere i dati delle cartelle aperte
-
   // Listener per aggiornare la cache quando un progetto viene eliminato
   React.useEffect(() => {
     const handleProjectDeleted = (event: CustomEvent) => {
@@ -122,7 +119,6 @@ export function NavMain({
           }
         });
 
-        // Se directoryId è undefined, è un progetto root - aggiorna anche la pagina
         if (!directoryId) {
           setTimeout(() => {
             router.refresh();
@@ -151,7 +147,6 @@ export function NavMain({
           }
         });
 
-        // Forza l'aggiornamento delle cartelle che contenevano il progetto
         if (updatedDirs.length > 0) {
           const updates: Record<string, number> = {};
           updatedDirs.forEach((dirId) => {
@@ -218,7 +213,6 @@ export function NavMain({
           }
         }
 
-        // Forza l'aggiornamento delle cartelle coinvolte nel movimento
         // Aggiorna solo le cartelle specifiche, non tutte
         const updates: Record<string, number> = {};
         if (oldDirectoryId && openDirs[oldDirectoryId]) {
@@ -270,10 +264,7 @@ export function NavMain({
       }
     };
 
-    const handleDirectoryCreated = () => {
-      // La nuova directory verrà mostrata automaticamente quando la lista delle directory si aggiorna
-      // Non abbiamo bisogno di aggiornare dirProjects perché la cartella è vuota
-    };
+    const handleDirectoryCreated = () => {};
 
     window.addEventListener(
       "projectDeleted",
@@ -318,15 +309,11 @@ export function NavMain({
         handleDirectoryCreated as EventListener
       );
     };
-  }, [openDirs, router, dirUpdates]); // Aggiungo dirUpdates alla dependency array
-
-  // Rimuoviamo questo useEffect perché causava aggiornamenti non necessari
-  // Le cartelle si caricano già quando vengono aperte individualmente
+  }, [openDirs, router, dirUpdates]);
 
   async function remove(dirId: string) {
     const ok = await deleteDirectoryAction(dirId);
     if (ok) {
-      // Close the dialog first
       setConfirm({ open: false, dirId: "", dirName: "" });
       router.push("/dashboard");
       router.refresh();
@@ -340,7 +327,7 @@ export function NavMain({
       setLoadingDirs((s) => ({ ...s, [dirId]: true }));
       try {
         const res = await listProjectsByDirAction(dirId, 1, 50, "title", "asc");
-        // Aggiungi un piccolo delay per mostrare l'animazione di caricamento
+
         await new Promise((resolve) => setTimeout(resolve, 500));
         setDirProjects((s) => ({ ...s, [dirId]: res.items || [] }));
       } catch (error) {
@@ -454,7 +441,7 @@ export function NavMain({
                       {dirId && loadingDirs[dirId] ? (
                         <SidebarMenuSubItem>
                           <div className="flex items-center gap-2 px-2 py-1 text-sm text-muted-foreground">
-                            <LoadingSpinner size="sm" />
+                            <LoadingSpinner />
                             <span>{tCommon("loadingProjects")}</span>
                           </div>
                         </SidebarMenuSubItem>
@@ -541,7 +528,6 @@ export function NavMain({
         </SidebarMenu>
       </SidebarGroup>
 
-      {/* RENAME directory dialog */}
       <RenameDirectoryDialog
         open={rename.open}
         onOpenChange={(o) => setRename((s) => ({ ...s, open: o }))}
@@ -553,7 +539,6 @@ export function NavMain({
         }}
       />
 
-      {/* DELETE directory dialog (legacy) */}
       <AlertDialog
         open={confirm.open}
         onOpenChange={(open) => setConfirm((s) => ({ ...s, open }))}
@@ -578,7 +563,6 @@ export function NavMain({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* Project rename/delete dialogs */}
     </>
   );
 }
