@@ -103,7 +103,7 @@ func main() {
 	api.Patch("/projects/:id", proj.UpdateProject)
 	api.Delete("/projects/:id", proj.DeleteProject)
 
-	// Generatore locale (anche questo se vuoi tenerlo protetto)
+	// Generatore video
 	api.Post("/generate", gen.Generate)
 
 	port := os.Getenv("PORT")

@@ -71,7 +71,7 @@ export default function ProjectMenu({
   const handleMove = async (dirId: string, dirLabel?: string) => {
     const res = await moveProjectAction(project.id, dirId);
     if (res.ok) {
-      setDropdownOpen(false); // Chiudi il dropdown
+      setDropdownOpen(false);
 
       // Emetti evento per aggiornare la sidebar in tempo reale
       const event = new CustomEvent("projectMoved", {

@@ -13,7 +13,7 @@ import { listDirectoriesForUser } from "./_actions/directories";
 import { cloneRequestHeaders } from "@/lib/headers";
 
 async function getSessionServer() {
-  const h = await cloneRequestHeaders(); // ✅ await
+  const h = await cloneRequestHeaders();
   return auth.api.getSession({ headers: h });
 }
 

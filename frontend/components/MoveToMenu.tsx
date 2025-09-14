@@ -30,18 +30,18 @@ export default function MoveToMenu({
 }: Omit<Props, "currentDirectoryId">) {
   const t = useTranslations("Project");
   const [open, setOpen] = React.useState(false);
-  // I targets sono già filtrati dal componente padre
+
   const filtered = targets;
 
   const handleMove = async (directoryId: string) => {
     await onMove(directoryId);
-    setOpen(false); // Chiudi il dropdown dopo lo spostamento
+    setOpen(false);
   };
 
   const handleCreateNew = () => {
     if (onCreateNew) {
       onCreateNew();
-      setOpen(false); // Chiudi il dropdown dopo aver aperto il dialog di creazione
+      setOpen(false);
     }
   };
 

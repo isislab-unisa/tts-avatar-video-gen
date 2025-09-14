@@ -79,7 +79,6 @@ export default async function FolderPage({
 
   return (
     <div className="min-h-[calc(100vh-8rem)] flex flex-col">
-      {/* Header fisso */}
       <div className="space-y-2 flex-shrink-0">
         <nav className="text-sm text-muted-foreground">
           <Link href="/dashboard" className="underline hover:no-underline">
@@ -95,7 +94,6 @@ export default async function FolderPage({
         />
       </div>
 
-      {/* Contenuto principale */}
       <div className="flex-1">
         {items.length === 0 ? (
           <div className="flex items-center justify-center h-full">
@@ -117,7 +115,6 @@ export default async function FolderPage({
         )}
       </div>
 
-      {/* Paginazione sempre in basso */}
       <div className="flex justify-center py-4 mt-auto">
         <Pagination
           current={page}

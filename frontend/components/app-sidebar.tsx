@@ -43,7 +43,7 @@ export function AppSidebar(
     title: d.name,
     url: `/dashboard/folder/${d.id}`,
     icon: Folder,
-    items: [], // se vuoi popolare i progetti, passa qui i subitems
+    items: [],
     meta: { id: d.id },
   }));
 

@@ -30,7 +30,6 @@ import { Folder, Plus } from "lucide-react";
 
 type DirectoryDTO = { id: string; name: string };
 
-// ⟵ tipo di risposta della server action token
 type TokenResp = { ok: true; token: string } | { ok: false; message?: string };
 
 const API = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
@@ -46,7 +45,7 @@ function base64ToBlob(base64: string, mime = "video/mp4") {
 
 export default function CreateProjectForm({
   directories,
-  getApiToken, // ⟵ server action passata dal server
+  getApiToken,
 }: {
   directories: DirectoryDTO[];
   getApiToken: () => Promise<TokenResp>;
@@ -107,7 +106,7 @@ export default function CreateProjectForm({
   async function saveTo(directoryId: string) {
     if (!videoBase64) return toast.error(t("generateFirst"));
 
-    const tk = await getApiToken(); // ⟵ uso la prop
+    const tk = await getApiToken();
     if (!tk.ok) return toast.error(tk.message);
 
     const vals = getValues();
@@ -130,11 +129,10 @@ export default function CreateProjectForm({
         throw new Error(msg || `${tm("saveError")} (${res.status})`);
       }
       const data = (await res.json()) as { id: string };
-      const projectTitle = getValues("title"); // Salva il titolo prima del reset
+      const projectTitle = getValues("title");
       toast.success(t("projectSaved"));
       reset();
 
-      // Emetti evento per aggiornare la sidebar senza refresh completo
       const event = new CustomEvent("projectCreated", {
         detail: {
           projectId: data.id,

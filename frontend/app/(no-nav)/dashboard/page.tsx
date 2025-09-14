@@ -50,7 +50,6 @@ export default async function DashboardHomePage({
   const order = asOrder(sp.order);
   const q = asQ(sp.q);
 
-  // 10 card = 2 righe da 5 -> niente scroll verticale
   const limit = 10;
 
   const [directories, data] = await Promise.all([
@@ -64,7 +63,6 @@ export default async function DashboardHomePage({
 
   return (
     <div className="min-h-[calc(100vh-8rem)] flex flex-col">
-      {/* Header fisso */}
       <div className="space-y-2 flex-shrink-0">
         <nav className="text-sm text-muted-foreground">{t("home")}</nav>
         <ProjectsToolbar
@@ -75,7 +73,6 @@ export default async function DashboardHomePage({
         />
       </div>
 
-      {/* Contenuto principale */}
       <div className="flex-1">
         {items.length === 0 ? (
           <div className="flex items-center justify-center h-full">
@@ -96,7 +93,6 @@ export default async function DashboardHomePage({
         )}
       </div>
 
-      {/* Paginazione sempre in basso */}
       <div className="flex justify-center py-4 mt-auto">
         <Pagination
           current={page}

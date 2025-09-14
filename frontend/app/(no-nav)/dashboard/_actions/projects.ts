@@ -9,7 +9,6 @@ import { getErrorMessage } from "@/lib/error-translations";
 const API = process.env.BACKEND_API_URL;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
 
-// === Helpers ===
 async function getJwt(): Promise<string> {
   const headers = await cloneRequestHeaders();
   const session = await auth.api.getSession({ headers });
@@ -17,7 +16,6 @@ async function getJwt(): Promise<string> {
   return signApiToken(session.user.id);
 }
 
-// === Tipi ===
 export type ProjectListItem = {
   id: string;
   title: string;
@@ -33,7 +31,6 @@ export type ListProjectsResp = {
   total: number;
 };
 
-// === Reads ===
 export async function listAllProjectsAction(
   page = 1,
   limit = 8,
@@ -106,7 +103,6 @@ export async function listProjectsByDirAction(
   };
 }
 
-// === Mutations ===
 export async function renameProjectAction(
   id: string,
   title: string
@@ -208,7 +204,7 @@ export async function getProjectDownloadUrlAction(
 }
 
 // === Video URL ===
-// Ottiene l'URL presigned per la visualizzazione del video (non per il download).
+// Ottiene l'URL presigned per la visualizzazione del video
 export async function getProjectVideoUrlAction(
   id: string
 ): Promise<{ ok: true; url: string } | { ok: false; message?: string }> {

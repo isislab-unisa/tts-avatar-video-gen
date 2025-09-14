@@ -11,13 +11,11 @@ type BaseProps = {
   className?: string;
 };
 
-// Variante A: ho già l'URL finale
 type WithUrl = BaseProps & {
   url: string;
   resolveUrl?: never;
 };
 
-// Variante B: devo risolvere l'URL al click (chiamo una Server Action)
 type WithResolver = BaseProps & {
   url?: never;
   resolveUrl: () => Promise<string | null>;

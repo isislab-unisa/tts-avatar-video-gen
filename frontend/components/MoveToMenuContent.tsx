@@ -24,7 +24,7 @@ export default function MoveToMenuContent({
 }: Omit<Props, "currentDirectoryId">) {
   const t = useTranslations("Project");
   const tm = useTranslations("Toast");
-  // I targets sono già filtrati dal componente padre
+
   const filtered = targets;
 
   return (
