@@ -183,7 +183,7 @@
     "renameDirectoryTitle": "Renombrar Carpeta",
     "rename": "Renombrar",
     "deleteDirectoryTitle": "Eliminar Carpeta",
-    "deleteDirectoryMessage": "¿Estás seguro de que quieres eliminar la carpeta \"{name}\"? Esta acción no se puede deshacer y eliminará todos los proyectos contenidos."
+    "deleteDirectoryMessage": "¿Estás seguro de que quieres eliminar la carpeta \"{name}\"?\nEsta acción no se puede deshacer y eliminará todos los proyectos contenidos."
   },
   "Toast": {
     "renameSuccess": "Título actualizado",
@@ -195,6 +195,9 @@
     "projectMoved": "Proyecto {title} movido a {folder}",
     "projectDeleted": "Proyecto {title} eliminado",
     "directoryCreated": "Carpeta creada",
+    "directoryRenamed": "Carpeta renombrada",
+    "directoryDeleted": "Carpeta eliminada",
+    "directoryMoved": "Carpeta {name} movida a {folder}",
     "signOutSuccess": "Desconectado exitosamente",
     "signOutError": "Error al desconectar",
     "loggingOut": "Desconectando...",

@@ -201,9 +201,9 @@ export default function ProjectActionMenu({
 
           <DropdownMenuItem
             onClick={handleDelete}
-            className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+            className="cursor-pointer gap-2 text-red-700 focus:text-red-700 focus:bg-red-50 dark:text-red-500 dark:focus:text-red-500 dark:focus:bg-red-900/20"
           >
-            <Trash2 className="h-4 w-4 text-red-600" />
+            <Trash2 className="h-4 w-4 text-red-700 dark:text-red-500" />
             {t("delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import {
   ChevronRight,
   MoreHorizontal,
@@ -295,6 +296,7 @@ export function NavMain({
   async function remove(dirId: string) {
     const ok = await deleteDirectoryAction(dirId);
     if (ok) {
+      toast.success(t("directoryDeleted"));
       setConfirm({ open: false, dirId: "", dirName: "" });
       router.push("/dashboard");
       router.refresh();
@@ -353,14 +355,14 @@ export function NavMain({
             <AlertDialogTitle>{t("deleteDirectoryTitle")}</AlertDialogTitle>
           </AlertDialogHeader>
           <div className="py-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-red-700 dark:text-red-500 whitespace-pre-line">
               {t("deleteDirectoryMessage", { name: confirm.dirName || "" })}
             </p>
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
             <Button
-              variant="destructive"
+              className="bg-red-700 hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-700 text-white"
               onClick={() => {
                 if (confirm.dirId) {
                   remove(confirm.dirId);
@@ -426,7 +428,7 @@ export function NavMain({
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            className="cursor-pointer text-destructive focus:text-destructive"
+                            className="cursor-pointer text-red-700 focus:text-red-700 focus:bg-red-50 dark:text-red-500 dark:focus:text-red-500 dark:focus:bg-red-900/20"
                             onClick={() =>
                               setConfirm({
                                 open: true,
@@ -435,7 +437,9 @@ export function NavMain({
                               })
                             }
                           >
-                            <Trash2 className={`${iconCls} text-destructive`} />
+                            <Trash2
+                              className={`${iconCls} text-red-700 dark:text-red-500`}
+                            />
                             {t("delete")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>

@@ -176,7 +176,7 @@
     "renameDirectoryTitle": "Rinomina Cartella",
     "rename": "Rinomina",
     "deleteDirectoryTitle": "Elimina Cartella",
-    "deleteDirectoryMessage": "Sei sicuro di voler eliminare la cartella \"{name}\"? Questa azione non può essere annullata e eliminerà tutti i progetti contenuti."
+    "deleteDirectoryMessage": "Sei sicuro di voler eliminare la cartella \"{name}\"?\nQuesta azione non può essere annullata e eliminerà tutti i progetti contenuti."
   },
   "Toast": {
     "renameSuccess": "Titolo aggiornato",
@@ -188,6 +188,9 @@
     "projectMoved": "Progetto {title} spostato in {folder}",
     "projectDeleted": "Progetto {title} eliminato",
     "directoryCreated": "Cartella creata",
+    "directoryRenamed": "Cartella rinominata",
+    "directoryDeleted": "Cartella eliminata",
+    "directoryMoved": "Cartella {name} spostata in {folder}",
     "signOutSuccess": "Disconnesso con successo",
     "signOutError": "Errore durante la disconnessione",
     "loggingOut": "Disconnessione in corso...",

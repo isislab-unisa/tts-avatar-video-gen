@@ -48,7 +48,7 @@ export default function ConfirmDeleteDialog({
             {cancelLabel ?? td("cancel")}
           </AlertDialogCancel>
           <Button
-            className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+            className="bg-red-700 hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-700 text-white cursor-pointer"
             disabled={pending}
             onClick={() => start(async () => void onConfirm())}
           >
