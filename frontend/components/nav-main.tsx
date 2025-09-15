@@ -129,32 +129,24 @@ export function NavMain({
     };
 
     const handleProjectRenamed = (event: CustomEvent) => {
-      const { projectId, newTitle } = event.detail;
+      const { projectId, newTitle, directoryId } = event.detail;
 
-      // Aggiorna il titolo del progetto nella cache
+      // Aggiorna il titolo del progetto solo nella cartella specifica
       setDirProjects((prev) => {
         const updated = { ...prev };
 
-        // Aggiorna il titolo del progetto in tutte le cartelle aperte
-        const updatedDirs: string[] = [];
-        Object.keys(updated).forEach((dirId) => {
-          if (updated[dirId]) {
-            updated[dirId] = updated[dirId].map((p) =>
-              p.id === projectId ? { ...p, title: newTitle } : p
-            );
-            updatedDirs.push(dirId);
-          }
-        });
+        // Aggiorna solo se la cartella è aperta e contiene il progetto
+        if (directoryId && updated[directoryId]) {
+          updated[directoryId] = updated[directoryId].map((p) =>
+            p.id === projectId ? { ...p, title: newTitle } : p
+          );
 
-        if (updatedDirs.length > 0) {
-          const updates: Record<string, number> = {};
-          updatedDirs.forEach((dirId) => {
-            if (openDirs[dirId]) {
-              updates[dirId] = (dirUpdates[dirId] || 0) + 1;
-            }
-          });
-          if (Object.keys(updates).length > 0) {
-            setDirUpdates((prev) => ({ ...prev, ...updates }));
+          // Aggiorna solo questa cartella specifica
+          if (openDirs[directoryId]) {
+            setDirUpdates((prev) => ({
+              ...prev,
+              [directoryId]: (prev[directoryId] || 0) + 1,
+            }));
           }
         }
 
