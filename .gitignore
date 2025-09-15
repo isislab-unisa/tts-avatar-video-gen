@@ -1,4 +1,8 @@
+node_modules/
 /frontend/node_modules
+
+# MinIO system files
+start/
 /frontend/.next
 /frontend/out
 /frontend/build

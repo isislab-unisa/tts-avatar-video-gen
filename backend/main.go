@@ -5,8 +5,10 @@ import (
 	"context"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -48,8 +50,38 @@ func jwtAuth() fiber.Handler {
 	}
 }
 
+func setupMinIO() {
+	log.Println("🔧 Configurando MinIO...")
+
+	// Aspetta che MinIO sia pronto
+	time.Sleep(3 * time.Second)
+
+	// Configura l'alias
+	cmd := exec.Command("mc", "alias", "set", "local", "http://localhost:9000", "minioadmin", "minioadmin")
+	if err := cmd.Run(); err != nil {
+		log.Printf("⚠️  Impossibile configurare l'alias MinIO: %v", err)
+		return
+	}
+
+	// Crea il bucket
+	cmd = exec.Command("mc", "mb", "local/dubme", "--ignore-existing")
+	if err := cmd.Run(); err != nil {
+		log.Printf("⚠️  Impossibile creare il bucket: %v", err)
+		return
+	}
+
+	// Configura l'accesso pubblico
+	cmd = exec.Command("mc", "anonymous", "set", "download", "local/dubme")
+	if err := cmd.Run(); err != nil {
+		log.Printf("⚠️  Impossibile configurare l'accesso pubblico: %v", err)
+		return
+	}
+
+	log.Println("✅ MinIO configurato correttamente!")
+}
+
 func main() {
-	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../.env")
 
 	if err := db.Connect(); err != nil {
 		log.Fatal(err)
@@ -57,6 +89,9 @@ func main() {
 	if err := handlers.EnsureDirectoryIndexes(context.Background()); err != nil {
 		log.Fatal("ensure indexes:", err)
 	}
+
+	// Configura MinIO automaticamente
+	setupMinIO()
 
 	minioStore, err := storage.NewMinio(context.Background())
 	if err != nil {

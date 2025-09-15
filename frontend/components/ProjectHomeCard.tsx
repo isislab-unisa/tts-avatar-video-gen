@@ -7,6 +7,44 @@ import { useTranslations, useLocale } from "next-intl";
 import { type ProjectListItem } from "@/app/(no-nav)/dashboard/_actions/projects";
 import { type DirectoryDTO } from "@/lib/schema/directory";
 import ProjectActionMenu from "@/components/ProjectActionMenu";
+// import { formatDateTime } from "@/lib/date-utils";
+
+// Funzione di formattazione data direttamente nel componente
+function formatDateTime(dateString: string, locale: string = "it"): string {
+  if (!dateString || dateString === "") {
+    return "Data non disponibile";
+  }
+
+  // Il database salva le date in UTC, le interpretiamo come locali
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
+    return "Data non valida";
+  }
+
+  // Usa i metodi locali per ottenere i valori corretti
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const seconds = date.getSeconds();
+
+  if (locale === "en") {
+    const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    const ampm = hours < 12 ? "AM" : "PM";
+    return `${month}/${day}/${year}, ${hour12}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")} ${ampm}`;
+  } else {
+    return `${day}/${month}/${year}, ${hours
+      .toString()
+      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  }
+}
 
 type Props = {
   item: ProjectListItem;
@@ -35,22 +73,6 @@ export default function ProjectHomeCard({
   const handleProjectUpdated = () => {
     // Aggiorna solo i dati del server senza ricaricare completamente la pagina
     router.refresh();
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-
-    // Format based on locale
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: locale === "en", // Use 12-hour format for English, 24-hour for others
-    };
-
-    return date.toLocaleString(locale, options);
   };
 
   return (
@@ -110,7 +132,7 @@ export default function ProjectHomeCard({
             )}
 
             <div className="text-xs text-muted-foreground">
-              {formatDateTime(item.createdAt)}
+              {tProj("createdOn")} {formatDateTime(item.createdAt, locale)}
             </div>
           </div>
 

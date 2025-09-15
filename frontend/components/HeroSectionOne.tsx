@@ -4,9 +4,15 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export function HeroSectionOne() {
   const t = useTranslations("Hero");
+  const { theme } = useTheme();
+
+  const dashboardImage =
+    theme === "dark" ? "/dashboard-dark.png" : "/dashboard-light.png";
+
   return (
     <>
       <div className="relative mx-auto my-10 flex w-full max-w-screen-xl flex-col items-center justify-center overflow-x-hidden px-4 sm:px-6 lg:px-8">
@@ -95,7 +101,7 @@ export function HeroSectionOne() {
           >
             <div className="w-full overflow-hidden rounded-2xl">
               <Image
-                src="/dashboard.svg"
+                src={dashboardImage}
                 alt="Dashboard preview"
                 width={1000}
                 height={600}

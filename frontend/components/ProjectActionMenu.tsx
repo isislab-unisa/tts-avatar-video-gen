@@ -108,7 +108,7 @@ export default function ProjectActionMenu({
     toast.success(tm("projectDeleted", { title: project.title }));
   };
 
-  const handleMoveSuccess = (newDirectoryId: string) => {
+  const handleMoveSuccess = (newDirectoryId: string, folderName?: string) => {
     setDropdownOpen(false); // Chiudi il dropdown
     onProjectUpdated?.();
 
@@ -125,7 +125,14 @@ export default function ProjectActionMenu({
 
     router.refresh(); // Aggiorna la sidebar
 
-    toast.success(tm("moveSuccess"));
+    // Mostra toast personalizzato con nome progetto e cartella
+    const folderLabel =
+      folderName ||
+      directories.find((d) => d.id === newDirectoryId)?.name ||
+      "";
+    toast.success(
+      tm("projectMoved", { title: project.title, folder: folderLabel })
+    );
   };
 
   const defaultTrigger = (
@@ -172,7 +179,10 @@ export default function ProjectActionMenu({
                       directoryId
                     );
                     if (res.ok) {
-                      handleMoveSuccess(directoryId);
+                      const folderName = directories.find(
+                        (d) => d.id === directoryId
+                      )?.name;
+                      handleMoveSuccess(directoryId, folderName);
                     } else {
                       toast.error(res.message || tm("moveFail"));
                     }
@@ -240,7 +250,7 @@ export default function ProjectActionMenu({
           // Sposta il progetto nella nuova cartella creata
           void moveProjectAction(project.id, dir.id).then((res) => {
             if (res.ok) {
-              handleMoveSuccess(dir.id);
+              handleMoveSuccess(dir.id, dir.name);
             } else {
               toast.error(res.message || tm("moveFail"));
             }

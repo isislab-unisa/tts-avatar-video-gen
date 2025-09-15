@@ -57,11 +57,12 @@ func (h *ProjectsHandler) CreateProject(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "upload fallito")
 	}
 
+	// Salva sempre in UTC nel database
 	doc := models.Project{
 		UserID:      userID,
 		Title:       title,
 		DirectoryID: directoryId,
-		CreatedAt:   time.Now().Add(2 * time.Hour),
+		CreatedAt:   time.Now().UTC(),
 		Avatar:      avatar,
 		AvatarImage: avatarImage,
 		Text:        text,
