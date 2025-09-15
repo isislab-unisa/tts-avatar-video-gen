@@ -61,7 +61,7 @@ func (h *ProjectsHandler) CreateProject(c *fiber.Ctx) error {
 		UserID:      userID,
 		Title:       title,
 		DirectoryID: directoryId,
-		CreatedAt:   time.Now(),
+		CreatedAt:   time.Now().Add(2 * time.Hour),
 		Avatar:      avatar,
 		AvatarImage: avatarImage,
 		Text:        text,

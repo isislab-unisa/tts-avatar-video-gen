@@ -263,14 +263,16 @@ export default function ProjectMenu({
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+            className="cursor-pointer gap-2 text-red-700 focus:text-red-700 focus:bg-red-50 dark:text-red-500 dark:focus:text-red-500 dark:focus:bg-red-900/20"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setDeleteOpen(true);
             }}
           >
-            <Trash2 className={`${iconSizes[size]} text-red-600`} />
+            <Trash2
+              className={`${iconSizes[size]} text-red-700 dark:text-red-500`}
+            />
             {tProj("delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>

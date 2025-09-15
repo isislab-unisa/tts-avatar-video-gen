@@ -188,7 +188,10 @@
     "deleteFolder": "Delete Folder",
     "deleteFolderConfirm": "Delete folder \"{name}\"?",
     "deleteFolderWarning": "Warning: all contained projects and related videos will also be deleted.",
-    "renameDirectoryTitle": "Rename Folder"
+    "renameDirectoryTitle": "Rename Folder",
+    "rename": "Rename",
+    "deleteDirectoryTitle": "Delete Folder",
+    "deleteDirectoryMessage": "Are you sure you want to delete the folder \"{name}\"?\nThis action cannot be undone and will delete all contained projects."
   },
   "Toast": {
     "renameSuccess": "Title updated",
@@ -200,6 +203,9 @@
     "projectMoved": "Project {title} moved to {folder}",
     "projectDeleted": "Project {title} deleted",
     "directoryCreated": "Folder created",
+    "directoryRenamed": "Folder renamed",
+    "directoryDeleted": "Folder deleted",
+    "directoryMoved": "Folder {name} moved to {folder}",
     "signOutSuccess": "Signed out successfully",
     "signOutError": "Error signing out",
     "loggingOut": "Logging out...",

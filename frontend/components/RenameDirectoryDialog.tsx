@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -38,6 +39,7 @@ export default function RenameDirectoryDialog({
 }: Props) {
   const td = useTranslations("Dialog");
   const tv = useTranslations("Validation");
+  const tm = useTranslations("Toast");
   const locale = useLocale();
   const schema = React.useMemo(() => getCreateDirectorySchema(tv), [tv]);
 
@@ -69,6 +71,7 @@ export default function RenameDirectoryDialog({
     start(async () => {
       const res = await renameDirectoryAction(directoryId, nextName);
       if (res.ok) {
+        toast.success(tm("directoryRenamed"));
         onRenamed?.(nextName);
         onOpenChange(false);
         return;

@@ -5,6 +5,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -63,10 +64,21 @@ func main() {
 	}
 	dir := &handlers.DirectoriesHandler{Store: minioStore}
 	proj := &handlers.ProjectsHandler{Store: minioStore}
-	gen := &handlers.GeneratorHandler{TestVideoPath: strings.TrimSpace(os.Getenv("GENERATOR_TEST_MP4"))}
-	if gen.TestVideoPath == "" {
-		gen.TestVideoPath = "assets/test.mp4"
+	testVideoPath := strings.TrimSpace(os.Getenv("GENERATOR_TEST_MP4"))
+	if testVideoPath == "" {
+		testVideoPath = "assets/test.mp4"
 	}
+	// Se il percorso non è assoluto, rendilo relativo alla directory del backend
+	if !filepath.IsAbs(testVideoPath) {
+		// Ottieni la directory del backend
+		backendDir, err := os.Getwd()
+		if err != nil {
+			log.Fatal("Errore nel ottenere la directory corrente:", err)
+		}
+		testVideoPath = filepath.Join(backendDir, testVideoPath)
+	}
+	log.Printf("Test video path: %s", testVideoPath)
+	gen := &handlers.GeneratorHandler{TestVideoPath: testVideoPath}
 
 	app := fiber.New(fiber.Config{
 		BodyLimit: 200 * 1024 * 1024,

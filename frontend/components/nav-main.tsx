@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import {
   ChevronRight,
   MoreHorizontal,
@@ -49,7 +50,6 @@ import { type DirectoryDTO } from "@/lib/schema/directory";
 import { listProjectsByDirAction } from "@/app/(no-nav)/dashboard/_actions/projects";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import RenameDirectoryDialog from "@/components/RenameDirectoryDialog";
-import LoadingSpinner from "@/components/ui/loading-spinner";
 import { type ProjectListItem } from "@/app/(no-nav)/dashboard/_actions/projects";
 
 const iconCls = "mr-2 h-4 w-4";
@@ -130,32 +130,24 @@ export function NavMain({
     };
 
     const handleProjectRenamed = (event: CustomEvent) => {
-      const { projectId, newTitle } = event.detail;
+      const { projectId, newTitle, directoryId } = event.detail;
 
-      // Aggiorna il titolo del progetto nella cache
+      // Aggiorna il titolo del progetto solo nella cartella specifica
       setDirProjects((prev) => {
         const updated = { ...prev };
 
-        // Aggiorna il titolo del progetto in tutte le cartelle aperte
-        const updatedDirs: string[] = [];
-        Object.keys(updated).forEach((dirId) => {
-          if (updated[dirId]) {
-            updated[dirId] = updated[dirId].map((p) =>
-              p.id === projectId ? { ...p, title: newTitle } : p
-            );
-            updatedDirs.push(dirId);
-          }
-        });
+        // Aggiorna solo se la cartella è aperta e contiene il progetto
+        if (directoryId && updated[directoryId]) {
+          updated[directoryId] = updated[directoryId].map((p) =>
+            p.id === projectId ? { ...p, title: newTitle } : p
+          );
 
-        if (updatedDirs.length > 0) {
-          const updates: Record<string, number> = {};
-          updatedDirs.forEach((dirId) => {
-            if (openDirs[dirId]) {
-              updates[dirId] = (dirUpdates[dirId] || 0) + 1;
-            }
-          });
-          if (Object.keys(updates).length > 0) {
-            setDirUpdates((prev) => ({ ...prev, ...updates }));
+          // Aggiorna solo questa cartella specifica
+          if (openDirs[directoryId]) {
+            setDirUpdates((prev) => ({
+              ...prev,
+              [directoryId]: (prev[directoryId] || 0) + 1,
+            }));
           }
         }
 
@@ -212,35 +204,22 @@ export function NavMain({
             updated[newDirectoryId] = [...updated[newDirectoryId], newProject];
           }
         }
-
-        // Aggiorna solo le cartelle specifiche, non tutte
-        const updates: Record<string, number> = {};
-        if (oldDirectoryId && openDirs[oldDirectoryId]) {
-          updates[oldDirectoryId] = (dirUpdates[oldDirectoryId] || 0) + 1;
-        }
-        if (newDirectoryId && openDirs[newDirectoryId]) {
-          updates[newDirectoryId] = (dirUpdates[newDirectoryId] || 0) + 1;
-        }
-
-        if (Object.keys(updates).length > 0) {
-          setDirUpdates((prev) => ({ ...prev, ...updates }));
-        }
-
         return updated;
       });
     };
 
     const handleProjectCreated = (event: CustomEvent) => {
-      const { projectId, directoryId, projectTitle } = event.detail;
+      const { directoryId, projectId, projectTitle } = event.detail;
 
-      // Aggiungi il progetto alla directory se è aperta e non è già presente
+      // Aggiungi il progetto alla cartella se è aperta
       if (directoryId && openDirs[directoryId]) {
         setDirProjects((prev) => {
           const updated = { ...prev };
           if (!updated[directoryId]) {
             updated[directoryId] = [];
           }
-          // Controlla se il progetto è già presente nella cartella
+
+          // Controlla se il progetto è già presente
           const isAlreadyPresent = updated[directoryId].some(
             (p) => p.id === projectId
           );
@@ -264,7 +243,10 @@ export function NavMain({
       }
     };
 
-    const handleDirectoryCreated = () => {};
+    const handleDirectoryCreated = () => {
+      // Refresh the page to update the sidebar with new directories
+      router.refresh();
+    };
 
     window.addEventListener(
       "projectDeleted",
@@ -314,6 +296,7 @@ export function NavMain({
   async function remove(dirId: string) {
     const ok = await deleteDirectoryAction(dirId);
     if (ok) {
+      toast.success(t("directoryDeleted"));
       setConfirm({ open: false, dirId: "", dirName: "" });
       router.push("/dashboard");
       router.refresh();
@@ -323,12 +306,15 @@ export function NavMain({
   async function onToggle(dirId: string, open: boolean) {
     setOpenDirs((s) => ({ ...s, [dirId]: open }));
     if (open) {
-      // Ricarica sempre i progetti quando si apre una cartella
+      // Controlla se abbiamo già i progetti in cache
+      if (dirProjects[dirId] && dirProjects[dirId].length > 0) {
+        return; // Non ricaricare se abbiamo già i dati
+      }
+
+      // Ricarica i progetti quando si apre una cartella
       setLoadingDirs((s) => ({ ...s, [dirId]: true }));
       try {
         const res = await listProjectsByDirAction(dirId, 1, 50, "title", "asc");
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
         setDirProjects((s) => ({ ...s, [dirId]: res.items || [] }));
       } catch (error) {
         console.error("Error loading projects:", error);
@@ -348,6 +334,46 @@ export function NavMain({
           if (!o) router.refresh();
         }}
       />
+
+      <RenameDirectoryDialog
+        open={rename.open}
+        onOpenChange={(o) => setRename({ ...rename, open: o })}
+        directoryId={rename.dirId || ""}
+        defaultName={rename.name}
+        onRenamed={() => {
+          setRename({ open: false, dirId: "", name: "" });
+          router.refresh();
+        }}
+      />
+
+      <AlertDialog
+        open={confirm.open}
+        onOpenChange={(o) => setConfirm({ ...confirm, open: o })}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("deleteDirectoryTitle")}</AlertDialogTitle>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-red-700 dark:text-red-500 whitespace-pre-line">
+              {t("deleteDirectoryMessage", { name: confirm.dirName || "" })}
+            </p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <Button
+              className="bg-red-700 hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-700 text-white"
+              onClick={() => {
+                if (confirm.dirId) {
+                  remove(confirm.dirId);
+                }
+              }}
+            >
+              {t("delete")}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <SidebarGroup>
         <SidebarMenu>
@@ -398,11 +424,11 @@ export function NavMain({
                             <FolderEdit
                               className={`${iconCls} text-muted-foreground`}
                             />
-                            <span>{t("renameFolder")}</span>
+                            {t("rename")}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                            className="cursor-pointer text-red-700 focus:text-red-700 focus:bg-red-50 dark:text-red-500 dark:focus:text-red-500 dark:focus:bg-red-900/20"
                             onClick={() =>
                               setConfirm({
                                 open: true,
@@ -411,8 +437,10 @@ export function NavMain({
                               })
                             }
                           >
-                            <Trash2 className={`${iconCls} text-red-600`} />
-                            <span>{t("deleteFolder")}</span>
+                            <Trash2
+                              className={`${iconCls} text-red-700 dark:text-red-500`}
+                            />
+                            {t("delete")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -421,7 +449,7 @@ export function NavMain({
                     <CollapsibleTrigger asChild>
                       <button
                         aria-label="Toggle"
-                        className={`shrink-0 inline-flex items-center justify-center h-7 w-7 rounded hover:bg-muted/50 relative z-10 cursor-pointer ${
+                        className={`shrink-0 inline-flex items-center justify-center h-7 w-7 rounded hover:bg-muted/50 relative z-10 cursor-pointer transition-all duration-200 ${
                           dirId && openDirs[dirId] ? "rotate-90" : ""
                         }`}
                         onClick={async (e) => {
@@ -436,13 +464,15 @@ export function NavMain({
                     </CollapsibleTrigger>
                   </div>
 
-                  <CollapsibleContent>
+                  <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
                     <SidebarMenuSub>
                       {dirId && loadingDirs[dirId] ? (
                         <SidebarMenuSubItem>
                           <div className="flex items-center gap-2 px-2 py-1 text-sm text-muted-foreground">
-                            <LoadingSpinner />
-                            <span>{tCommon("loadingProjects")}</span>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b border-primary"></div>
+                            <span className="text-xs">
+                              {tCommon("loadingProjects")}
+                            </span>
                           </div>
                         </SidebarMenuSubItem>
                       ) : dirId &&
@@ -467,58 +497,41 @@ export function NavMain({
                                   </Link>
                                 </SidebarMenuSubButton>
 
-                                {dirId && (
-                                  <div className="opacity-0 group-hover/project-item:opacity-100 transition-opacity ml-auto">
-                                    <ProjectActionMenu
-                                      project={sub as ProjectListItem}
-                                      directories={directories}
-                                      currentDirId={dirId}
-                                      onProjectUpdated={() => {
-                                        // Ricarica i progetti per questa cartella
-                                        const loadProjects = async () => {
-                                          try {
-                                            const res =
-                                              await listProjectsByDirAction(
-                                                dirId,
-                                                1,
-                                                50,
-                                                "title",
-                                                "asc"
-                                              );
-                                            setDirProjects((s) => ({
-                                              ...s,
-                                              [dirId]: res.items || [],
-                                            }));
-                                          } catch (error) {
-                                            console.error(
-                                              "Error loading projects:",
-                                              error
-                                            );
-                                            setDirProjects((s) => ({
-                                              ...s,
-                                              [dirId]: [],
-                                            }));
-                                          }
-                                        };
-                                        void loadProjects();
-                                      }}
-                                      className="h-6 w-6"
-                                      size="sm"
-                                      variant="ghost"
-                                    />
-                                  </div>
-                                )}
+                                <ProjectActionMenu
+                                  project={{
+                                    id: sub.id || "",
+                                    title: sub.title,
+                                    directoryId: dirId,
+                                    directoryName: item.title,
+                                    createdAt:
+                                      sub.createdAt || new Date().toISOString(),
+                                    avatar: sub.avatar,
+                                    avatarImage: sub.avatarImage,
+                                  }}
+                                  directories={directories
+                                    .filter((d) => d.id !== dirId)
+                                    .map((d) => ({ id: d.id, name: d.name }))}
+                                  currentDirId={dirId}
+                                  onProjectUpdated={() => {
+                                    // Refresh the projects list when a project is updated
+                                    if (dirId && openDirs[dirId]) {
+                                      onToggle(dirId, true);
+                                    }
+                                  }}
+                                />
                               </div>
                             </SidebarMenuSubItem>
                           ))}
                         </div>
-                      ) : (
+                      ) : dirId &&
+                        dirProjects[dirId] &&
+                        dirProjects[dirId].length === 0 ? (
                         <SidebarMenuSubItem>
                           <div className="px-2 py-1 text-sm text-muted-foreground">
                             {tCommon("noProjectsInFolder")}
                           </div>
                         </SidebarMenuSubItem>
-                      )}
+                      ) : null}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
@@ -527,42 +540,6 @@ export function NavMain({
           })}
         </SidebarMenu>
       </SidebarGroup>
-
-      <RenameDirectoryDialog
-        open={rename.open}
-        onOpenChange={(o) => setRename((s) => ({ ...s, open: o }))}
-        directoryId={rename.dirId || ""}
-        defaultName={directories.find((d) => d.id === rename.dirId)?.name || ""}
-        onRenamed={() => {
-          setRename({ open: false, dirId: undefined, name: "" });
-          router.refresh();
-        }}
-      />
-
-      <AlertDialog
-        open={confirm.open}
-        onOpenChange={(open) => setConfirm((s) => ({ ...s, open }))}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("deleteFolderConfirm", { name: confirm.dirName || "" })}
-            </AlertDialogTitle>
-          </AlertDialogHeader>
-          <p className="text-sm text-red-600">{t("deleteFolderWarning")}</p>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">
-              {t("cancel")}
-            </AlertDialogCancel>
-            <Button
-              className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
-              onClick={() => confirm.dirId && remove(confirm.dirId)}
-            >
-              {t("delete")}
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
