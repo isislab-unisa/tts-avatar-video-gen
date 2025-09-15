@@ -180,7 +180,10 @@
     "deleteFolder": "Supprimer Dossier",
     "deleteFolderConfirm": "Supprimer le dossier \"{name}\" ?",
     "deleteFolderWarning": "Attention : tous les projets contenus et les vidéos associées seront également supprimés.",
-    "renameDirectoryTitle": "Renommer Dossier"
+    "renameDirectoryTitle": "Renommer Dossier",
+    "rename": "Renommer",
+    "deleteDirectoryTitle": "Supprimer Dossier",
+    "deleteDirectoryMessage": "Êtes-vous sûr de vouloir supprimer le dossier \"{name}\" ? Cette action ne peut pas être annulée et supprimera tous les projets contenus."
   },
   "Toast": {
     "renameSuccess": "Titre mis à jour",

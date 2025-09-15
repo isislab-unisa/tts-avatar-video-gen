@@ -173,7 +173,10 @@
     "deleteFolder": "Elimina Cartella",
     "deleteFolderConfirm": "Eliminare la cartella \"{name}\"?",
     "deleteFolderWarning": "Attenzione: verranno eliminati anche tutti i progetti contenuti e i relativi video.",
-    "renameDirectoryTitle": "Rinomina Cartella"
+    "renameDirectoryTitle": "Rinomina Cartella",
+    "rename": "Rinomina",
+    "deleteDirectoryTitle": "Elimina Cartella",
+    "deleteDirectoryMessage": "Sei sicuro di voler eliminare la cartella \"{name}\"? Questa azione non può essere annullata e eliminerà tutti i progetti contenuti."
   },
   "Toast": {
     "renameSuccess": "Titolo aggiornato",

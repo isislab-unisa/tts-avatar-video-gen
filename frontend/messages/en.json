@@ -188,7 +188,10 @@
     "deleteFolder": "Delete Folder",
     "deleteFolderConfirm": "Delete folder \"{name}\"?",
     "deleteFolderWarning": "Warning: all contained projects and related videos will also be deleted.",
-    "renameDirectoryTitle": "Rename Folder"
+    "renameDirectoryTitle": "Rename Folder",
+    "rename": "Rename",
+    "deleteDirectoryTitle": "Delete Folder",
+    "deleteDirectoryMessage": "Are you sure you want to delete the folder \"{name}\"? This action cannot be undone and will delete all contained projects."
   },
   "Toast": {
     "renameSuccess": "Title updated",

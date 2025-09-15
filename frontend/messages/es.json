@@ -180,7 +180,10 @@
     "deleteFolder": "Eliminar Carpeta",
     "deleteFolderConfirm": "¿Eliminar la carpeta \"{name}\"?",
     "deleteFolderWarning": "Advertencia: también se eliminarán todos los proyectos contenidos y los videos relacionados.",
-    "renameDirectoryTitle": "Renombrar Carpeta"
+    "renameDirectoryTitle": "Renombrar Carpeta",
+    "rename": "Renombrar",
+    "deleteDirectoryTitle": "Eliminar Carpeta",
+    "deleteDirectoryMessage": "¿Estás seguro de que quieres eliminar la carpeta \"{name}\"? Esta acción no se puede deshacer y eliminará todos los proyectos contenidos."
   },
   "Toast": {
     "renameSuccess": "Título actualizado",
