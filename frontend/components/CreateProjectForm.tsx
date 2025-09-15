@@ -30,7 +30,6 @@ import { Folder, Plus } from "lucide-react";
 
 type DirectoryDTO = { id: string; name: string };
 
-// ⟵ tipo di risposta della server action token
 type TokenResp = { ok: true; token: string } | { ok: false; message?: string };
 
 const API = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
@@ -46,13 +45,15 @@ function base64ToBlob(base64: string, mime = "video/mp4") {
 
 export default function CreateProjectForm({
   directories,
-  getApiToken, // ⟵ server action passata dal server
+  getApiToken,
 }: {
   directories: DirectoryDTO[];
   getApiToken: () => Promise<TokenResp>;
 }) {
   const router = useRouter();
+  const t = useTranslations("Project");
   const tv = useTranslations("Validation");
+  const tm = useTranslations("Toast");
   const locale = useLocale();
   const schema = React.useMemo(() => getProjectCreateSchema(tv), [tv]);
 
@@ -81,7 +82,7 @@ export default function CreateProjectForm({
   async function onGenerate() {
     const ok = await trigger(["title", "text"], { shouldFocus: true });
     if (!ok) {
-      toast.error("Correggi i campi evidenziati");
+      toast.error(t("fixFields"));
       return;
     }
     const { text } = getValues();
@@ -91,7 +92,7 @@ export default function CreateProjectForm({
     if (!res.ok) return toast.error(res.message);
     setVideoBase64(res.base64);
     setPreviewUrl(URL.createObjectURL(base64ToBlob(res.base64)));
-    toast.success("Video generato");
+    toast.success(t("videoGenerated"));
   }
 
   function onDownload() {
@@ -103,9 +104,9 @@ export default function CreateProjectForm({
   }
 
   async function saveTo(directoryId: string) {
-    if (!videoBase64) return toast.error("Genera prima il video");
+    if (!videoBase64) return toast.error(t("generateFirst"));
 
-    const tk = await getApiToken(); // ⟵ uso la prop
+    const tk = await getApiToken();
     if (!tk.ok) return toast.error(tk.message);
 
     const vals = getValues();
@@ -125,11 +126,22 @@ export default function CreateProjectForm({
       });
       if (!res.ok) {
         const msg = await res.text().catch(() => "");
-        throw new Error(msg || `Errore salvataggio (${res.status})`);
+        throw new Error(msg || `${tm("saveError")} (${res.status})`);
       }
       const data = (await res.json()) as { id: string };
-      toast.success("Progetto salvato");
+      const projectTitle = getValues("title");
+      toast.success(t("projectSaved"));
       reset();
+
+      const event = new CustomEvent("projectCreated", {
+        detail: {
+          projectId: data.id,
+          directoryId: directoryId,
+          projectTitle: projectTitle,
+        },
+      });
+      window.dispatchEvent(event);
+
       router.push(`/dashboard/project/${data.id}`);
     } catch (err) {
       toast.error((err as Error).message);
@@ -154,7 +166,7 @@ export default function CreateProjectForm({
               <video
                 src={previewUrl}
                 controls
-                className="h-full w-full object-contain rounded-2xl"
+                className="h-full w-full object-contain rounded-2xl cursor-pointer"
               />
             )}
           </div>
@@ -162,8 +174,8 @@ export default function CreateProjectForm({
 
         <div className="space-y-4">
           <div className="grid gap-2">
-            <Label>Titolo</Label>
-            <Input placeholder="Titolo progetto" {...register("title")} />
+            <Label>{t("titleLabel")}</Label>
+            <Input placeholder={t("titlePlaceholder")} {...register("title")} />
             {formState.errors.title && (
               <p className="text-sm text-red-600">
                 {formState.errors.title.message}
@@ -172,9 +184,9 @@ export default function CreateProjectForm({
           </div>
 
           <div className="grid gap-2">
-            <Label>Testo</Label>
+            <Label>{t("textLabel")}</Label>
             <Textarea
-              placeholder="Inserisci il testo…"
+              placeholder={t("textPlaceholder")}
               className="min-h-[140px]"
               {...register("text")}
             />
@@ -187,7 +199,7 @@ export default function CreateProjectForm({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <div className="grid gap-2">
-              <Label>Avatar</Label>
+              <Label>{t("avatarLabel")}</Label>
               <Button
                 variant="outline"
                 className="justify-start gap-2"
@@ -203,15 +215,15 @@ export default function CreateProjectForm({
                 Cody
               </Button>
               <p className="text-xs text-muted-foreground">
-                altri avatar presto
+                {t("avatarDescription")}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label>Colore background</Label>
+              <Label>{t("backgroundLabel")}</Label>
               <Input value={bgColor} disabled />
               <p className="text-xs text-muted-foreground">
-                disponibile a breve
+                {t("backgroundDescription")}
               </p>
             </div>
           </div>
@@ -222,45 +234,52 @@ export default function CreateProjectForm({
             <Button
               onClick={onGenerate}
               disabled={isGenerating}
-              className="min-w-[140px]"
+              className="min-w-[140px] cursor-pointer"
               type="button"
             >
-              {isGenerating ? "Generazione..." : "Genera"}
+              {isGenerating ? t("generating") : t("generate")}
             </Button>
             <Button
               variant="outline"
               onClick={onDownload}
               disabled={!videoBase64}
-              className="min-w-[140px]"
+              className="min-w-[140px] cursor-pointer"
               type="button"
             >
-              Download
+              {t("downloadVideo")}
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   disabled={!videoBase64}
-                  className="min-w-[140px]"
+                  className="min-w-[140px] cursor-pointer"
                   type="button"
                 >
-                  Salva
+                  {t("saveProject")}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-72 z-50">
-                {directories.map((d) => (
-                  <DropdownMenuItem
-                    key={d.id}
-                    className="cursor-pointer"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      void saveTo(d.id);
-                    }}
-                  >
+                {directories.length > 0 ? (
+                  directories.map((d) => (
+                    <DropdownMenuItem
+                      key={d.id}
+                      className="cursor-pointer"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        void saveTo(d.id);
+                      }}
+                    >
+                      <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <span>{d.name}</span>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled>
                     <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <span>{d.name}</span>
+                    <span>{tm("noFoldersAvailable")}</span>
                   </DropdownMenuItem>
-                ))}
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer"
@@ -268,7 +287,7 @@ export default function CreateProjectForm({
                   disabled={!videoBase64}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  <span>Crea nuova cartella…</span>
+                  <span>{t("createNewFolder")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -281,8 +300,18 @@ export default function CreateProjectForm({
         onOpenChange={setOpenCreateDir}
         onCreated={(dir) => {
           setOpenCreateDir(false);
+
+          // Emetti evento per aggiornare la sidebar senza refresh completo
+          const event = new CustomEvent("directoryCreated", {
+            detail: {
+              directoryId: dir.id,
+              directoryName: dir.name,
+            },
+          });
+          window.dispatchEvent(event);
+
           if (videoBase64) void saveTo(dir.id);
-          else toast.error("Genera prima il video");
+          else toast.error(t("generateFirst"));
         }}
       />
     </div>

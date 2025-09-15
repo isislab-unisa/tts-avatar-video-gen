@@ -3,14 +3,24 @@ import ProjectDetail from "@/components/ProjectDetail";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { auth } from "@/lib/auth";
 import { signApiToken } from "@/lib/jwt";
-import {
-  listDirectoriesForUser,
-  type DirectoryDTO,
-} from "@/app/(no-nav)/dashboard/_actions/directories";
-import type { ProjectDTO } from "./_actions";
+import { listDirectoriesForUser } from "@/app/(no-nav)/dashboard/_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
 import { getLocale, getTranslations } from "next-intl/server";
 
 const API = process.env.BACKEND_API_URL!;
+if (!API) throw new Error("BACKEND_API_URL non configurato");
+
+export type ProjectDTO = {
+  id: string;
+  title: string;
+  text: string;
+  directoryId: string;
+  createdAt: string;
+  avatar: string;
+  avatarImage: string;
+  bucketId: string;
+  downloadUrl: string;
+};
 
 async function fetchProject(
   id: string,
@@ -58,48 +68,33 @@ export default async function Page({
     : undefined;
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-4 px-4">
-      {/* Breadcrumb + data (no overflow) */}
-      <div className="flex items-center justify-between gap-3">
-        <nav
-          aria-label="Breadcrumb"
-          className="min-w-0 overflow-x-hidden text-sm text-muted-foreground"
-        >
-          <div className="inline-flex items-center gap-2">
+    <div className="space-y-3 overflow-hidden">
+      <nav className="text-sm text-muted-foreground">
+        <Link href="/dashboard" className="hover:underline cursor-pointer">
+          {tCommon("home")}
+        </Link>
+        {dir && (
+          <>
+            {" / "}
             <Link
-              href="/dashboard"
-              className="hover:underline cursor-pointer shrink-0"
+              href={`/dashboard/folder/${dir.id}`}
+              className="hover:underline cursor-pointer"
+              title={dir.name}
             >
-              {tCommon("home")}
+              {dir.name}
             </Link>
+          </>
+        )}
+        {project && (
+          <>
+            {" / "}
+            <span title={project.title}>{project.title}</span>
+          </>
+        )}
+      </nav>
 
-            {dir && (
-              <>
-                <span className="shrink-0">/</span>
-                <Link
-                  href={`/dashboard/folder/${dir.id}`}
-                  className="hover:underline cursor-pointer truncate max-w-[30vw] sm:max-w-[40vw] md:max-w-[20vw] lg:max-w-[24rem]"
-                  title={dir.name}
-                >
-                  {dir.name}
-                </Link>
-              </>
-            )}
-
-            {project && (
-              <>
-                <span className="shrink-0">/</span>
-                <span
-                  className="text-foreground truncate max-w-[40vw] sm:max-w-[50vw] md:max-w-[28vw] lg:max-w-[32rem]"
-                  title={project.title}
-                >
-                  {project.title}
-                </span>
-              </>
-            )}
-          </div>
-        </nav>
-
+      <div className="flex items-center justify-between gap-3">
+        <div />
         {project && (
           <span className="text-xs text-muted-foreground shrink-0">
             {tProject("createdOn")}{" "}

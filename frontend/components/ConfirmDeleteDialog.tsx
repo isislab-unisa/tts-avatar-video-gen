@@ -44,11 +44,11 @@ export default function ConfirmDeleteDialog({
           </AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>
+          <AlertDialogCancel disabled={pending} className="cursor-pointer">
             {cancelLabel ?? td("cancel")}
           </AlertDialogCancel>
           <Button
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
             disabled={pending}
             onClick={() => start(async () => void onConfirm())}
           >

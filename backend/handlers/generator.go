@@ -11,7 +11,7 @@ type GeneratorHandler struct {
 	TestVideoPath string // es: "assets/test.mp4"
 }
 
-// POST /api/generate  -> ritorna sempre test.mp4 dopo un piccolo delay
+// POST /api/generate  -> ritorna sempre test.mp4 dopo un piccolo delay che poi in futuro sarà sostituito con il vero generatore
 func (h *GeneratorHandler) Generate(c *fiber.Ctx) error {
 	// Simula lavoro
 	time.Sleep(2 * time.Second)

@@ -1,23 +1,27 @@
 import Link from "next/link";
-import ProjectCard from "@/components/ProjectCard";
-import { SortDropdown } from "@/components/sort-dropdown";
-import {
-  listDirectoriesForUser,
-  type DirectoryDTO,
-} from "../../_actions/directories";
+import { getTranslations } from "next-intl/server";
+import ProjectHomeCard from "@/components/ProjectHomeCard";
+import ProjectsToolbar from "@/components/ProjectsToolbar";
+import Pagination from "@/components/Pagination";
+import { listDirectoriesForUser } from "../../_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
+
 import {
   listProjectsByDirAction,
   type ProjectListItem,
 } from "../../_actions/projects";
 
-type Params = Promise<{ folderId: string }>;
+type Params = { folderId: string };
+type SearchParams = {
+  page?: string;
+  sort?: "createdAt" | "title";
+  order?: "asc" | "desc";
+  q?: string;
+};
 
-type SearchParams = Promise<{
-  page?: string | string[];
-  sort?: "createdAt" | "title" | string | string[];
-  order?: "asc" | "desc" | string | string[];
-  [k: string]: string | string[] | undefined;
-}>;
+function asQ(raw?: string): string {
+  return raw ? String(raw) : "";
+}
 
 function toIntOr(def: number, raw?: string | string[]) {
   const s = Array.isArray(raw) ? raw[0] : raw;
@@ -39,22 +43,33 @@ export default async function FolderPage({
   params,
   searchParams,
 }: {
-  params: Params;
-  searchParams: SearchParams;
+  params: Promise<Params>;
+  searchParams: Promise<SearchParams>;
 }) {
-  // Await the promises
-  const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
+  const t = await getTranslations("Common");
 
+  const [resolvedParams, resolvedSearchParams] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const sp = resolvedSearchParams ?? {};
   const page = Math.max(1, toIntOr(1, sp.page));
   const sort = asSort(sp.sort);
   const order = asOrder(sp.order);
-  const limit = 8;
+  const q = asQ(sp.q);
+  // 10 card = 2 righe da 5
+  const limit = 10;
 
   const [directories, data] = await Promise.all([
     listDirectoriesForUser() as Promise<DirectoryDTO[]>,
-    listProjectsByDirAction(resolvedParams.folderId, page, limit, sort, order),
+    listProjectsByDirAction(
+      resolvedParams.folderId,
+      page,
+      limit,
+      sort,
+      order,
+      q
+    ),
   ]);
 
   const items: ProjectListItem[] = data.items ?? [];
@@ -63,32 +78,32 @@ export default async function FolderPage({
   const currentDir = directories.find((d) => d.id === resolvedParams.folderId);
 
   return (
-    <div className="space-y-4">
-      <nav className="text-sm text-muted-foreground">
-        <Link href="/dashboard" className="underline hover:no-underline">
-          Home
-        </Link>{" "}
-        / {currentDir?.name ?? "Cartella"}
-      </nav>
-
-      <div className="flex justify-end">
-        <SortDropdown
+    <div className="min-h-[calc(100vh-8rem)] flex flex-col">
+      <div className="space-y-2 flex-shrink-0">
+        <nav className="text-sm text-muted-foreground">
+          <Link href="/dashboard" className="underline hover:no-underline">
+            {t("home")}
+          </Link>{" "}
+          / {currentDir?.name ?? t("folderFallback")}
+        </nav>
+        <ProjectsToolbar
           basePath={`/dashboard/folder/${resolvedParams.folderId}`}
           currentSort={sort}
           currentOrder={order}
+          isInFolder={true}
         />
       </div>
 
-      <div className="min-h-[60vh]">
+      <div className="flex-1">
         {items.length === 0 ? (
-          <div className="min-h-[40vh] grid place-items-center">
-            <p className="text-muted-foreground">Nessun progetto.</p>
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">{t("noProjectsInFolder")}</p>
           </div>
         ) : (
-          <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid gap-1 gap-y-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {items.map((p) => (
               <li key={p.id}>
-                <ProjectCard
+                <ProjectHomeCard
                   item={p}
                   directories={directories}
                   showFolder={false}
@@ -100,10 +115,11 @@ export default async function FolderPage({
         )}
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center py-4 mt-auto">
         <Pagination
           current={page}
           totalPages={totalPages}
+          t={t}
           makeHref={(p) => {
             const qs = new URLSearchParams({ page: String(p), sort, order });
             return `/dashboard/folder/${
@@ -112,44 +128,6 @@ export default async function FolderPage({
           }}
         />
       </div>
-    </div>
-  );
-}
-
-function Pagination({
-  current,
-  totalPages,
-  makeHref,
-}: {
-  current: number;
-  totalPages: number;
-  makeHref: (p: number) => string;
-}) {
-  const prevDisabled = current <= 1;
-  const nextDisabled = current >= totalPages;
-  return (
-    <div className="inline-flex items-center gap-2">
-      <Link
-        href={prevDisabled ? "#" : makeHref(current - 1)}
-        className={`px-3 py-2 rounded-md border ${
-          prevDisabled ? "pointer-events-none opacity-50" : ""
-        }`}
-        aria-disabled={prevDisabled}
-      >
-        ←
-      </Link>
-      <span className="text-sm">
-        Pagina {current} di {totalPages}
-      </span>
-      <Link
-        href={nextDisabled ? "#" : makeHref(current + 1)}
-        className={`px-3 py-2 rounded-md border ${
-          nextDisabled ? "pointer-events-none opacity-50" : ""
-        }`}
-        aria-disabled={nextDisabled}
-      >
-        →
-      </Link>
     </div>
   );
 }

@@ -23,20 +23,30 @@ type Props = {
 };
 
 export default function MoveToMenu({
-  currentDirectoryId,
   targets,
   onMove,
   onCreateNew,
   className,
-}: Props) {
+}: Omit<Props, "currentDirectoryId">) {
   const t = useTranslations("Project");
-  const filtered = React.useMemo(
-    () => targets.filter((d) => d.id !== currentDirectoryId),
-    [targets, currentDirectoryId]
-  );
+  const [open, setOpen] = React.useState(false);
+
+  const filtered = targets;
+
+  const handleMove = async (directoryId: string) => {
+    await onMove(directoryId);
+    setOpen(false);
+  };
+
+  const handleCreateNew = () => {
+    if (onCreateNew) {
+      onCreateNew();
+      setOpen(false);
+    }
+  };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className={className || "cursor-pointer"}>
           <FolderSymlink className="mr-2 h-4 w-4" />
@@ -44,23 +54,35 @@ export default function MoveToMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="z-50 w-72">
-        {filtered.map((d) => (
-          <DropdownMenuItem
-            key={d.id}
-            className="cursor-pointer"
-            onSelect={(e) => {
-              e.preventDefault();
-              void onMove(d.id);
-            }}
-          >
-            <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{d.name}</span>
-          </DropdownMenuItem>
-        ))}
+        <div className="max-h-48 overflow-y-auto">
+          {filtered.length > 0 ? (
+            filtered.map((d) => (
+              <DropdownMenuItem
+                key={d.id}
+                className="cursor-pointer"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  void handleMove(d.id);
+                }}
+              >
+                <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
+                <span className="truncate">{d.name}</span>
+              </DropdownMenuItem>
+            ))
+          ) : (
+            <DropdownMenuItem disabled className="text-muted-foreground">
+              <Folder className="mr-2 h-4 w-4" />
+              <span>{t("noFolders")}</span>
+            </DropdownMenuItem>
+          )}
+        </div>
         {onCreateNew ? (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onSelect={onCreateNew}>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={handleCreateNew}
+            >
               <FolderPlus className="mr-2 h-4 w-4" />
               <span>{t("createNewFolder")}</span>
             </DropdownMenuItem>

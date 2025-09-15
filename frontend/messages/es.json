@@ -109,7 +109,27 @@
   },
 
   "Common": {
-    "home": "Inicio"
+    "home": "Inicio",
+    "page": "Página",
+    "of": "de",
+    "createDirectory": "Crear Carpeta",
+    "createProject": "Crear Proyecto",
+    "toggleSidebar": "Mostrar/Ocultar Barra Lateral",
+    "noProjects": "Sin proyectos",
+    "noProjectsInFolder": "No hay proyectos presentes",
+    "noFolders": "No hay carpetas disponibles",
+    "loadingProjects": "Cargando proyectos...",
+    "sort": "Ordenar",
+    "sortField": "Campo",
+    "sortDirection": "Dirección",
+    "sortByDate": "Por fecha",
+    "sortByTitle": "Por título",
+    "sortAscending": "Ascendente",
+    "sortDescending": "Descendente",
+    "searchProjects": "Buscar proyectos...",
+    "searchInFolder": "Buscar en esta carpeta...",
+    "moreFolders": "y {count} carpetas más",
+    "folderFallback": "Carpeta"
   },
 
   "Project": {
@@ -119,10 +139,30 @@
     "avatarLabel": "Avatar",
     "createdOn": "Creado el",
     "download": "Descargar",
+    "folder": "Carpeta",
     "moveTo": "Mover a…",
     "createNewFolder": "Crear nueva carpeta…",
     "rename": "Renombrar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "titlePlaceholder": "Título del proyecto",
+    "textPlaceholder": "Ingresa el texto…",
+    "avatarDescription": "otros avatares próximamente",
+    "backgroundLabel": "Color de fondo",
+    "backgroundDescription": "disponible pronto",
+    "generate": "Generar",
+    "generating": "Generando...",
+    "downloadVideo": "Descargar",
+    "saveProject": "Guardar",
+    "loadingVideo": "Cargando video...",
+    "videoNotAvailable": "Video no disponible",
+    "noFolders": "No hay carpetas disponibles",
+    "titleUpdated": "Título actualizado",
+    "selectFolder": "Seleccionar carpeta",
+    "generateFirst": "Genera el video primero",
+    "fixFields": "Corrige los campos resaltados",
+    "videoGenerated": "Video generado",
+    "projectSaved": "Proyecto guardado",
+    "deleteConfirmTitle": "¿Eliminar proyecto?"
   },
   "Dialog": {
     "renameProjectTitle": "Renombrar proyecto",
@@ -130,22 +170,45 @@
     "cancel": "Cancelar",
     "save": "Guardar",
     "saving": "Guardando...",
+    "titleUpdated": "Título actualizado",
     "deleteProjectTitle": "¿Eliminar el proyecto?",
     "delete": "Eliminar",
     "createDirTitle": "Crear carpeta",
     "nameLabel": "Nombre",
-    "creating": "Creando..."
+    "creating": "Creando...",
+    "renameFolder": "Renombrar Carpeta",
+    "deleteFolder": "Eliminar Carpeta",
+    "deleteFolderConfirm": "¿Eliminar la carpeta \"{name}\"?",
+    "deleteFolderWarning": "Advertencia: también se eliminarán todos los proyectos contenidos y los videos relacionados.",
+    "renameDirectoryTitle": "Renombrar Carpeta"
   },
   "Toast": {
     "renameSuccess": "Título actualizado",
     "renameFail": "Error al renombrar",
     "moveSuccess": "Movido",
-    "moveFail": "Error al mover",
+    "moveFail": "Error al mover el proyecto",
     "deleteSuccess": "Proyecto eliminado",
     "deleteFail": "Error al eliminar",
     "projectMoved": "Proyecto {title} movido a {folder}",
     "projectDeleted": "Proyecto {title} eliminado",
-    "directoryCreated": "Carpeta creada"
+    "directoryCreated": "Carpeta creada",
+    "signOutSuccess": "Desconectado exitosamente",
+    "signOutError": "Error al desconectar",
+    "loggingOut": "Desconectando...",
+    "logOut": "Cerrar sesión",
+    "downloadFail": "Descarga fallida",
+    "downloadStarted": "Descarga iniciada",
+    "noFoldersAvailable": "No hay carpetas disponibles",
+    "saveError": "Error de guardado"
+  },
+  "Api": {
+    "notAuthenticated": "No autenticado",
+    "renameError": "Error al renombrar",
+    "moveError": "Error al mover",
+    "deleteError": "Error al eliminar",
+    "projectNotFound": "Proyecto no encontrado",
+    "downloadFailed": "Descarga fallida",
+    "folderFallback": "Carpeta"
   },
   "Validation": {
     "email": "Introduce una dirección de correo válida",
@@ -159,12 +222,35 @@
     "duplicateDir": "Ya existe una carpeta con este nombre",
     "genericError": "Revisa los campos resaltados",
     "sameName": "El nuevo nombre coincide con el actual",
-    "textRequired": "El texto es obligatorio"
+    "textRequired": "El texto es obligatorio",
+    "invalid name": "Nombre no válido"
   },
   "Status": {
     "loading": "Cargando…",
     "errorTitle": "Algo salió mal",
     "errorMessage": "Ocurrió un error al cargar el proyecto.",
     "retry": "Intentar de nuevo"
+  },
+
+  "Error": {
+    "projectErrorTitle": "Error de Proyecto",
+    "projectErrorDescription": "Hubo un error al cargar el proyecto. Inténtalo de nuevo.",
+    "folderErrorTitle": "Error de Carpeta",
+    "folderErrorDescription": "Hubo un error al cargar la carpeta. Inténtalo de nuevo.",
+    "tryAgain": "Intentar de nuevo",
+    "goToDashboard": "Ir al Panel"
+  },
+
+  "Errors": {
+    "notAuthenticated": "No autenticado",
+    "renameError": "Error al renombrar",
+    "moveError": "Error al mover",
+    "deleteError": "Error al eliminar",
+    "projectNotFound": "Proyecto no encontrado",
+    "downloadFailed": "Descarga fallida",
+    "folderFallback": "Carpeta",
+    "duplicateTitle": "Ya existe un proyecto con este título",
+    "downloadUrlMissing": "URL de descarga no disponible",
+    "videoUrlMissing": "URL de video no disponible"
   }
 }

@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +26,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   projectId: string;
+  directoryId?: string | null;
   defaultTitle: string;
   onRenamed?: (newTitle: string) => void;
 };
@@ -33,11 +35,13 @@ export default function RenameProjectDialog({
   open,
   onOpenChange,
   projectId,
+  directoryId,
   defaultTitle,
   onRenamed,
 }: Props) {
   const td = useTranslations("Dialog");
   const tv = useTranslations("Validation");
+  const tm = useTranslations("Toast");
   const locale = useLocale();
   const schema = React.useMemo(() => getProjectRenameSchema(tv), [tv]);
 
@@ -55,8 +59,9 @@ export default function RenameProjectDialog({
   React.useEffect(() => {
     if (open) {
       reset({ title: defaultTitle });
+      clearErrors();
     }
-  }, [open, defaultTitle, reset]);
+  }, [open, defaultTitle, reset, clearErrors]);
 
   const [pending, start] = React.useTransition();
 
@@ -74,20 +79,42 @@ export default function RenameProjectDialog({
           return;
         }
         if (res.ok) {
-          toast.success(td("save"));
+          toast.success(tm("renameSuccess"));
           onRenamed?.(values.title);
+
+          // Emetti evento per aggiornare la sidebar
+          const event = new CustomEvent("projectRenamed", {
+            detail: {
+              projectId: projectId,
+              directoryId: directoryId,
+              newTitle: values.title,
+            },
+          });
+          window.dispatchEvent(event);
+
           onOpenChange(false);
           return;
         }
-        toast.error(res.message || "Error");
+        toast.error(res.message || tm("renameFail"));
         return;
       }
       if (res) {
-        toast.success(td("save"));
+        toast.success(tm("renameSuccess"));
         onRenamed?.(values.title);
+
+        // Emetti evento per aggiornare la sidebar
+        const event = new CustomEvent("projectRenamed", {
+          detail: {
+            projectId: projectId,
+            directoryId: directoryId,
+            newTitle: values.title,
+          },
+        });
+        window.dispatchEvent(event);
+
         onOpenChange(false);
       } else {
-        toast.error("Error");
+        toast.error(tm("renameFail"));
       }
     });
   };
@@ -103,19 +130,23 @@ export default function RenameProjectDialog({
         }
       }}
     >
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[420px]">
         <AlertDialogHeader>
           <AlertDialogTitle>{td("renameProjectTitle")}</AlertDialogTitle>
         </AlertDialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid gap-3"
+          noValidate
+        >
           <div className="grid gap-2">
-            <label
+            <Label
               htmlFor="new-title"
-              className="text-sm text-muted-foreground"
+              className={formState.errors.title ? "text-red-600" : ""}
             >
               {td("newTitle")}
-            </label>
+            </Label>
             <Input
               id="new-title"
               aria-invalid={!!formState.errors.title}
@@ -126,17 +157,29 @@ export default function RenameProjectDialog({
               {...register("title")}
             />
             {formState.errors.title ? (
-              <p id="title-error" className="text-xs text-red-600">
+              <p id="title-error" className="text-sm text-red-600">
                 {formState.errors.title.message}
               </p>
             ) : null}
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel type="button" disabled={pending}>
+            <AlertDialogCancel
+              type="button"
+              disabled={pending}
+              className="cursor-pointer"
+            >
               {td("cancel")}
             </AlertDialogCancel>
-            <Button type="submit" disabled={pending}>
+            <Button
+              type="submit"
+              disabled={pending}
+              className="cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(onSubmit)();
+              }}
+            >
               {pending ? td("saving") : td("save")}
             </Button>
           </AlertDialogFooter>

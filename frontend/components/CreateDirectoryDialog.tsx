@@ -18,10 +18,8 @@ import {
   getCreateDirectorySchema,
   type CreateDirectoryForm,
 } from "@/lib/schema/project";
-import {
-  createDirectoryAction,
-  type DirectoryDTO,
-} from "@/app/(no-nav)/dashboard/_actions/directories";
+import { createDirectoryAction } from "@/app/(no-nav)/dashboard/_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { useTranslations as useToastTranslations } from "next-intl";
@@ -65,9 +63,15 @@ export function CreateDirectoryDialog({
         reset();
         onOpenChange(false);
       } else if (res.field === "name") {
-        setError("name", { type: "server", message: res.message });
+        const msgKey = res.message;
+        const message =
+          typeof msgKey === "string" ? tv(msgKey) : tv("genericError");
+        setError("name", { type: "server", message });
       } else {
-        toast.error(res.message || "Errore");
+        const msgKey = res.message;
+        const message =
+          typeof msgKey === "string" ? tv(msgKey) : tv("genericError");
+        toast.error(message);
       }
     });
   };
@@ -108,10 +112,14 @@ export function CreateDirectoryDialog({
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel type="button" disabled={pending}>
+            <AlertDialogCancel
+              type="button"
+              disabled={pending}
+              className="cursor-pointer"
+            >
               {td("cancel")}
             </AlertDialogCancel>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending} className="cursor-pointer">
               {pending ? td("creating") : td("save")}
             </Button>
           </AlertDialogFooter>

@@ -109,7 +109,27 @@
   },
 
   "Common": {
-    "home": "Accueil"
+    "home": "Accueil",
+    "page": "Page",
+    "of": "de",
+    "createDirectory": "Créer Dossier",
+    "createProject": "Créer Projet",
+    "toggleSidebar": "Afficher/Masquer Barre Latérale",
+    "noProjects": "Aucun projet",
+    "noProjectsInFolder": "Aucun projet présent",
+    "noFolders": "Aucun dossier disponible",
+    "loadingProjects": "Chargement des projets...",
+    "sort": "Trier",
+    "sortField": "Champ",
+    "sortDirection": "Direction",
+    "sortByDate": "Par date",
+    "sortByTitle": "Par titre",
+    "sortAscending": "Ascendant",
+    "sortDescending": "Descendant",
+    "searchProjects": "Rechercher des projets...",
+    "searchInFolder": "Rechercher dans ce dossier...",
+    "moreFolders": "et {count} dossiers de plus",
+    "folderFallback": "Dossier"
   },
 
   "Project": {
@@ -119,10 +139,30 @@
     "avatarLabel": "Avatar",
     "createdOn": "Créé le",
     "download": "Télécharger",
+    "folder": "Dossier",
     "moveTo": "Déplacer vers…",
     "createNewFolder": "Créer un nouveau dossier…",
     "rename": "Renommer",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "titlePlaceholder": "Titre du projet",
+    "textPlaceholder": "Entrez le texte…",
+    "avatarDescription": "autres avatars bientôt",
+    "backgroundLabel": "Couleur d'arrière-plan",
+    "backgroundDescription": "disponible bientôt",
+    "generate": "Générer",
+    "generating": "Génération...",
+    "downloadVideo": "Télécharger",
+    "saveProject": "Enregistrer",
+    "loadingVideo": "Chargement de la vidéo...",
+    "videoNotAvailable": "Vidéo non disponible",
+    "noFolders": "Aucun dossier disponible",
+    "titleUpdated": "Titre mis à jour",
+    "selectFolder": "Sélectionner dossier",
+    "generateFirst": "Génère d'abord la vidéo",
+    "fixFields": "Corrige les champs surlignés",
+    "videoGenerated": "Vidéo générée",
+    "projectSaved": "Projet enregistré",
+    "deleteConfirmTitle": "Supprimer le projet ?"
   },
   "Dialog": {
     "renameProjectTitle": "Renommer le projet",
@@ -130,22 +170,45 @@
     "cancel": "Annuler",
     "save": "Enregistrer",
     "saving": "Enregistrement...",
+    "titleUpdated": "Titre mis à jour",
     "deleteProjectTitle": "Supprimer le projet ?",
     "delete": "Supprimer",
     "createDirTitle": "Créer un dossier",
     "nameLabel": "Nom",
-    "creating": "Création..."
+    "creating": "Création...",
+    "renameFolder": "Renommer Dossier",
+    "deleteFolder": "Supprimer Dossier",
+    "deleteFolderConfirm": "Supprimer le dossier \"{name}\" ?",
+    "deleteFolderWarning": "Attention : tous les projets contenus et les vidéos associées seront également supprimés.",
+    "renameDirectoryTitle": "Renommer Dossier"
   },
   "Toast": {
     "renameSuccess": "Titre mis à jour",
     "renameFail": "Échec du renommage",
     "moveSuccess": "Déplacé",
-    "moveFail": "Échec du déplacement",
+    "moveFail": "Échec du déplacement du projet",
     "deleteSuccess": "Projet supprimé",
     "deleteFail": "Échec de la suppression",
     "projectMoved": "Projet {title} déplacé vers {folder}",
     "projectDeleted": "Projet {title} supprimé",
-    "directoryCreated": "Dossier créé"
+    "directoryCreated": "Dossier créé",
+    "signOutSuccess": "Déconnexion réussie",
+    "signOutError": "Erreur lors de la déconnexion",
+    "loggingOut": "Déconnexion en cours...",
+    "logOut": "Se déconnecter",
+    "downloadFail": "Téléchargement échoué",
+    "downloadStarted": "Téléchargement démarré",
+    "noFoldersAvailable": "Aucun dossier disponible",
+    "saveError": "Erreur de sauvegarde"
+  },
+  "Api": {
+    "notAuthenticated": "Non authentifié",
+    "renameError": "Erreur de renommage",
+    "moveError": "Erreur de déplacement",
+    "deleteError": "Erreur de suppression",
+    "projectNotFound": "Projet introuvable",
+    "downloadFailed": "Téléchargement échoué",
+    "folderFallback": "Dossier"
   },
   "Validation": {
     "email": "Veuillez saisir une adresse e-mail valide",
@@ -159,12 +222,35 @@
     "duplicateDir": "Un dossier avec ce nom existe déjà",
     "genericError": "Vérifiez les champs en surbrillance",
     "sameName": "Le nouveau nom est identique à l'actuel",
-    "textRequired": "Le texte est obligatoire"
+    "textRequired": "Le texte est obligatoire",
+    "invalid name": "Nom invalide"
   },
   "Status": {
     "loading": "Chargement…",
     "errorTitle": "Un problème est survenu",
     "errorMessage": "Une erreur s'est produite lors du chargement du projet.",
     "retry": "Réessayer"
+  },
+
+  "Error": {
+    "projectErrorTitle": "Erreur de Projet",
+    "projectErrorDescription": "Une erreur s'est produite lors du chargement du projet. Réessayez.",
+    "folderErrorTitle": "Erreur de Dossier",
+    "folderErrorDescription": "Une erreur s'est produite lors du chargement du dossier. Réessayez.",
+    "tryAgain": "Réessayer",
+    "goToDashboard": "Aller au Tableau de Bord"
+  },
+
+  "Errors": {
+    "notAuthenticated": "Non authentifié",
+    "renameError": "Erreur de renommage",
+    "moveError": "Erreur de déplacement",
+    "deleteError": "Erreur de suppression",
+    "projectNotFound": "Projet introuvable",
+    "downloadFailed": "Téléchargement échoué",
+    "folderFallback": "Dossier",
+    "duplicateTitle": "Un projet avec ce titre existe déjà",
+    "downloadUrlMissing": "URL de téléchargement non disponible",
+    "videoUrlMissing": "URL vidéo non disponible"
   }
 }

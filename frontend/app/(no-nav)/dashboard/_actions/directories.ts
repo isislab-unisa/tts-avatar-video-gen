@@ -1,13 +1,12 @@
 "use server";
-
+import "server-only";
 import { auth } from "@/lib/auth";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { signApiToken } from "@/lib/jwt";
+import { DirectoryDTO } from "@/lib/schema/directory";
 
 const API = process.env.BACKEND_API_URL!;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
-
-export type DirectoryDTO = { id: string; name: string };
 
 async function getToken(): Promise<string> {
   const h = await cloneRequestHeaders();
@@ -47,11 +46,11 @@ export async function createDirectoryAction(
       return {
         ok: false,
         field: "name",
-        message: "Esiste già una cartella con questo nome",
+        message: "duplicateDir",
       };
     }
     const msg = await r.text().catch(() => "");
-    return { ok: false, message: msg || "Errore creazione" };
+    return { ok: false, message: msg || "genericError" };
   }
   const dir = (await r.json()) as DirectoryDTO;
   return { ok: true, dir };

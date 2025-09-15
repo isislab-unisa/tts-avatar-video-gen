@@ -90,10 +90,34 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      scope: ["openid", "email", "profile"],
+      profile: (profile: {
+        id: string;
+        name: string;
+        email: string;
+        picture: string;
+      }) => ({
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+        image: profile.picture,
+      }),
     },
     github: {
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      scope: ["user:email"],
+      profile: (profile: {
+        id: string;
+        name: string;
+        email: string;
+        avatar_url: string;
+      }) => ({
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+        image: profile.avatar_url,
+      }),
     },
   },
   session: {

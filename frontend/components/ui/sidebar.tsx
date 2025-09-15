@@ -68,11 +68,30 @@ function SidebarProvider({
 }) {
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
+  const [isHydrated, setIsHydrated] = React.useState(false);
 
-  // This is the internal state of the sidebar.
-  // We use openProp and setOpenProp for control from outside the component.
+  // Always start with defaultOpen to prevent hydration mismatch
   const [_open, _setOpen] = React.useState(defaultOpen);
   const open = openProp ?? _open;
+
+  // Read from cookie after hydration
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const cookies = document.cookie.split(";");
+    const sidebarCookie = cookies.find((cookie) =>
+      cookie.trim().startsWith(`${SIDEBAR_COOKIE_NAME}=`)
+    );
+    if (sidebarCookie) {
+      const value = sidebarCookie.split("=")[1];
+      const isOpen = value === "true";
+      if (isOpen !== _open) {
+        _setOpen(isOpen);
+      }
+    }
+
+    setIsHydrated(true);
+  }, [_open]);
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
       const openState = typeof value === "function" ? value(open) : value;
@@ -116,14 +135,24 @@ function SidebarProvider({
   const contextValue = React.useMemo<SidebarContextProps>(
     () => ({
       state,
-      open,
+      open: isHydrated ? open : defaultOpen, // Use defaultOpen until hydrated
       setOpen,
       isMobile,
       openMobile,
       setOpenMobile,
       toggleSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [
+      state,
+      open,
+      setOpen,
+      isMobile,
+      openMobile,
+      setOpenMobile,
+      toggleSidebar,
+      isHydrated,
+      defaultOpen,
+    ]
   );
 
   return (
@@ -140,6 +169,8 @@ function SidebarProvider({
           }
           className={cn(
             "group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full",
+            !isHydrated && "opacity-0",
+            isHydrated && "opacity-100 transition-opacity duration-200",
             className
           )}
           {...props}
@@ -266,7 +297,7 @@ function SidebarTrigger({
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("size-7", className)}
+      className={cn("size-7 cursor-pointer", className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();

@@ -1,6 +1,6 @@
 {
   "Hero": {
-    "title": "Dai vita e voce al tuo avatar 3D con pochi clic",
+    "title": "Dai vita e voce al tuo avatar 3D con pochi click",
     "description": "Scegli un personaggio, scrivi il testo e scarica un video realistico con sincronizzazione labiale. Trasforma le tue idee in avatar parlanti in pochi secondi.",
     "login": "Accedi",
     "register": "Registrati"
@@ -101,15 +101,28 @@
     "dashboardButton": "Vai alla dashboard"
   },
 
-  "_ValidationOld": {
-    "email": "Inserisci un indirizzo email valido",
-    "password": "La password deve contenere almeno 8 caratteri",
-    "username": "Il nome utente deve contenere almeno 2 caratteri",
-    "confirmPassword": "Le password non corrispondono"
-  },
-
   "Common": {
-    "home": "Home"
+    "home": "Home",
+    "page": "Pagina",
+    "of": "di",
+    "createDirectory": "Crea Cartella",
+    "createProject": "Crea Progetto",
+    "toggleSidebar": "Mostra/Nascondi Sidebar",
+    "noProjects": "Nessun progetto",
+    "noProjectsInFolder": "Nessun progetto presente",
+    "noFolders": "Nessuna cartella disponibile",
+    "loadingProjects": "Caricamento progetti...",
+    "sort": "Ordina",
+    "sortField": "Campo",
+    "sortDirection": "Direzione",
+    "sortByDate": "Per data",
+    "sortByTitle": "Per titolo",
+    "sortAscending": "Ascendente",
+    "sortDescending": "Discendente",
+    "searchProjects": "Cerca progetti...",
+    "searchInFolder": "Cerca in questa cartella...",
+    "moreFolders": "e altre {count} cartelle",
+    "folderFallback": "Cartella"
   },
 
   "Project": {
@@ -119,10 +132,30 @@
     "avatarLabel": "Avatar",
     "createdOn": "Creato il",
     "download": "Download",
+    "folder": "Cartella",
     "moveTo": "Sposta in…",
     "createNewFolder": "Crea nuova cartella…",
     "rename": "Rinomina",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "titlePlaceholder": "Titolo progetto",
+    "textPlaceholder": "Inserisci il testo…",
+    "avatarDescription": "altri avatar presto",
+    "backgroundLabel": "Colore background",
+    "backgroundDescription": "disponibile a breve",
+    "generate": "Genera",
+    "generating": "Generazione...",
+    "downloadVideo": "Download",
+    "saveProject": "Salva",
+    "loadingVideo": "Caricamento video...",
+    "videoNotAvailable": "Video non disponibile",
+    "noFolders": "Nessuna cartella disponibile",
+    "titleUpdated": "Titolo aggiornato",
+    "selectFolder": "Seleziona cartella",
+    "generateFirst": "Genera prima il video",
+    "fixFields": "Correggi i campi evidenziati",
+    "videoGenerated": "Video generato",
+    "projectSaved": "Progetto salvato",
+    "deleteConfirmTitle": "Eliminare il progetto?"
   },
   "Dialog": {
     "renameProjectTitle": "Rinomina progetto",
@@ -130,22 +163,45 @@
     "cancel": "Annulla",
     "save": "Salva",
     "saving": "Salvataggio...",
+    "titleUpdated": "Titolo aggiornato",
     "deleteProjectTitle": "Eliminare il progetto?",
     "delete": "Elimina",
     "createDirTitle": "Crea cartella",
     "nameLabel": "Nome",
-    "creating": "Creazione..."
+    "creating": "Creazione...",
+    "renameFolder": "Rinomina Cartella",
+    "deleteFolder": "Elimina Cartella",
+    "deleteFolderConfirm": "Eliminare la cartella \"{name}\"?",
+    "deleteFolderWarning": "Attenzione: verranno eliminati anche tutti i progetti contenuti e i relativi video.",
+    "renameDirectoryTitle": "Rinomina Cartella"
   },
   "Toast": {
     "renameSuccess": "Titolo aggiornato",
     "renameFail": "Rinomina fallita",
     "moveSuccess": "Spostato",
-    "moveFail": "Spostamento fallito",
+    "moveFail": "Impossibile spostare il progetto",
     "deleteSuccess": "Progetto eliminato",
     "deleteFail": "Eliminazione fallita",
     "projectMoved": "Progetto {title} spostato in {folder}",
     "projectDeleted": "Progetto {title} eliminato",
-    "directoryCreated": "Cartella creata"
+    "directoryCreated": "Cartella creata",
+    "signOutSuccess": "Disconnesso con successo",
+    "signOutError": "Errore durante la disconnessione",
+    "loggingOut": "Disconnessione in corso...",
+    "logOut": "Esci",
+    "downloadFail": "Download fallito",
+    "downloadStarted": "Download avviato",
+    "noFoldersAvailable": "Nessuna cartella disponibile",
+    "saveError": "Errore salvataggio"
+  },
+  "Api": {
+    "notAuthenticated": "Non autenticato",
+    "renameError": "Errore rinomina",
+    "moveError": "Errore spostamento",
+    "deleteError": "Errore eliminazione",
+    "projectNotFound": "Progetto non trovato",
+    "downloadFailed": "Download fallito",
+    "folderFallback": "Cartella"
   },
   "Validation": {
     "email": "Inserisci un indirizzo email valido",
@@ -159,12 +215,35 @@
     "duplicateDir": "Esiste già una cartella con questo nome",
     "genericError": "Controlla i campi evidenziati",
     "sameName": "Il nuovo nome coincide con quello attuale",
-    "textRequired": "Il testo è obbligatorio"
+    "textRequired": "Il testo è obbligatorio",
+    "invalid name": "Nome non valido"
   },
   "Status": {
     "loading": "Caricamento…",
     "errorTitle": "Qualcosa è andato storto",
     "errorMessage": "Si è verificato un errore durante il caricamento del progetto.",
     "retry": "Riprova"
+  },
+
+  "Error": {
+    "projectErrorTitle": "Errore Progetto",
+    "projectErrorDescription": "Si è verificato un errore durante il caricamento del progetto. Riprova.",
+    "folderErrorTitle": "Errore Cartella",
+    "folderErrorDescription": "Si è verificato un errore durante il caricamento della cartella. Riprova.",
+    "tryAgain": "Riprova",
+    "goToDashboard": "Vai alla Dashboard"
+  },
+
+  "Errors": {
+    "notAuthenticated": "Non autenticato",
+    "renameError": "Errore rinomina",
+    "moveError": "Errore spostamento",
+    "deleteError": "Errore eliminazione",
+    "projectNotFound": "Progetto non trovato",
+    "downloadFailed": "Download fallito",
+    "folderFallback": "Cartella",
+    "duplicateTitle": "Esiste già un progetto con questo titolo",
+    "downloadUrlMissing": "URL di download non presente",
+    "videoUrlMissing": "URL video non presente"
   }
 }

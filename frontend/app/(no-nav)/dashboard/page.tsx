@@ -1,21 +1,25 @@
-import Link from "next/link";
-import ProjectCard from "@/components/ProjectCard";
-import { SortDropdown } from "@/components/sort-dropdown";
-import {
-  listDirectoriesForUser,
-  type DirectoryDTO,
-} from "./_actions/directories";
+import { getTranslations } from "next-intl/server";
+import ProjectHomeCard from "@/components/ProjectHomeCard";
+import ProjectsToolbar from "@/components/ProjectsToolbar";
+import Pagination from "@/components/Pagination";
+import { listDirectoriesForUser } from "./_actions/directories";
+import { type DirectoryDTO } from "@/lib/schema/directory";
 import {
   listAllProjectsAction,
   type ProjectListItem,
 } from "./_actions/projects";
 
-type SearchParams = Promise<{
+type SearchParams = {
   page?: string | string[];
   sort?: "createdAt" | "title" | string | string[];
   order?: "asc" | "desc" | string | string[];
-  [k: string]: string | string[] | undefined;
-}>;
+  q?: string | string[];
+};
+
+function asQ(raw?: string | string[]): string {
+  const s = Array.isArray(raw) ? raw[0] : raw;
+  return s ? String(s) : "";
+}
 
 function toIntOr(def: number, raw?: string | string[]) {
   const s = Array.isArray(raw) ? raw[0] : raw;
@@ -36,20 +40,21 @@ function asOrder(raw?: string | string[]): "asc" | "desc" {
 export default async function DashboardHomePage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
-  // Await the search params promise
-  const resolvedSearchParams = await searchParams;
+  const t = await getTranslations("Common");
 
-  const sp = resolvedSearchParams ?? {};
+  const sp = await searchParams;
   const page = Math.max(1, toIntOr(1, sp.page));
   const sort = asSort(sp.sort);
   const order = asOrder(sp.order);
-  const limit = 8;
+  const q = asQ(sp.q);
+
+  const limit = 10;
 
   const [directories, data] = await Promise.all([
     listDirectoriesForUser() as Promise<DirectoryDTO[]>,
-    listAllProjectsAction(page, limit, sort, order),
+    listAllProjectsAction(page, limit, sort, order, q),
   ]);
 
   const items: ProjectListItem[] = data.items ?? [];
@@ -57,87 +62,49 @@ export default async function DashboardHomePage({
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className="space-y-4">
-      <nav className="text-sm text-muted-foreground">Home</nav>
-
-      <div className="flex justify-end">
-        <SortDropdown
+    <div className="min-h-[calc(100vh-8rem)] flex flex-col">
+      <div className="space-y-2 flex-shrink-0">
+        <nav className="text-sm text-muted-foreground">{t("home")}</nav>
+        <ProjectsToolbar
           basePath="/dashboard"
           currentSort={sort}
           currentOrder={order}
+          isInFolder={false}
         />
       </div>
 
-      <div className="min-h-[60vh]">
+      <div className="flex-1">
         {items.length === 0 ? (
-          <div className="min-h-[40vh] grid place-items-center">
-            <p className="text-muted-foreground">Nessun progetto trovato.</p>
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">{t("noProjectsInFolder")}</p>
           </div>
         ) : (
-          <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid gap-1 gap-y-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {items.map((p) => (
               <li key={p.id}>
-                <ProjectCard item={p} directories={directories} showFolder />
+                <ProjectHomeCard
+                  item={p}
+                  directories={directories}
+                  showFolder
+                />
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center py-4 mt-auto">
         <Pagination
           current={page}
           totalPages={totalPages}
-          sort={sort}
-          order={order}
+          t={t}
+          makeHref={(p) => {
+            const qs = new URLSearchParams({ page: String(p), sort, order });
+            if (q) qs.set("q", q);
+            return `/dashboard?${qs.toString()}`;
+          }}
         />
       </div>
-    </div>
-  );
-}
-
-function Pagination({
-  current,
-  totalPages,
-  sort,
-  order,
-}: {
-  current: number;
-  totalPages: number;
-  sort: "createdAt" | "title";
-  order: "asc" | "desc";
-}) {
-  const href = (p: number) => {
-    const qs = new URLSearchParams({ page: String(p), sort, order });
-    return `/dashboard?${qs.toString()}`;
-  };
-
-  const prevDisabled = current <= 1;
-  const nextDisabled = current >= totalPages;
-
-  return (
-    <div className="inline-flex items-center gap-2">
-      <Link
-        href={prevDisabled ? "#" : href(current - 1)}
-        className={`px-3 py-2 rounded-md border ${
-          prevDisabled ? "pointer-events-none opacity-50" : ""
-        }`}
-        aria-disabled={prevDisabled}
-      >
-        ←
-      </Link>
-      <span className="text-sm">
-        Pagina {current} di {totalPages}
-      </span>
-      <Link
-        href={nextDisabled ? "#" : href(current + 1)}
-        className={`px-3 py-2 rounded-md border ${
-          nextDisabled ? "pointer-events-none opacity-50" : ""
-        }`}
-        aria-disabled={nextDisabled}
-      >
-        →
-      </Link>
     </div>
   );
 }

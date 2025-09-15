@@ -11,3 +11,5 @@ export const directorySchema = z.object({
 });
 
 export type DirectoryForm = z.infer<typeof directorySchema>;
+
+export type DirectoryDTO = { id: string; name: string };

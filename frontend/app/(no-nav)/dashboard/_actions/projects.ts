@@ -4,15 +4,16 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { signApiToken } from "@/lib/jwt";
+import { getErrorMessage } from "@/lib/error-translations";
 
-const API = process.env.BACKEND_API_URL!;
+const API = process.env.BACKEND_API_URL;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
 
 async function getJwt(): Promise<string> {
-  const h = await cloneRequestHeaders();
-  const session = await auth.api.getSession({ headers: h });
-  if (!session) throw new Error("Non autenticato");
-  return await signApiToken(session.user.id);
+  const headers = await cloneRequestHeaders();
+  const session = await auth.api.getSession({ headers });
+  if (!session) throw new Error(getErrorMessage("notAuthenticated"));
+  return signApiToken(session.user.id);
 }
 
 export type ProjectListItem = {
@@ -25,13 +26,17 @@ export type ProjectListItem = {
   directoryName?: string;
 };
 
-export type ListProjectsResp = { items: ProjectListItem[]; total: number };
+export type ListProjectsResp = {
+  items: ProjectListItem[];
+  total: number;
+};
 
 export async function listAllProjectsAction(
   page = 1,
   limit = 8,
   sort: "createdAt" | "title" = "createdAt",
-  order: "asc" | "desc" = "desc"
+  order: "asc" | "desc" = "desc",
+  q?: string
 ): Promise<ListProjectsResp> {
   const p = Math.max(1, Number(page) || 1);
   const l = Math.max(1, Number(limit) || 8);
@@ -43,12 +48,16 @@ export async function listAllProjectsAction(
   url.searchParams.set("skip", String(skip));
   url.searchParams.set("sort", sort);
   url.searchParams.set("order", order);
+  if (q && q.trim()) url.searchParams.set("q", q.trim());
 
   const r = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
-  if (!r.ok) return { items: [], total: 0 };
+
+  if (!r.ok) {
+    return { items: [], total: 0 };
+  }
 
   const data = (await r.json()) as ListProjectsResp;
   return {
@@ -62,7 +71,8 @@ export async function listProjectsByDirAction(
   page = 1,
   limit = 8,
   sort: "createdAt" | "title" = "createdAt",
-  order: "asc" | "desc" = "desc"
+  order: "asc" | "desc" = "desc",
+  q?: string
 ): Promise<ListProjectsResp> {
   const p = Math.max(1, Number(page) || 1);
   const l = Math.max(1, Number(limit) || 8);
@@ -75,12 +85,16 @@ export async function listProjectsByDirAction(
   url.searchParams.set("skip", String(skip));
   url.searchParams.set("sort", sort);
   url.searchParams.set("order", order);
+  if (q && q.trim()) url.searchParams.set("q", q.trim());
 
   const r = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
-  if (!r.ok) return { items: [], total: 0 };
+
+  if (!r.ok) {
+    return { items: [], total: 0 };
+  }
 
   const data = (await r.json()) as ListProjectsResp;
   return {
@@ -92,9 +106,7 @@ export async function listProjectsByDirAction(
 export async function renameProjectAction(
   id: string,
   title: string
-): Promise<
-  boolean | { ok: true } | { ok: false; field?: "title"; message?: string }
-> {
+): Promise<{ ok: true } | { ok: false; field?: "title"; message?: string }> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "PATCH",
@@ -105,25 +117,28 @@ export async function renameProjectAction(
     body: JSON.stringify({ title: title.trim() }),
     cache: "no-store",
   });
+
   if (r.ok) {
     revalidatePath("/dashboard");
     return { ok: true };
   }
+
   if (r.status === 409) {
     return {
       ok: false,
       field: "title",
-      message: "Esiste già un progetto con questo titolo",
+      message: getErrorMessage("duplicateTitle"),
     };
   }
+
   const msg = await r.text().catch(() => "");
-  return { ok: false, message: msg || "Errore rinomina" };
+  return { ok: false, message: msg || getErrorMessage("renameError") };
 }
 
 export async function moveProjectAction(
   id: string,
   directoryId: string
-): Promise<boolean> {
+): Promise<{ ok: boolean; message?: string }> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "PATCH",
@@ -134,23 +149,81 @@ export async function moveProjectAction(
     body: JSON.stringify({ directoryId }),
     cache: "no-store",
   });
-  if (r.ok) revalidatePath("/dashboard");
-  return r.ok;
+
+  if (r.ok) {
+    revalidatePath("/dashboard");
+    return { ok: true };
+  }
+
+  const msg = await r.text().catch(() => "");
+  return { ok: false, message: msg || getErrorMessage("moveError") };
 }
 
 export async function deleteProjectAction(
   id: string
-): Promise<boolean | { ok: boolean; message?: string }> {
+): Promise<{ ok: boolean; message?: string }> {
   const token = await getJwt();
   const r = await fetch(`${API}/api/projects/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
+
   if (r.ok) {
     revalidatePath("/dashboard");
     return { ok: true };
   }
+
   const msg = await r.text().catch(() => "");
-  return { ok: false, message: msg || "Errore eliminazione" };
+  return { ok: false, message: msg || getErrorMessage("deleteError") };
+}
+
+// === Download URL ===
+// Prende i dettagli del progetto dal backend e restituisce la URL finale (presigned) da usare lato client.
+export async function getProjectDownloadUrlAction(
+  id: string
+): Promise<{ ok: true; url: string } | { ok: false; message?: string }> {
+  const token = await getJwt();
+  const r = await fetch(`${API}/api/projects/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    return {
+      ok: false,
+      message: msg || getErrorMessage("projectNotFound"),
+    };
+  }
+
+  const data = (await r.json()) as { downloadUrl?: string };
+  if (data?.downloadUrl) return { ok: true, url: data.downloadUrl };
+
+  return { ok: false, message: getErrorMessage("downloadUrlMissing") };
+}
+
+// === Video URL ===
+// Ottiene l'URL presigned per la visualizzazione del video
+export async function getProjectVideoUrlAction(
+  id: string
+): Promise<{ ok: true; url: string } | { ok: false; message?: string }> {
+  const token = await getJwt();
+  const r = await fetch(`${API}/api/projects/${id}/video`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    return {
+      ok: false,
+      message: msg || getErrorMessage("projectNotFound"),
+    };
+  }
+
+  const data = (await r.json()) as { videoUrl?: string };
+  if (data?.videoUrl) return { ok: true, url: data.videoUrl };
+
+  return { ok: false, message: getErrorMessage("videoUrlMissing") };
 }

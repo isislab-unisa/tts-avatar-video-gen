@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -23,23 +24,26 @@ import { FolderPlus, CirclePlus, Folder } from "lucide-react";
 import { NavMain, type NavItem } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
-
-export type DirectoryDTO = { id: string; name: string };
+import { DirectoryDTO } from "@/lib/schema/directory";
 
 export function AppSidebar(
-  props: React.ComponentProps<typeof Sidebar> & { directories?: DirectoryDTO[] }
+  props: React.ComponentProps<typeof Sidebar> & {
+    directories?: DirectoryDTO[];
+    user?: { name: string; email: string; image?: string | null };
+  }
 ) {
-  const { directories = [], ...rest } = props;
+  const { directories = [], user, ...rest } = props;
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [openCreateDir, setOpenCreateDir] = React.useState(false);
   const router = useRouter();
+  const t = useTranslations("Common");
 
   const directoryGroups: NavItem[] = directories.map((d) => ({
     title: d.name,
     url: `/dashboard/folder/${d.id}`,
     icon: Folder,
-    items: [], // se vuoi popolare i progetti, passa qui i subitems
+    items: [],
     meta: { id: d.id },
   }));
 
@@ -71,23 +75,25 @@ export function AppSidebar(
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-9 h-9 p-0 cursor-pointer"
-                    aria-label="Create Directory"
+                    className="w-9 h-9 p-0 cursor-pointer hover:scale-105 transition-transform duration-200"
+                    aria-label={t("createDirectory")}
                     onClick={() => setOpenCreateDir(true)}
                   >
                     <FolderPlus className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Create Directory</TooltipContent>
+                <TooltipContent side="right">
+                  {t("createDirectory")}
+                </TooltipContent>
               </Tooltip>
             ) : (
               <Button
                 variant="outline"
-                className="w-full justify-start gap-2 cursor-pointer"
+                className="w-full justify-start gap-2 cursor-pointer hover:scale-[1.02] transition-transform duration-200"
                 onClick={() => setOpenCreateDir(true)}
               >
                 <FolderPlus className="h-4 w-4" />
-                Create Directory
+                {t("createDirectory")}
               </Button>
             )}
 
@@ -97,40 +103,48 @@ export function AppSidebar(
                   <Link href="/dashboard/project/create">
                     <Button
                       variant="outline"
-                      className="w-9 h-9 p-0 cursor-pointer"
-                      aria-label="Create Project"
+                      className="w-9 h-9 p-0 cursor-pointer hover:scale-105 transition-transform duration-200"
+                      aria-label={t("createProject")}
                     >
                       <CirclePlus className="h-4 w-4" />
                     </Button>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right">Create Project</TooltipContent>
+                <TooltipContent side="right">
+                  {t("createProject")}
+                </TooltipContent>
               </Tooltip>
             ) : (
               <Link href="/dashboard/project/create" className="w-full">
                 <Button
                   variant="outline"
-                  className="w-full justify-start gap-2 cursor-pointer"
+                  className="w-full justify-start gap-2 cursor-pointer hover:scale-[1.02] transition-transform duration-200"
                 >
                   <CirclePlus className="h-4 w-4" />
-                  Create Project
+                  {t("createProject")}
                 </Button>
               </Link>
             )}
           </div>
 
-          {!isCollapsed && <Separator className="my-1" />}
+          {!isCollapsed && <Separator className="my-0.5" />}
         </SidebarHeader>
 
         <SidebarContent className="overflow-y-auto">
           {!isCollapsed && (
-            <NavMain items={directoryGroups} directories={directories} />
+            <div className="animate-slide-in">
+              <NavMain items={directoryGroups} directories={directories} />
+            </div>
           )}
         </SidebarContent>
 
         <SidebarFooter>
           <NavUser
-            user={{ name: "Cody", email: "m@example.com", avatar: "/cody.png" }}
+            user={{
+              name: user?.name || "User",
+              email: user?.email || "user@example.com",
+              avatar: user?.image || "/cody.png",
+            }}
           />
         </SidebarFooter>
 

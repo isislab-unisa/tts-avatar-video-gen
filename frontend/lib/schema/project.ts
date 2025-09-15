@@ -30,7 +30,6 @@ export const projectSchema = z.object({
 
 export type ProjectForm = z.infer<typeof projectSchema>;
 
-// i18n-aware schema factory for project creation form (client-side)
 export const getProjectCreateSchema = (t: (k: string) => string) =>
   z.object({
     title: z
