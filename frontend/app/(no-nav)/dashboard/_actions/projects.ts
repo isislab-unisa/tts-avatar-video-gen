@@ -178,7 +178,6 @@ export async function deleteProjectAction(
   return { ok: false, message: msg || getErrorMessage("deleteError") };
 }
 
-// === Download URL ===
 // Prende i dettagli del progetto dal backend e restituisce la URL finale (presigned) da usare lato client.
 export async function getProjectDownloadUrlAction(
   id: string
@@ -203,7 +202,6 @@ export async function getProjectDownloadUrlAction(
   return { ok: false, message: getErrorMessage("downloadUrlMissing") };
 }
 
-// === Video URL ===
 // Ottiene l'URL presigned per la visualizzazione del video
 export async function getProjectVideoUrlAction(
   id: string

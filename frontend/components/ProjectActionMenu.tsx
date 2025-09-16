@@ -125,7 +125,6 @@ export default function ProjectActionMenu({
 
     router.refresh(); // Aggiorna la sidebar
 
-    // Mostra toast personalizzato con nome progetto e cartella
     const folderLabel =
       folderName ||
       directories.find((d) => d.id === newDirectoryId)?.name ||

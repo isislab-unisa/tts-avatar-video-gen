@@ -301,7 +301,7 @@ export default function CreateProjectForm({
         onCreated={(dir) => {
           setOpenCreateDir(false);
 
-          // Emetti sempre l'evento per aggiornare la sidebar
+          // Emessione dell'evento per aggiornare la sidebar
           const event = new CustomEvent("directoryCreated", {
             detail: {
               directoryId: dir.id,
@@ -311,7 +311,7 @@ export default function CreateProjectForm({
           window.dispatchEvent(event);
 
           if (videoBase64) {
-            // Salva il progetto nella nuova cartella dopo un breve delay
+            // Salva il progetto nella nuova cartella dopo un breve delay, inserito per evitare problemi di rendering perché la cartella non è ancora stata aggiornata
             setTimeout(() => {
               void saveTo(dir.id);
             }, 100);

@@ -1,49 +1,12 @@
 import Link from "next/link";
 import ProjectDetail from "@/components/ProjectDetail";
+import LocalTime from "@/components/LocalTime";
 import { cloneRequestHeaders } from "@/lib/headers";
 import { auth } from "@/lib/auth";
 import { signApiToken } from "@/lib/jwt";
 import { listDirectoriesForUser } from "@/app/(no-nav)/dashboard/_actions/directories";
 import { type DirectoryDTO } from "@/lib/schema/directory";
 import { getLocale, getTranslations } from "next-intl/server";
-// import { formatDateTime } from "@/lib/date-utils";
-
-// Funzione di formattazione data direttamente nel componente
-function formatDateTime(dateString: string, locale: string = "it"): string {
-  if (!dateString || dateString === "") {
-    return "Data non disponibile";
-  }
-
-  // Il database salva le date in UTC, le interpretiamo come locali
-  const date = new Date(dateString);
-
-  if (isNaN(date.getTime())) {
-    return "Data non valida";
-  }
-
-  // Usa i metodi locali per ottenere i valori corretti
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-
-  const seconds = date.getSeconds();
-
-  if (locale === "en") {
-    const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    const ampm = hours < 12 ? "AM" : "PM";
-    return `${month}/${day}/${year}, ${hour12}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")} ${ampm}`;
-  } else {
-    return `${day}/${month}/${year}, ${hours
-      .toString()
-      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
-      .toString()
-      .padStart(2, "0")}`;
-  }
-}
 
 const API = process.env.BACKEND_API_URL!;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
@@ -135,7 +98,12 @@ export default async function Page({
         <div />
         {project && (
           <span className="text-xs text-muted-foreground shrink-0">
-            {tProject("createdOn")} {formatDateTime(project.createdAt, locale)}
+            {tProject("createdOn")}{" "}
+            <LocalTime
+              iso={project.createdAt}
+              locale={locale}
+              showSeconds={false}
+            />
           </span>
         )}
       </div>

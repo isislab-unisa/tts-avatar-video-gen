@@ -7,7 +7,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// LocalTime serializza time.Time in formato locale invece che UTC
 type LocalTime time.Time
 
 func (lt LocalTime) MarshalJSON() ([]byte, error) {

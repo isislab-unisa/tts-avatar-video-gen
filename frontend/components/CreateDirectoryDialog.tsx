@@ -61,7 +61,7 @@ export function CreateDirectoryDialog({
         toast.success(tm("directoryCreated"));
         if (res.dir) onCreated?.(res.dir);
 
-        // Emit event to update sidebar
+        // Emit event per aggiornare la sidebar
         const event = new CustomEvent("directoryCreated");
         window.dispatchEvent(event);
 

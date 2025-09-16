@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -51,12 +50,7 @@ func jwtAuth() fiber.Handler {
 }
 
 func setupMinIO() {
-	log.Println("🔧 Configurando MinIO...")
 
-	// Aspetta che MinIO sia pronto
-	time.Sleep(3 * time.Second)
-
-	// Configura l'alias
 	cmd := exec.Command("mc", "alias", "set", "local", "http://localhost:9000", "minioadmin", "minioadmin")
 	if err := cmd.Run(); err != nil {
 		log.Printf("⚠️  Impossibile configurare l'alias MinIO: %v", err)
@@ -103,9 +97,9 @@ func main() {
 	if testVideoPath == "" {
 		testVideoPath = "assets/test.mp4"
 	}
-	// Se il percorso non è assoluto, rendilo relativo alla directory del backend
+
 	if !filepath.IsAbs(testVideoPath) {
-		// Ottieni la directory del backend
+
 		backendDir, err := os.Getwd()
 		if err != nil {
 			log.Fatal("Errore nel ottenere la directory corrente:", err)

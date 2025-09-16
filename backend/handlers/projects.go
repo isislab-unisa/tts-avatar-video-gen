@@ -57,7 +57,6 @@ func (h *ProjectsHandler) CreateProject(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "upload fallito")
 	}
 
-	// Salva sempre in UTC nel database
 	doc := models.Project{
 		UserID:      userID,
 		Title:       title,
@@ -178,7 +177,6 @@ func (h *ProjectsHandler) DeleteProject(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// GET /api/projects?dir=<id>&sort=createdAt|title&order=asc|desc&limit=12&skip=0&q=<query>
 func (h *ProjectsHandler) ListProjects(c *fiber.Ctx) error {
 	userID, _ := c.Locals("userId").(string)
 	dir := strings.TrimSpace(c.Query("dir"))
@@ -202,7 +200,7 @@ func (h *ProjectsHandler) ListProjects(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{"userId": userID, "directoryId": dir}
-	// Add search filter for title prefix if query is provided
+
 	if q != "" {
 		filter["title"] = bson.M{"$regex": "^" + strings.ReplaceAll(regexp.QuoteMeta(q), "\\", "\\\\"), "$options": "i"}
 	}

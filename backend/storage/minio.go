@@ -42,14 +42,13 @@ func NewMinio(ctx context.Context) (*MinioStore, error) {
 	var publicCl *minio.Client
 	if base := strings.TrimSpace(os.Getenv("MINIO_PUBLIC_URL")); base != "" {
 		log.Printf("[minio] configuring public client with URL: %s", base)
-		// Usa l'endpoint interno per la connessione, ma salva l'URL pubblico per i presigned URL
+
 		internalEndpoint := os.Getenv("MINIO_ENDPOINT")
 		if internalEndpoint == "" {
 			internalEndpoint = "minio:9000"
 		}
 		log.Printf("[minio] using internal endpoint for connection: %s", internalEndpoint)
 
-		// Usa l'endpoint interno per la connessione
 		publicCl, err = minio.New(internalEndpoint, &minio.Options{
 			Creds:  credentials.NewStaticV4(access, secret, ""),
 			Secure: useSSL,
@@ -111,13 +110,12 @@ func (s *MinioStore) PutMP4(ctx context.Context, data []byte) (string, error) {
 }
 
 func (s *MinioStore) PresignGet(ctx context.Context, objectName string, exp time.Duration) (string, error) {
-	// Usa URL diretti per bucket pubblico (più semplice e affidabile)
+
 	publicURL := os.Getenv("MINIO_PUBLIC_URL")
 	if publicURL == "" {
 		publicURL = "http://localhost:9000"
 	}
 
-	// Costruisci l'URL diretto
 	directURL := strings.TrimSuffix(publicURL, "/") + "/" + s.Bucket + "/" + objectName
 	log.Printf("[minio] direct URL generated for object %s: %s", objectName, directURL)
 	return directURL, nil
