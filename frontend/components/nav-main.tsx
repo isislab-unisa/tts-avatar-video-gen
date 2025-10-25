@@ -79,6 +79,7 @@ export function NavMain({
   const router = useRouter();
   const t = useTranslations("Dialog");
   const tCommon = useTranslations("Common");
+  const tToast = useTranslations("Toast");
 
   const [confirm, setConfirm] = React.useState<{
     open: boolean;
@@ -296,7 +297,7 @@ export function NavMain({
   async function remove(dirId: string) {
     const ok = await deleteDirectoryAction(dirId);
     if (ok) {
-      toast.success(t("directoryDeleted"));
+      toast.success(tToast("directoryDeleted"));
       setConfirm({ open: false, dirId: "", dirName: "" });
       router.push("/dashboard");
       router.refresh();

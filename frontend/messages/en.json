@@ -64,7 +64,8 @@
     "loading": "Please wait...",
     "toastSuccess": "Account created! Check your email to verify.",
     "toastError": "Signup failed.",
-    "toastUnexpected": "Unexpected error occurred."
+    "toastUnexpected": "Unexpected error occurred.",
+    "userAlreadyExists": "User already exists"
   },
 
   "ForgotPassword": {

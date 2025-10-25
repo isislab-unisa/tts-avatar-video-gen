@@ -55,7 +55,12 @@ export function SignupForm() {
             router.push("/login");
           },
           onError: (ctx) => {
-            toast.error(ctx.error.message || t("toastError"));
+            // Gestione specifica per "User already exists"
+            if (ctx.error.message === "User already exists") {
+              toast.error(t("userAlreadyExists"));
+            } else {
+              toast.error(ctx.error.message || t("toastError"));
+            }
           },
         }
       );
