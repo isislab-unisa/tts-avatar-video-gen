@@ -64,7 +64,8 @@
     "loading": "Por favor espera...",
     "toastSuccess": "¡Cuenta creada! Revisa tu correo para verificar.",
     "toastError": "Registro fallido.",
-    "toastUnexpected": "Ocurrió un error inesperado."
+    "toastUnexpected": "Ocurrió un error inesperado.",
+    "userAlreadyExists": "El usuario ya existe"
   },
 
   "ForgotPassword": {
