@@ -83,6 +83,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: ${MINIO_BUCKET}
+      GENERATOR_URL: http://host.docker.internal:7001
     ports:
       - "4000:4000"
     restart: unless-stopped

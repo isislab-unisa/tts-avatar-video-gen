@@ -23,7 +23,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { generateVideoAction } from "@/app/(no-nav)/dashboard/project/_actions";
+import {
+  generateVideoAction,
+  cleanupGeneratedTemp,
+} from "@/app/(no-nav)/dashboard/project/_actions";
 import { useTranslations, useLocale } from "next-intl";
 import { CreateDirectoryDialog } from "@/components/CreateDirectoryDialog";
 import { Folder, Plus } from "lucide-react";
@@ -60,8 +63,29 @@ export default function CreateProjectForm({
   const [openCreateDir, setOpenCreateDir] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [videoBase64, setVideoBase64] = React.useState<string | null>(null);
+  const [tempPath, setTempPath] = React.useState<string | undefined>(undefined);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [bgColor] = React.useState("#000000");
+  // Cleanup temp when leaving the page
+  React.useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (tempPath) {
+        navigator.sendBeacon?.(
+          `${API}/api/generate/cleanup`,
+          new Blob([JSON.stringify({ path: tempPath })], {
+            type: "application/json",
+          })
+        );
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (tempPath) {
+        void cleanupGeneratedTemp(tempPath);
+      }
+    };
+  }, [tempPath]);
 
   const { register, formState, getValues, trigger, reset, clearErrors } =
     useForm<ProjectCreateForm>({
@@ -85,13 +109,19 @@ export default function CreateProjectForm({
       toast.error(t("fixFields"));
       return;
     }
-    const { text } = getValues();
+    const { text, title } = getValues();
     setIsGenerating(true);
-    const res = await generateVideoAction({ text, avatar: AVATAR_ID, bgColor });
+    const res = await generateVideoAction({
+      text,
+      avatar: AVATAR_ID,
+      bgColor,
+      title,
+    });
     setIsGenerating(false);
     if (!res.ok) return toast.error(res.message);
     setVideoBase64(res.base64);
     setPreviewUrl(URL.createObjectURL(base64ToBlob(res.base64)));
+    setTempPath(res.tempPath);
     toast.success(t("videoGenerated"));
   }
 
@@ -130,6 +160,11 @@ export default function CreateProjectForm({
       }
       const data = (await res.json()) as { id: string };
       const projectTitle = getValues("title");
+      // cleanup temp on successful save
+      if (tempPath) {
+        void cleanupGeneratedTemp(tempPath);
+        setTempPath(undefined);
+      }
       toast.success(t("projectSaved"));
       reset();
 
