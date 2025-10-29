@@ -1,0 +1,8 @@
+generator/TestMac.app/** filter=lfs diff=lfs merge=lfs -text
+generator/**/*.assets filter=lfs diff=lfs merge=lfs -text
+generator/**/*.resS filter=lfs diff=lfs merge=lfs -text
+generator/**/*.dylib filter=lfs diff=lfs merge=lfs -text
+generator/**/*.zip filter=lfs diff=lfs merge=lfs -text
+generator/stv-win/** filter=lfs diff=lfs merge=lfs -text
+generator/stv-win-no/** filter=lfs diff=lfs merge=lfs -text
+generator/** filter=lfs diff=lfs merge=lfs -text

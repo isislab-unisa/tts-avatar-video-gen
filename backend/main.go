@@ -107,6 +107,7 @@ func main() {
 		testVideoPath = filepath.Join(backendDir, testVideoPath)
 	}
 	log.Printf("Test video path: %s", testVideoPath)
+
 	gen := &handlers.GeneratorHandler{TestVideoPath: testVideoPath}
 
 	app := fiber.New(fiber.Config{
@@ -146,6 +147,7 @@ func main() {
 
 	// Generatore video
 	api.Post("/generate", gen.Generate)
+	api.Post("/generate/cleanup", gen.Cleanup)
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -18,7 +18,11 @@ export async function generateVideoAction(input: {
   text: string;
   avatar: "cody";
   bgColor?: string;
-}): Promise<{ ok: true; base64: string } | { ok: false; message: string }> {
+  title?: string;
+}): Promise<
+  | { ok: true; base64: string; tempPath?: string }
+  | { ok: false; message: string }
+> {
   try {
     const { token } = await getSessionAndJwt();
     const res = await fetch(`${API}/api/generate`, {
@@ -34,9 +38,28 @@ export async function generateVideoAction(input: {
       const msg = await res.text().catch(() => "");
       return { ok: false, message: msg || `Errore generatore (${res.status})` };
     }
+    const tempPath = res.headers.get("x-generator-output") || undefined;
     const ab = await res.arrayBuffer();
-    return { ok: true, base64: Buffer.from(ab).toString("base64") };
+    return { ok: true, base64: Buffer.from(ab).toString("base64"), tempPath };
   } catch (error) {
     return { ok: false, message: (error as Error).message || "Errore di rete" };
+  }
+}
+
+export async function cleanupGeneratedTemp(path: string | undefined) {
+  if (!path) return;
+  try {
+    const { token } = await getSessionAndJwt();
+    await fetch(`${API}/api/generate/cleanup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ path }),
+      cache: "no-store",
+    });
+  } catch {
+    // ignore cleanup errors
   }
 }
