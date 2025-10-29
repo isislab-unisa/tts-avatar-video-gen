@@ -28,21 +28,3 @@ start/
 .vscode/
 .idea/
 *.swp
-# Generator binaries and bundles
-generator/TestMac.app/
-generator/stv-win/
-generator/stv-win-no/
-generator/stv-win-*.zip
-
-# Generated media
-generator/generated/
-start/dubme/videos/
-
-# Unity/large artifacts
-*.dll
-*.dylib
-*.bundle
-*.assets
-*.resS
-*.zip
-*.mp4
