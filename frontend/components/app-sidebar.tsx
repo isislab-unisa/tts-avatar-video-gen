@@ -30,9 +30,10 @@ export function AppSidebar(
   props: React.ComponentProps<typeof Sidebar> & {
     directories?: DirectoryDTO[];
     user?: { name: string; email: string; image?: string | null };
+    isDev?: boolean;
   }
 ) {
-  const { directories = [], user, ...rest } = props;
+  const { directories = [], user, isDev = false, ...rest } = props;
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [openCreateDir, setOpenCreateDir] = React.useState(false);
@@ -145,6 +146,7 @@ export function AppSidebar(
               email: user?.email || "user@example.com",
               avatar: user?.image || "/cody.png",
             }}
+            isDev={isDev}
           />
         </SidebarFooter>
 

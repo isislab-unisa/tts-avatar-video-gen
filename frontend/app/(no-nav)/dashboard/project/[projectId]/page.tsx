@@ -1,9 +1,7 @@
 import Link from "next/link";
 import ProjectDetail from "@/components/ProjectDetail";
 import LocalTime from "@/components/LocalTime";
-import { cloneRequestHeaders } from "@/lib/headers";
-import { auth } from "@/lib/auth";
-import { signApiToken } from "@/lib/jwt";
+import { getJwtWithDevFallback } from "@/lib/dev-auth";
 import { listDirectoriesForUser } from "@/app/(no-nav)/dashboard/_actions/directories";
 import { type DirectoryDTO } from "@/lib/schema/directory";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -48,17 +46,16 @@ export default async function Page({
     getLocale(),
   ]);
 
-  const h = await cloneRequestHeaders();
-  const session = await auth.api.getSession({ headers: h });
-  if (!session) {
+  let token: string;
+  try {
+    token = await getJwtWithDevFallback();
+  } catch {
     return (
       <div className="min-h-[60vh] grid place-items-center px-4">
         <p className="text-muted-foreground">{tProject("notFound")}</p>
       </div>
     );
   }
-
-  const token = await signApiToken(session.user.id);
   const [project, directories] = await Promise.all([
     fetchProject(projectId, token),
     listDirectoriesForUser(),

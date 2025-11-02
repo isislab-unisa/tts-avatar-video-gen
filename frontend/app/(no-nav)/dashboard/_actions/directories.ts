@@ -1,18 +1,17 @@
 "use server";
 import "server-only";
-import { auth } from "@/lib/auth";
-import { cloneRequestHeaders } from "@/lib/headers";
-import { signApiToken } from "@/lib/jwt";
+import { getJwtWithDevFallback } from "@/lib/dev-auth";
 import { DirectoryDTO } from "@/lib/schema/directory";
 
 const API = process.env.BACKEND_API_URL!;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
 
 async function getToken(): Promise<string> {
-  const h = await cloneRequestHeaders();
-  const session = await auth.api.getSession({ headers: h });
-  if (!session) throw new Error("Non autenticato");
-  return await signApiToken(session.user.id);
+  try {
+    return await getJwtWithDevFallback();
+  } catch {
+    throw new Error("Non autenticato");
+  }
 }
 
 export async function listDirectoriesForUser(): Promise<DirectoryDTO[]> {

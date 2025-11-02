@@ -24,6 +24,7 @@ import { useState, useEffect } from "react";
 
 export function NavUser({
   user,
+  isDev = false,
 }: {
   user: {
     name: string;
@@ -31,6 +32,7 @@ export function NavUser({
     avatar?: string;
     image?: string;
   };
+  isDev?: boolean;
 }) {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -67,6 +69,38 @@ export function NavUser({
     }
   };
   const { isMobile } = useSidebar();
+
+  // In dev mode, show a simple non-interactive user display
+  if (isDev) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            size="lg"
+            className="cursor-default"
+            disabled
+          >
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarFallback className="rounded-lg p-0">
+                <Image
+                  src="/cody.png"
+                  alt="Fallback Cody"
+                  width={32}
+                  height={32}
+                  className="h-full w-full object-cover rounded-lg"
+                  priority
+                  unoptimized
+                />
+              </AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">{user.name}</span>
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>

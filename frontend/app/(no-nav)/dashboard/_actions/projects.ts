@@ -1,19 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
-import { cloneRequestHeaders } from "@/lib/headers";
-import { signApiToken } from "@/lib/jwt";
 import { getErrorMessage } from "@/lib/error-translations";
+import { getJwtWithDevFallback } from "@/lib/dev-auth";
 
 const API = process.env.BACKEND_API_URL;
 if (!API) throw new Error("BACKEND_API_URL non configurato");
 
 async function getJwt(): Promise<string> {
-  const headers = await cloneRequestHeaders();
-  const session = await auth.api.getSession({ headers });
-  if (!session) throw new Error(getErrorMessage("notAuthenticated"));
-  return signApiToken(session.user.id);
+  try {
+    return await getJwtWithDevFallback();
+  } catch {
+    throw new Error(getErrorMessage("notAuthenticated"));
+  }
 }
 
 export type ProjectListItem = {

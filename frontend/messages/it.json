@@ -213,7 +213,7 @@
   "Validation": {
     "email": "Inserisci un indirizzo email valido",
     "password": "La password deve contenere almeno 8 caratteri",
-    "username": "Il nome utente deve contenere almeno 2 caratteri",
+    "username": "Il nome Dev Usere contenere almeno 2 caratteri",
     "confirmPassword": "Le password non corrispondono",
     "titleMin": "Il titolo deve avere almeno 2 caratteri",
     "titleMax": "Il titolo può essere lungo al massimo 120 caratteri",
