@@ -1,17 +1,15 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { signApiToken } from "@/lib/jwt";
-import { cloneRequestHeaders } from "@/lib/headers";
+import { getJwtWithDevFallback } from "@/lib/dev-auth";
 
 const API = process.env.BACKEND_API_URL!;
 
-async function getSessionAndJwt(): Promise<{ token: string }> {
-  const h = await cloneRequestHeaders();
-  const session = await auth.api.getSession({ headers: h });
-  if (!session) throw new Error("Non autenticato");
-  const token = await signApiToken(session.user.id);
-  return { token };
+async function getToken(): Promise<string> {
+  try {
+    return await getJwtWithDevFallback();
+  } catch {
+    throw new Error("Non autenticato");
+  }
 }
 
 export async function generateVideoAction(input: {
@@ -24,7 +22,7 @@ export async function generateVideoAction(input: {
   | { ok: false; message: string }
 > {
   try {
-    const { token } = await getSessionAndJwt();
+    const token = await getToken();
     const res = await fetch(`${API}/api/generate`, {
       method: "POST",
       headers: {
@@ -49,7 +47,7 @@ export async function generateVideoAction(input: {
 export async function cleanupGeneratedTemp(path: string | undefined) {
   if (!path) return;
   try {
-    const { token } = await getSessionAndJwt();
+    const token = await getToken();
     await fetch(`${API}/api/generate/cleanup`, {
       method: "POST",
       headers: {
@@ -60,6 +58,6 @@ export async function cleanupGeneratedTemp(path: string | undefined) {
       cache: "no-store",
     });
   } catch {
-    // ignore cleanup errors
+    return;
   }
 }

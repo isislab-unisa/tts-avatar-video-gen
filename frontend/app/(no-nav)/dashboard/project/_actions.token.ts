@@ -1,8 +1,6 @@
 "use server";
 
-import { cloneRequestHeaders } from "@/lib/headers";
-import { auth } from "@/lib/auth";
-import { signApiToken } from "@/lib/jwt";
+import { getJwtWithDevFallback } from "@/lib/dev-auth";
 
 export type TokenResp =
   | { ok: true; token: string }
@@ -10,12 +8,9 @@ export type TokenResp =
 
 export async function getApiTokenAction(): Promise<TokenResp> {
   try {
-    const headers = await cloneRequestHeaders();
-    const session = await auth.api.getSession({ headers });
-    if (!session) return { ok: false, message: "Non autenticato" };
-    const token = await signApiToken(session.user.id);
+    const token = await getJwtWithDevFallback();
     return { ok: true, token };
   } catch (e) {
-    return { ok: false, message: (e as Error).message };
+    return { ok: false, message: (e as Error).message || "Non autenticato" };
   }
 }

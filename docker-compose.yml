@@ -105,6 +105,8 @@ services:
         BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
 
         API_JWT_SECRET: ${API_JWT_SECRET:-supersecret123}
+        DEV_MODE: ${DEV_MODE:-true}
+        DEV_USER_ID: ${DEV_USER_ID:-dev-user-local}
         # OAuth Credentials
         GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
         GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
@@ -131,6 +133,10 @@ services:
       BACKEND_API_URL: http://backend:4000
 
       MONGODB_URI: mongodb://mongo:27017/dubme
+      
+      # Dev mode for local development (bypasses login)
+      DEV_MODE: ${DEV_MODE:-true}
+      DEV_USER_ID: ${DEV_USER_ID:-dev-user-local}
     ports:
       - "3000:3000"
     restart: unless-stopped

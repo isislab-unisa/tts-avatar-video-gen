@@ -1,15 +1,14 @@
 // app/api/jwt/route.ts
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { signApiToken } from "@/lib/jwt";
+import { getJwtWithDevFallback } from "@/lib/dev-auth";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request) {
-  const session = await auth.api.getSession({ headers: req.headers });
-  if (!session) {
+export async function GET() {
+  try {
+    const token = await getJwtWithDevFallback();
+    return NextResponse.json({ token });
+  } catch {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  const token = await signApiToken(session.user.id);
-  return NextResponse.json({ token });
 }
