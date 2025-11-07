@@ -75,15 +75,11 @@ export function NavUser({
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton
-            size="lg"
-            className="cursor-default"
-            disabled
-          >
+          <SidebarMenuButton size="lg" className="cursor-default" disabled>
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarFallback className="rounded-lg p-0">
                 <Image
-                  src="/cody.png"
+                  src="/cody-avatar.png"
                   alt="Fallback Cody"
                   width={32}
                   height={32}
@@ -121,7 +117,7 @@ export function NavUser({
                 ) : (
                   <AvatarFallback className="rounded-lg p-0">
                     <Image
-                      src="/cody.png"
+                      src="/cody-avatar.png"
                       alt="Fallback Cody"
                       width={32}
                       height={32}
@@ -157,7 +153,7 @@ export function NavUser({
                   ) : (
                     <AvatarFallback className="rounded-lg p-0">
                       <Image
-                        src="/cody.png"
+                        src="/cody-avatar.png"
                         alt="Fallback Cody"
                         width={32}
                         height={32}

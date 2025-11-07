@@ -144,7 +144,7 @@ export function AppSidebar(
             user={{
               name: user?.name || "User",
               email: user?.email || "user@example.com",
-              avatar: user?.image || "/cody.png",
+              avatar: user?.image || "/cody-avatar.png",
             }}
             isDev={isDev}
           />

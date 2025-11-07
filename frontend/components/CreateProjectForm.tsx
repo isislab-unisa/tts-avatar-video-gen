@@ -37,7 +37,7 @@ type TokenResp = { ok: true; token: string } | { ok: false; message?: string };
 
 const API = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
 const AVATAR_ID = "cody";
-const AVATAR_IMG = "/cody.png";
+const AVATAR_IMG = "/cody-avatar.png";
 
 function base64ToBlob(base64: string, mime = "video/mp4") {
   const byteChars = atob(base64);
