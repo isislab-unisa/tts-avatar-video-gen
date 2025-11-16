@@ -19,3 +19,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+IMPORTANT NOTICE: TTS Model License Exception
+
+All source code and resources in the DUBME project are released under the MIT License, making the project fully open source and free for both personal and commercial use.
+
+Exception: The Coqui XXTS-v2 Text-to-Speech (TTS) model included in this project is distributed under the Coqui Public Model License 1.0.0 (https://coqui.ai/cpml.txt), which allows only non-commercial use of the model and its outputs.
+
+Anyone using the TTS model or its outputs must comply with the terms of the Coqui Public Model License, including the non-commercial restriction and the requirement to provide a copy or link to the original license.
+
+Note: In the future, a new TTS model will be adopted to make the project fully open source without commercial restrictions.

@@ -64,7 +64,7 @@ export default function ProjectHomeCard({
     >
       <div className="aspect-[16/11] w-full bg-muted relative">
         <Image
-          src={item.avatarImage || "/cody.png"}
+          src={item.avatarImage || "/cody-avatar.png"}
           alt="preview"
           fill
           sizes="(max-width:768px) 100vw, (max-width:1280px) 50vw, 20vw"
