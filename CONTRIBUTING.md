@@ -34,7 +34,7 @@ Before contributing, ensure you have:
   - React/TypeScript
   - Go programming
   - REST API design
-  - Git/GitHub workflow
+  - Git/GitHub
 
 ### Development Setup
 
@@ -260,11 +260,11 @@ def gen(t, v):
 
 - **Single Responsibility:** Each function/component does one thing
 - **DRY:** Don't Repeat Yourself
-- **KISS:** Keep It Simple, Stupid
+- **KISS:** Keep It Simple
 - **Error Handling:** Always handle errors gracefully
 - **Type Safety:** Use TypeScript and Go typing
 - **Comments:** Explain WHY, not WHAT
-- **Testing:** Write tests for new features
+- **Testing:** Write tests for new features (if you can)
 
 #### Commit Guidelines
 
@@ -286,14 +286,6 @@ git commit -m "WIP"
 ```
 
 **Commit message format:**
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
 
 **Types:**
 
@@ -324,9 +316,7 @@ Closes #123
 Documentation improvements are always welcome!
 
 - **README updates:** New features, setup changes
-- **API documentation:** Endpoint descriptions
 - **Architecture docs:** System design, component descriptions
-- **Tutorials:** How-to guides
 - **Translations:** Help translate docs to other languages
 
 ---
@@ -342,19 +332,7 @@ Documentation improvements are always welcome!
    git rebase upstream/main
    ```
 
-2. **Run tests** locally
-
-   ```bash
-   # Backend
-   cd backend
-   go test ./...
-
-   # Frontend
-   cd frontend
-   npm test
-   ```
-
-3. **Lint your code**
+2. **Lint your code**
 
    ```bash
    # Frontend
@@ -362,7 +340,7 @@ Documentation improvements are always welcome!
    npm run lint
    ```
 
-4. **Test your changes manually** with dev server
+3. **Test your changes manually** with dev server
 
 ### Submitting the Pull Request
 
@@ -433,52 +411,11 @@ Documentation improvements are always welcome!
 ### Review Process
 
 - **At least one maintainer review** is required
-- **GitHub Actions** must pass (tests, linting)
+- **GitHub Actions** must pass (tests, linting) (soon implemented)
 - **Discussions may occur** - be responsive and open to feedback
 - **Changes may be requested** - update your PR accordingly
 
 ---
-
-## Testing
-
-### Frontend Tests
-
-```bash
-cd frontend
-
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm test -- --watch
-
-# Run tests with coverage
-npm test -- --coverage
-```
-
-### Backend Tests
-
-```bash
-cd backend
-
-# Run all tests
-go test ./...
-
-# Run specific test
-go test ./handlers -run TestGenerate
-
-# Run with coverage
-go test -cover ./...
-```
-
-### Integration Testing
-
-```bash
-# Start dev servers first (Docker + all services)
-
-# Run integration tests
-npm run test:integration
-```
 
 ### Manual Testing Checklist
 
@@ -529,56 +466,6 @@ DUBME/
 
 ---
 
-## Common Issues & Solutions
-
-### Git LFS Not Working
-
-```bash
-# Reinstall Git LFS
-brew install git-lfs
-git lfs install --force
-
-# Re-pull files
-git lfs pull
-```
-
-### Port Already in Use
-
-```bash
-# Find process using port
-lsof -i :3000  # Frontend
-lsof -i :4000  # Backend
-lsof -i :7001  # Flask
-
-# Kill process
-kill -9 <PID>
-```
-
-### Docker Issues
-
-```bash
-# Rebuild containers
-docker-compose down
-docker system prune -a
-docker-compose up -d --build
-
-# Check container logs
-docker-compose logs -f <service>
-```
-
-### MongoDB Connection Error
-
-```bash
-# Verify MongoDB is running
-docker-compose ps mongo
-
-# Reset MongoDB
-docker-compose down -v
-docker-compose up -d mongo
-```
-
----
-
 ## Communication
 
 - **GitHub Issues:** Bug reports and feature requests
@@ -603,16 +490,6 @@ Contributors will be:
 By contributing to DUBME, you agree that your contributions will be licensed under the same non-commercial license as the project.
 
 **Important:** Your contributions must not violate any existing licenses or intellectual property rights.
-
----
-
-## Additional Resources
-
-- [Git Documentation](https://git-scm.com/doc)
-- [GitHub Guides](https://guides.github.com)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Go Fiber Documentation](https://docs.gofiber.io)
-- [MongoDB Documentation](https://docs.mongodb.com)
 
 ---
 
